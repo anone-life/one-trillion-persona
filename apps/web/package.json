@@ -1,0 +1,19 @@
+{
+  "name": "@1t-persona/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@1t-persona/core": "*",
+    "@1t-persona/designer": "*",
+    "@1t-persona/files": "*"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

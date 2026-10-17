@@ -1,0 +1,15 @@
+{
+  "name": "@1t-persona/files",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@1t-persona/core": "*"
+  },
+  "devDependencies": {
+    "@1t-persona/designer": "*"
+  }
+}

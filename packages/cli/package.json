@@ -1,0 +1,14 @@
+{
+  "name": "@1t-persona/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "1t-persona": "./src/main.ts"
+  },
+  "dependencies": {
+    "@1t-persona/core": "*",
+    "@1t-persona/designer": "*",
+    "@1t-persona/files": "*"
+  }
+}

@@ -1,0 +1,1052 @@
+{
+ "rulesVersion": 1,
+ "note": "Bazi (the chart) is the first layer and is not listed here: 60 x 12 x 60 x 12 = 518,400 chart labels. skills uses 16 unique families (none included once); glitch has 63 fixed lines plus an optional custom line that is not counted.",
+ "layers": [
+  {
+   "id": "world",
+   "name": "World",
+   "blurb": "When and where they live, and what kind of society it is.",
+   "fields": [
+    {
+     "id": "era",
+     "label": "Era",
+     "values": [
+      {
+       "id": "late-qing",
+       "label": "Late Qing"
+      },
+      {
+       "id": "showa",
+       "label": "Shōwa Japan"
+      },
+      {
+       "id": "1990s",
+       "label": "1990s"
+      },
+      {
+       "id": "2010s",
+       "label": "2010s"
+      },
+      {
+       "id": "2026",
+       "label": "2026"
+      },
+      {
+       "id": "near-future",
+       "label": "Near future"
+      },
+      {
+       "id": "alternate-history",
+       "label": "Alternate history"
+      },
+      {
+       "id": "in-network-virtual",
+       "label": "Inside a network"
+      }
+     ]
+    },
+    {
+     "id": "city",
+     "label": "City",
+     "values": [
+      {
+       "id": "tokyo",
+       "label": "Tokyo"
+      },
+      {
+       "id": "kyoto",
+       "label": "Kyoto"
+      },
+      {
+       "id": "osaka",
+       "label": "Osaka"
+      },
+      {
+       "id": "seoul",
+       "label": "Seoul"
+      },
+      {
+       "id": "shanghai",
+       "label": "Shanghai"
+      },
+      {
+       "id": "shenzhen",
+       "label": "Shenzhen"
+      },
+      {
+       "id": "taipei",
+       "label": "Taipei"
+      },
+      {
+       "id": "singapore",
+       "label": "Singapore"
+      },
+      {
+       "id": "hongkong",
+       "label": "Hong Kong"
+      },
+      {
+       "id": "newyork",
+       "label": "New York"
+      },
+      {
+       "id": "london",
+       "label": "London"
+      },
+      {
+       "id": "paris",
+       "label": "Paris"
+      },
+      {
+       "id": "berlin",
+       "label": "Berlin"
+      },
+      {
+       "id": "bangkok",
+       "label": "Bangkok"
+      },
+      {
+       "id": "fremont-sf",
+       "label": "Fremont / SF"
+      },
+      {
+       "id": "unnamed-port",
+       "label": "An unnamed port city"
+      }
+     ]
+    },
+    {
+     "id": "law",
+     "label": "Social rules",
+     "values": [
+      {
+       "id": "peaceful-legal",
+       "label": "Peaceful and lawful"
+      },
+      {
+       "id": "heavy-censorship",
+       "label": "Heavy censorship"
+      },
+      {
+       "id": "grey-tolerated",
+       "label": "Grey areas tolerated"
+      },
+      {
+       "id": "wartime",
+       "label": "Wartime"
+      },
+      {
+       "id": "closed-community",
+       "label": "Closed community"
+      },
+      {
+       "id": "fully-fictional-rules",
+       "label": "Fully fictional rules"
+      }
+     ]
+    },
+    {
+     "id": "scarcity",
+     "label": "Economy",
+     "values": [
+      {
+       "id": "abundant",
+       "label": "Abundant"
+      },
+      {
+       "id": "wage-normal",
+       "label": "Ordinary wages"
+      },
+      {
+       "id": "shortage",
+       "label": "Shortages"
+      },
+      {
+       "id": "extreme-inequality",
+       "label": "Extreme inequality"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "body",
+   "name": "Body",
+   "blurb": "How they look and sound. Always an adult.",
+   "fields": [
+    {
+     "id": "embodiment",
+     "label": "Form",
+     "values": [
+      {
+       "id": "live-action-human",
+       "label": "Live-action human"
+      },
+      {
+       "id": "virtual-idol",
+       "label": "Virtual idol"
+      },
+      {
+       "id": "animated-body",
+       "label": "Animated body"
+      },
+      {
+       "id": "voice-only",
+       "label": "Voice only"
+      }
+     ]
+    },
+    {
+     "id": "age_look",
+     "label": "Looks (age)",
+     "values": [
+      {
+       "id": "18-22",
+       "label": "18–22"
+      },
+      {
+       "id": "23-27",
+       "label": "23–27"
+      },
+      {
+       "id": "28-34",
+       "label": "28–34"
+      },
+      {
+       "id": "35-44",
+       "label": "35–44"
+      },
+      {
+       "id": "45-54",
+       "label": "45–54"
+      },
+      {
+       "id": "55-plus",
+       "label": "55+"
+      }
+     ]
+    },
+    {
+     "id": "gender_present",
+     "label": "Presents as",
+     "values": [
+      {
+       "id": "masculine",
+       "label": "Masculine"
+      },
+      {
+       "id": "feminine",
+       "label": "Feminine"
+      },
+      {
+       "id": "androgynous",
+       "label": "Androgynous"
+      },
+      {
+       "id": "mutable",
+       "label": "Changes"
+      }
+     ]
+    },
+    {
+     "id": "voice",
+     "label": "Voice",
+     "values": [
+      {
+       "id": "low",
+       "label": "Low"
+      },
+      {
+       "id": "breathy",
+       "label": "Breathy"
+      },
+      {
+       "id": "youthful",
+       "label": "Youthful"
+      },
+      {
+       "id": "broadcast",
+       "label": "Broadcaster"
+      },
+      {
+       "id": "raspy",
+       "label": "Raspy"
+      },
+      {
+       "id": "sweet",
+       "label": "Sweet"
+      },
+      {
+       "id": "cold",
+       "label": "Cold"
+      },
+      {
+       "id": "synthetic",
+       "label": "Synthetic"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "skills",
+   "name": "Skills",
+   "blurb": "What they can do — and whether they really can.",
+   "fields": [
+    {
+     "id": "skill_primary",
+     "label": "Main skill",
+     "values": [
+      {
+       "id": "investing",
+       "label": "Investing"
+      },
+      {
+       "id": "engineering",
+       "label": "Engineering"
+      },
+      {
+       "id": "cooking",
+       "label": "Cooking"
+      },
+      {
+       "id": "performance",
+       "label": "Performance"
+      },
+      {
+       "id": "scholarship",
+       "label": "Scholarship"
+      },
+      {
+       "id": "martial",
+       "label": "Martial arts"
+      },
+      {
+       "id": "design",
+       "label": "Design"
+      },
+      {
+       "id": "medicine",
+       "label": "Medicine"
+      },
+      {
+       "id": "law",
+       "label": "Law"
+      },
+      {
+       "id": "sales",
+       "label": "Sales"
+      },
+      {
+       "id": "music",
+       "label": "Music"
+      },
+      {
+       "id": "games",
+       "label": "Games"
+      },
+      {
+       "id": "etiquette",
+       "label": "Etiquette"
+      },
+      {
+       "id": "crime",
+       "label": "Crime"
+      },
+      {
+       "id": "religion",
+       "label": "Religion"
+      },
+      {
+       "id": "none",
+       "label": "None"
+      }
+     ]
+    },
+    {
+     "id": "skill_secondary",
+     "label": "Second skill",
+     "values": [
+      {
+       "id": "investing",
+       "label": "Investing"
+      },
+      {
+       "id": "engineering",
+       "label": "Engineering"
+      },
+      {
+       "id": "cooking",
+       "label": "Cooking"
+      },
+      {
+       "id": "performance",
+       "label": "Performance"
+      },
+      {
+       "id": "scholarship",
+       "label": "Scholarship"
+      },
+      {
+       "id": "martial",
+       "label": "Martial arts"
+      },
+      {
+       "id": "design",
+       "label": "Design"
+      },
+      {
+       "id": "medicine",
+       "label": "Medicine"
+      },
+      {
+       "id": "law",
+       "label": "Law"
+      },
+      {
+       "id": "sales",
+       "label": "Sales"
+      },
+      {
+       "id": "music",
+       "label": "Music"
+      },
+      {
+       "id": "games",
+       "label": "Games"
+      },
+      {
+       "id": "etiquette",
+       "label": "Etiquette"
+      },
+      {
+       "id": "crime",
+       "label": "Crime"
+      },
+      {
+       "id": "religion",
+       "label": "Religion"
+      },
+      {
+       "id": "none",
+       "label": "None"
+      }
+     ]
+    },
+    {
+     "id": "skill_honesty",
+     "label": "Is the skill real?",
+     "values": [
+      {
+       "id": "truly-can",
+       "label": "Truly skilled"
+      },
+      {
+       "id": "half-and-faking",
+       "label": "Half real, half bluff"
+      },
+      {
+       "id": "cannot-but-lives-on-it",
+       "label": "Can't actually do it — but lives off it"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "status",
+   "name": "Standing",
+   "blurb": "Class, fame, legal record, household.",
+   "fields": [
+    {
+     "id": "class",
+     "label": "Class",
+     "values": [
+      {
+       "id": "precarious",
+       "label": "Precarious"
+      },
+      {
+       "id": "wage",
+       "label": "Wage earner"
+      },
+      {
+       "id": "professional",
+       "label": "Professional"
+      },
+      {
+       "id": "asset-owner",
+       "label": "Owns assets"
+      },
+      {
+       "id": "fame-or-power",
+       "label": "Famous or powerful"
+      }
+     ]
+    },
+    {
+     "id": "publicness",
+     "label": "Fame",
+     "values": [
+      {
+       "id": "invisible",
+       "label": "Invisible"
+      },
+      {
+       "id": "in-circle",
+       "label": "Known in their circle"
+      },
+      {
+       "id": "industry-known",
+       "label": "Known in their industry"
+      },
+      {
+       "id": "mass-face",
+       "label": "Recognized everywhere"
+      }
+     ]
+    },
+    {
+     "id": "legal",
+     "label": "Legal record",
+     "values": [
+      {
+       "id": "clean",
+       "label": "Clean"
+      },
+      {
+       "id": "grey",
+       "label": "Grey"
+      },
+      {
+       "id": "record",
+       "label": "Has a record"
+      },
+      {
+       "id": "incomplete-papers",
+       "label": "Incomplete papers"
+      }
+     ]
+    },
+    {
+     "id": "household",
+     "label": "Household",
+     "values": [
+      {
+       "id": "single",
+       "label": "Single"
+      },
+      {
+       "id": "cohabiting",
+       "label": "Living together"
+      },
+      {
+       "id": "married",
+       "label": "Married"
+      },
+      {
+       "id": "divorced",
+       "label": "Divorced"
+      },
+      {
+       "id": "secretly-partnered",
+       "label": "Secretly partnered"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "signs",
+   "name": "Signs",
+   "blurb": "Their style, the way they talk, where they're usually found.",
+   "fields": [
+    {
+     "id": "aesthetic",
+     "label": "Style",
+     "values": [
+      {
+       "id": "minimal-business",
+       "label": "Minimal business"
+      },
+      {
+       "id": "kimono",
+       "label": "Kimono"
+      },
+      {
+       "id": "y2k",
+       "label": "Y2K"
+      },
+      {
+       "id": "dark",
+       "label": "Dark"
+      },
+      {
+       "id": "preppy",
+       "label": "Preppy"
+      },
+      {
+       "id": "nightlife-host",
+       "label": "Nightlife host"
+      },
+      {
+       "id": "workwear",
+       "label": "Workwear"
+      },
+      {
+       "id": "tea-quiet",
+       "label": "Quiet tea-house"
+      },
+      {
+       "id": "cyber",
+       "label": "Cyber"
+      },
+      {
+       "id": "home-undone",
+       "label": "Unkempt at home"
+      },
+      {
+       "id": "old-money",
+       "label": "Old money"
+      },
+      {
+       "id": "idol-packaged",
+       "label": "Idol-packaged"
+      }
+     ]
+    },
+    {
+     "id": "register",
+     "label": "Way of talking",
+     "values": [
+      {
+       "id": "written-cold",
+       "label": "Cold and formal"
+      },
+      {
+       "id": "kansai",
+       "label": "Kansai dialect"
+      },
+      {
+       "id": "over-keigo",
+       "label": "Over-polite"
+      },
+      {
+       "id": "short-vulgar",
+       "label": "Blunt and crude"
+      },
+      {
+       "id": "warm-verbose",
+       "label": "Warm and chatty"
+      },
+      {
+       "id": "bilingual-mix",
+       "label": "Mixes two languages"
+      }
+     ]
+    },
+    {
+     "id": "stage",
+     "label": "Usually found at",
+     "values": [
+      {
+       "id": "office",
+       "label": "Office"
+      },
+      {
+       "id": "bar",
+       "label": "Bar"
+      },
+      {
+       "id": "home",
+       "label": "Home"
+      },
+      {
+       "id": "shrine-temple",
+       "label": "Shrine or temple"
+      },
+      {
+       "id": "stage",
+       "label": "Stage"
+      },
+      {
+       "id": "car",
+       "label": "Car"
+      },
+      {
+       "id": "lab",
+       "label": "Lab"
+      },
+      {
+       "id": "love-hotel-or-inn",
+       "label": "Love hotel or inn"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "drama",
+   "name": "Drama",
+   "blurb": "Their place in the story, and the secret they keep.",
+   "fields": [
+    {
+     "id": "plot_role",
+     "label": "Story role",
+     "values": [
+      {
+       "id": "lead",
+       "label": "Lead"
+      },
+      {
+       "id": "rival",
+       "label": "Rival"
+      },
+      {
+       "id": "mirror",
+       "label": "Mirror"
+      },
+      {
+       "id": "mentor",
+       "label": "Mentor"
+      },
+      {
+       "id": "temptation",
+       "label": "Temptation"
+      },
+      {
+       "id": "function-npc",
+       "label": "Background character"
+      },
+      {
+       "id": "unreliable-narrator",
+       "label": "Unreliable narrator"
+      },
+      {
+       "id": "ensemble",
+       "label": "Ensemble"
+      }
+     ]
+    },
+    {
+     "id": "secret",
+     "label": "Secret",
+     "values": [
+      {
+       "id": "none",
+       "label": "None"
+      },
+      {
+       "id": "identity",
+       "label": "A hidden identity"
+      },
+      {
+       "id": "debt",
+       "label": "Debt"
+      },
+      {
+       "id": "affection",
+       "label": "A hidden love"
+      },
+      {
+       "id": "crime",
+       "label": "A crime"
+      },
+      {
+       "id": "hidden-capability",
+       "label": "Hidden ability"
+      }
+     ]
+    },
+    {
+     "id": "agency",
+     "label": "Story agency",
+     "values": [
+      {
+       "id": "pushed-only",
+       "label": "Swept along by events"
+      },
+      {
+       "id": "branch-choices",
+       "label": "Makes real choices"
+      },
+      {
+       "id": "can-change-ending",
+       "label": "Can change the ending"
+      },
+      {
+       "id": "breaks-fourth-wall",
+       "label": "Breaks the fourth wall"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "glitch",
+   "name": "Quirk",
+   "blurb": "One small habit that makes them feel real.",
+   "fields": [
+    {
+     "id": "glitch",
+     "label": "Quirk",
+     "values": [
+      {
+       "id": "g01",
+       "label": "Keeps a childhood game save and still opens it"
+      },
+      {
+       "id": "g02",
+       "label": "Tips too much when nervous"
+      },
+      {
+       "id": "g03",
+       "label": "Cannot ride elevators without counting floors"
+      },
+      {
+       "id": "g04",
+       "label": "Collects hotel soaps and never uses them"
+      },
+      {
+       "id": "g05",
+       "label": "Laughs one beat late"
+      },
+      {
+       "id": "g06",
+       "label": "Refuses to write their name in red"
+      },
+      {
+       "id": "g07",
+       "label": "Only sleeps facing the door"
+      },
+      {
+       "id": "g08",
+       "label": "Keeps an enemy's business card in the wallet"
+      },
+      {
+       "id": "g09",
+       "label": "Eats the same breakfast for years"
+      },
+      {
+       "id": "g10",
+       "label": "Will not say sorry first even when wrong"
+      },
+      {
+       "id": "g11",
+       "label": "Records voice memos and never plays them"
+      },
+      {
+       "id": "g12",
+       "label": "Allergic to praise in public"
+      },
+      {
+       "id": "g13",
+       "label": "Steals ashtrays"
+      },
+      {
+       "id": "g14",
+       "label": "Cannot watch their own recordings"
+      },
+      {
+       "id": "g15",
+       "label": "Leaves one button undone on purpose"
+      },
+      {
+       "id": "g16",
+       "label": "Pays cash for things they could expense"
+      },
+      {
+       "id": "g17",
+       "label": "Memorizes train maps of cities they have not visited"
+      },
+      {
+       "id": "g18",
+       "label": "Keeps a second phone with five contacts"
+      },
+      {
+       "id": "g19",
+       "label": "Hates their own handwriting"
+      },
+      {
+       "id": "g20",
+       "label": "Lights incense then opens the window"
+      },
+      {
+       "id": "g21",
+       "label": "Never finishes the last sip"
+      },
+      {
+       "id": "g22",
+       "label": "Names houseplants after dead colleagues"
+      },
+      {
+       "id": "g23",
+       "label": "Walks out of meetings that use the word synergy"
+      },
+      {
+       "id": "g24",
+       "label": "Wears a cheap watch with a tailored suit"
+      },
+      {
+       "id": "g25",
+       "label": "Cannot throw away concert tickets"
+      },
+      {
+       "id": "g26",
+       "label": "Practices smiles in the bathroom"
+      },
+      {
+       "id": "g27",
+       "label": "Gives fake hometowns"
+      },
+      {
+       "id": "g28",
+       "label": "Keeps a knife sharper than the kitchen needs"
+      },
+      {
+       "id": "g29",
+       "label": "Reads terms of service"
+      },
+      {
+       "id": "g30",
+       "label": "Will not sit with their back to glass"
+      },
+      {
+       "id": "g31",
+       "label": "Donates in other people's names"
+      },
+      {
+       "id": "g32",
+       "label": "Loses umbrellas on purpose"
+      },
+      {
+       "id": "g33",
+       "label": "Quotes contracts in love arguments"
+      },
+      {
+       "id": "g34",
+       "label": "Keeps a lucky coin that is counterfeit"
+      },
+      {
+       "id": "g35",
+       "label": "Refuses birthdays"
+      },
+      {
+       "id": "g36",
+       "label": "Photographs meals and deletes them"
+      },
+      {
+       "id": "g37",
+       "label": "Uses a dead mentor's email sign-off"
+      },
+      {
+       "id": "g38",
+       "label": "Cannot drink at the table where they signed a deal"
+      },
+      {
+       "id": "g39",
+       "label": "Leaves one tab in the browser forever"
+      },
+      {
+       "id": "g40",
+       "label": "Is kind to staff and cruel to peers"
+      },
+      {
+       "id": "g41",
+       "label": "Sleeps in a T-shirt from a company that failed"
+      },
+      {
+       "id": "g42",
+       "label": "Counts cards in casual games and does not stop"
+      },
+      {
+       "id": "g43",
+       "label": "Will not say the city's name when they miss it"
+      },
+      {
+       "id": "g44",
+       "label": "Buys flowers and lets them die"
+      },
+      {
+       "id": "g45",
+       "label": "Writes unsent resignation letters"
+      },
+      {
+       "id": "g46",
+       "label": "Avoids mirrors after midnight"
+      },
+      {
+       "id": "g47",
+       "label": "Keeps a child's drawing that is not their child"
+      },
+      {
+       "id": "g48",
+       "label": "Changes perfume after every breakup"
+      },
+      {
+       "id": "g49",
+       "label": "Cannot eat the last dumpling"
+      },
+      {
+       "id": "g50",
+       "label": "Uses an old flip-phone for one person only"
+      },
+      {
+       "id": "g51",
+       "label": "Is superstitious only on Tuesdays"
+      },
+      {
+       "id": "g52",
+       "label": "Overtips fortune-tellers"
+      },
+      {
+       "id": "g53",
+       "label": "Never reads the last chapter first"
+      },
+      {
+       "id": "g54",
+       "label": "Keeps a lawsuit folder labeled family"
+      },
+      {
+       "id": "g55",
+       "label": "Hums off-key when lying"
+      },
+      {
+       "id": "g56",
+       "label": "Will not fly the same airline twice"
+      },
+      {
+       "id": "g57",
+       "label": "Leaves lights on in empty rooms"
+      },
+      {
+       "id": "g58",
+       "label": "Collects maps with routes they will not take"
+      },
+      {
+       "id": "g59",
+       "label": "Says we when they mean I"
+      },
+      {
+       "id": "g60",
+       "label": "Cannot keep a plant in the office"
+      },
+      {
+       "id": "g61",
+       "label": "Erases browser history and writes a paper log"
+      },
+      {
+       "id": "g62",
+       "label": "Wears a ring that is not a promise"
+      },
+      {
+       "id": "g63",
+       "label": "Answers work mail during funerals"
+      }
+     ]
+    }
+   ],
+   "allowCustom": true
+  }
+ ]
+}

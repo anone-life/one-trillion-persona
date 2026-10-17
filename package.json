@@ -1,0 +1,20 @@
+{
+  "name": "one-trillion-persona",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "node --test packages/*/test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "1t": "node packages/cli/src/main.ts",
+    "web": "npm --workspace @1t-persona/web run dev",
+    "web:build": "npm --workspace @1t-persona/web run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  }
+}

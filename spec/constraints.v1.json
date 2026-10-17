@@ -1,0 +1,103 @@
+{
+ "rulesVersion": 1,
+ "note": "Forbidden combinations. When a sampled layer hits one, that layer is re-drawn from its own sub-stream (attempt counter increments). Layers are sampled in the order world, body, skills, status, signs, drama, glitch, so a rule always re-draws the later of the two layers it names.",
+ "forbid": [
+  {
+   "why": "No virtual idols before the internet era.",
+   "when": {
+    "world.era": [
+     "late-qing",
+     "showa"
+    ]
+   },
+   "and": {
+    "body.embodiment": [
+     "virtual-idol"
+    ]
+   }
+  },
+  {
+   "why": "Synthetic voices need modern tech.",
+   "when": {
+    "world.era": [
+     "late-qing",
+     "showa"
+    ]
+   },
+   "and": {
+    "body.voice": [
+     "synthetic"
+    ]
+   }
+  },
+  {
+   "why": "Wartime is not a time of abundance.",
+   "when": {
+    "world.law": [
+     "wartime"
+    ]
+   },
+   "and": {
+    "world.scarcity": [
+     "abundant"
+    ]
+   }
+  },
+  {
+   "why": "Modern subculture styles do not exist in the Late Qing.",
+   "when": {
+    "world.era": [
+     "late-qing"
+    ]
+   },
+   "and": {
+    "signs.aesthetic": [
+     "y2k",
+     "cyber",
+     "idol-packaged",
+     "nightlife-host"
+    ]
+   }
+  },
+  {
+   "why": "Y2K and cyber styles are anachronistic in Shōwa.",
+   "when": {
+    "world.era": [
+     "showa"
+    ]
+   },
+   "and": {
+    "signs.aesthetic": [
+     "y2k",
+     "cyber"
+    ]
+   }
+  },
+  {
+   "why": "Video games did not exist in the Late Qing.",
+   "when": {
+    "world.era": [
+     "late-qing"
+    ]
+   },
+   "and": {
+    "skills.skill_primary": [
+     "games"
+    ]
+   }
+  },
+  {
+   "why": "Video games did not exist in the Late Qing.",
+   "when": {
+    "world.era": [
+     "late-qing"
+    ]
+   },
+   "and": {
+    "skills.skill_secondary": [
+     "games"
+    ]
+   }
+  }
+ ]
+}

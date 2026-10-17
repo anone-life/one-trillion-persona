@@ -1,0 +1,144 @@
+{
+  "rulesVersion": 1,
+  "note": "Creative translation table, not a measured mapping. The Ten Gods are treated as a vocabulary of relationships around the self; each one becomes a want, the cost that comes with it, and the thing that breaks the character. Masks say how a god shows up in each of four settings. Written in English first; zh/ja later.",
+  "gods": {
+    "companion": {
+      "zh": "比肩", "name": "The Peer", "classical": "Companion",
+      "want": "To stand on equal footing and owe nobody.",
+      "cost": "Turns down help even when drowning; treats every favor as a debt.",
+      "break": "Being made dependent — stripped of the ability to do it alone.",
+      "mbti": { "EI": 0.2, "NS": 0, "TF": 0.3, "JP": 0 }
+    },
+    "rob_wealth": {
+      "zh": "劫财", "name": "The Rival", "classical": "Rob Wealth",
+      "want": "To win — especially against someone just like them.",
+      "cost": "Competes with the people closest to them; can't let a small loss go.",
+      "break": "Losing publicly to someone they considered an equal.",
+      "mbti": { "EI": -0.4, "NS": 0, "TF": 0.2, "JP": 0.3 }
+    },
+    "eating_god": {
+      "zh": "食神", "name": "The Artist", "classical": "Eating God",
+      "want": "To make things and enjoy them at an unhurried pace.",
+      "cost": "Drifts away from conflict and deadlines; comfort becomes avoidance.",
+      "break": "Being forced into a life with no room to make anything of their own.",
+      "mbti": { "EI": 0, "NS": -0.4, "TF": -0.3, "JP": 0.3 }
+    },
+    "hurting_officer": {
+      "zh": "伤官", "name": "The Rebel", "classical": "Hurting Officer",
+      "want": "To be brilliant and say the true thing out loud.",
+      "cost": "Cuts people with the truth; picks fights with any authority.",
+      "break": "Being silenced — or having their talent dismissed by someone with power.",
+      "mbti": { "EI": -0.2, "NS": -0.4, "TF": 0.4, "JP": 0.4 }
+    },
+    "indirect_wealth": {
+      "zh": "偏财", "name": "The Adventurer", "classical": "Indirect Wealth",
+      "want": "Big chances, wide circles, money that moves.",
+      "cost": "Spreads attention thin; promises more than they can keep.",
+      "break": "A gamble that fails and takes their reputation for generosity with it.",
+      "mbti": { "EI": -0.5, "NS": 0.2, "TF": 0, "JP": 0.3 }
+    },
+    "direct_wealth": {
+      "zh": "正财", "name": "The Provider", "classical": "Direct Wealth",
+      "want": "Steady ground: earned money, kept promises, a home that holds.",
+      "cost": "Counts everything; love starts to look like an account book.",
+      "break": "Losing what they built slowly to something they couldn't control.",
+      "mbti": { "EI": 0.1, "NS": 0.4, "TF": -0.1, "JP": -0.4 }
+    },
+    "seven_killings": {
+      "zh": "七杀", "name": "The Warrior", "classical": "Seven Killings",
+      "want": "To face the threat head-on and come out in command.",
+      "cost": "Lives on alert; meets tenderness as if it were an attack.",
+      "break": "Being cornered with no fight possible — helpless in front of others.",
+      "mbti": { "EI": -0.2, "NS": 0.1, "TF": 0.5, "JP": -0.3 }
+    },
+    "direct_officer": {
+      "zh": "正官", "name": "The Guardian", "classical": "Direct Officer",
+      "want": "To be trusted, to do it right, to have a place in the order of things.",
+      "cost": "Swallows disagreement to stay approved; rules become a hiding place.",
+      "break": "Public disgrace — the title or the trust taken away.",
+      "mbti": { "EI": 0.1, "NS": 0.4, "TF": 0.1, "JP": -0.5 }
+    },
+    "indirect_resource": {
+      "zh": "偏印", "name": "The Mystic", "classical": "Indirect Resource",
+      "want": "To understand what others miss, on their own odd terms.",
+      "cost": "Withdraws, distrusts warmth, and lets suspicion do the talking.",
+      "break": "Being made ordinary and readable — their inner world laughed at.",
+      "mbti": { "EI": 0.5, "NS": -0.5, "TF": 0.2, "JP": 0.1 }
+    },
+    "direct_resource": {
+      "zh": "正印", "name": "The Nurturer", "classical": "Direct Resource",
+      "want": "To be cared for — and to care, protect and teach.",
+      "cost": "Waits to be chosen; can mistake being needed for being loved.",
+      "break": "The person or place that made them feel safe disappears.",
+      "mbti": { "EI": 0.4, "NS": -0.2, "TF": -0.4, "JP": -0.2 }
+    }
+  },
+  "masks": {
+    "social_face": {
+      "label": "Social face", "zh": "年柱 · 在外人面前",
+      "lines": {
+        "companion": "With strangers: friendly but even-handed — nobody gets special treatment, including them.",
+        "rob_wealth": "With strangers: quick to joke, quicker to compare; sizes up who's ahead.",
+        "eating_god": "With strangers: easygoing and generous with food, jokes and time.",
+        "hurting_officer": "With strangers: sharp, funny, a little too honest for first meetings.",
+        "indirect_wealth": "With strangers: the life of the room — remembers names, picks up the tab.",
+        "direct_wealth": "With strangers: polite, practical, notices who pays and who doesn't.",
+        "seven_killings": "With strangers: guarded and intense; people sense they shouldn't push.",
+        "direct_officer": "With strangers: correct, composed, and careful about appearances.",
+        "indirect_resource": "With strangers: hard to read; answers questions with questions.",
+        "direct_resource": "With strangers: gentle and attentive — the one who asks if you've eaten."
+      }
+    },
+    "work_mode": {
+      "label": "Work mode", "zh": "月柱 · 做事的时候",
+      "lines": {
+        "companion": "At work: self-reliant; would rather redo it alone than delegate.",
+        "rob_wealth": "At work: competitive and fast; treats colleagues as a scoreboard.",
+        "eating_god": "At work: craft over speed; does beautiful work on their own schedule.",
+        "hurting_officer": "At work: innovative and insubordinate; fixes what they were told not to touch.",
+        "indirect_wealth": "At work: a dealmaker; juggles five opportunities and drops one.",
+        "direct_wealth": "At work: dependable, thorough, keeps the books straight.",
+        "seven_killings": "At work: thrives in crisis; takes command when things go wrong.",
+        "direct_officer": "At work: follows procedure, earns trust, rises through the proper channels.",
+        "indirect_resource": "At work: a specialist; brilliant at the strange problem nobody else wants.",
+        "direct_resource": "At work: the mentor; makes the team safer and slower."
+      }
+    },
+    "private_self": {
+      "label": "Private self", "zh": "日柱 · 私下里",
+      "lines": {
+        "companion": "In private: needs their own space even in love; affection given as equals.",
+        "rob_wealth": "In private: possessive and playful; jealousy shows up as teasing.",
+        "eating_god": "In private: soft, sensual, happiest cooking for someone at home.",
+        "hurting_officer": "In private: emotionally vivid; argues to feel close.",
+        "indirect_wealth": "In private: romantic in bursts, then distracted; loves the chase.",
+        "direct_wealth": "In private: loyal and steady; shows love through doing things for you.",
+        "seven_killings": "In private: fiercely protective; vulnerability arrives only after a fight.",
+        "direct_officer": "In private: proper even when close; feelings expressed through responsibility.",
+        "indirect_resource": "In private: lets very few in; once in, you see a whole hidden world.",
+        "direct_resource": "In private: wants to be held and to hold; remembers every small kindness."
+      }
+    },
+    "inner_drive": {
+      "label": "Inner drive", "zh": "时柱 · 心里真正想要的",
+      "lines": {
+        "companion": "Deep down: to prove they never needed anyone — and to be wrong about that.",
+        "rob_wealth": "Deep down: to be chosen over the rival, just once, without asking.",
+        "eating_god": "Deep down: a quiet life that is entirely their own.",
+        "hurting_officer": "Deep down: to be recognized as exceptional by someone who matters.",
+        "indirect_wealth": "Deep down: freedom — never being tied to one place or one fate.",
+        "direct_wealth": "Deep down: security for the people they love, measured and guaranteed.",
+        "seven_killings": "Deep down: to never be powerless again.",
+        "direct_officer": "Deep down: an honorable name that outlives them.",
+        "indirect_resource": "Deep down: to understand why — about themselves most of all.",
+        "direct_resource": "Deep down: a home where they are wanted without having to earn it."
+      }
+    }
+  },
+  "strength": {
+    "strong": "Self-driven: pushes outward, resists being steered.",
+    "balanced": "Adaptive: bends with the situation without losing the thread.",
+    "weak": "Relational: draws strength from the people and structures around them."
+  },
+  "mbtiRule": "Axis score = 0.5 + sum(god weight x god mbti delta), clamped to [0.05, 0.95]. Positive EI leans I, positive NS leans S, positive TF leans T, positive JP leans P. Type probability = product of the four axis probabilities; report the top 3 renormalized to sum to 1. Output prior only, never an input."
+}

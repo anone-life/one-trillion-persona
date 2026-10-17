@@ -1,0 +1,30 @@
+/* 配色、字体栈、圆角：复制自 anone.life 的 tokens.css（「纸与墨」），2026-10-17 同步。
+   规矩不变：纸与墨打底，朱只花在能点的东西和选中态上；不能点的用墨，「一万亿」那一下用金。
+   本项目英文先做，所以字体直接用 tokens.css 里 :root[lang="en"] 那一套。 */
+:root {
+  --paper: #f4efe6; --paper-2: #fffdf8; --paper-3: #ece5d8; --paper-mine: #e2d7c1;
+  --ink: #1b1a17; --ink-2: #514d45; --ink-3: #8d877a;
+  --rule: rgba(27, 26, 23, 0.14); --rule-soft: rgba(27, 26, 23, 0.07);
+  --shu: #b8442f; --shu-soft: rgba(184, 68, 47, 0.1); --on-shu: #fffdf8; --gold: #9c8449; --enji: #8a2b34;
+  --mincho: "Iowan Old Style", Charter, "Palatino Linotype", Palatino, Georgia, "Hiragino Mincho ProN", "Songti SC", serif;
+  --gothic: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Sans", "PingFang SC", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --radius: 6px; --radius-sm: 4px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131210; --paper-2: #1c1a17; --paper-3: #24211d; --paper-mine: #2f2a22;
+    --ink: #f2eee5; --ink-2: #bdb7aa; --ink-3: #857f73;
+    --rule: rgba(242, 238, 229, 0.16); --rule-soft: rgba(242, 238, 229, 0.07);
+    --shu: #e0674c; --shu-soft: rgba(224, 103, 76, 0.14); --on-shu: #1b1a17; --gold: #c3a664;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131210; --paper-2: #1c1a17; --paper-3: #24211d; --paper-mine: #2f2a22;
+  --ink: #f2eee5; --ink-2: #bdb7aa; --ink-3: #857f73;
+  --rule: rgba(242, 238, 229, 0.16); --rule-soft: rgba(242, 238, 229, 0.07);
+  --shu: #e0674c; --shu-soft: rgba(224, 103, 76, 0.14); --on-shu: #1b1a17; --gold: #c3a664;
+  color-scheme: dark;
+}
