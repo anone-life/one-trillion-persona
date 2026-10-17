@@ -4,6 +4,7 @@ import {
 } from "@1t-persona/core";
 import { checkName } from "@1t-persona/core";
 import { askJson, type Model } from "./model.ts";
+import { pronounsFor } from "./designer.ts";
 
 export interface Finalized {
   enough: boolean;
@@ -27,7 +28,7 @@ const SYSTEM = [
   '{"name": "", "relationToUser": "", "enough": true, "missing": [], "overrides": {}}',
   "",
   "- name: the character's name, if the user gave or accepted one. Name only. Empty string if none.",
-  "- relationToUser: what the user is to the character, one short phrase (\"her coworker at the night shift\"). Empty if never settled.",
+  "- relationToUser: who THE USER is (not the character) in the character's life — one short noun phrase describing the user (\"a coworker on the night shift\", \"the new writer on the show\"). Don't start it with \"the user is\". Empty if never settled.",
   "- enough: true when there is a name AND at least one concrete thing the user decided or confirmed about the character. Small talk only = false.",
   "- missing: when enough is false, what's still needed — at most three items, each under six words, in words the user understands. Empty array when enough is true.",
   "- overrides: fields the user clearly CHANGED from the seed's value, mapped to the closest allowed value from the menu below. Key is \"layer.field\", value is one of the listed ids, copied exactly.",
@@ -35,10 +36,14 @@ const SYSTEM = [
   "  Don't include fields the user kept as they were.",
 ].join("\n");
 
-export async function finalize(model: Model, skeleton: Skeleton, transcript: string): Promise<Finalized> {
+/** language：relationToUser 和 missing 用的语言（英文名，如 "Japanese"），默认英文。 */
+export async function finalize(model: Model, skeleton: Skeleton, transcript: string, language = "English"): Promise<Finalized> {
+  const p = pronounsFor(skeleton);
   const user = [
+    `Write relationToUser and missing in ${language}. The character's pronouns are ${p.subj}/${p.obj}/${p.poss}; if a pronoun for the character is needed, use those.`,
+    "",
     "The seed's current values:",
-    JSON.stringify(skeleton.layers),
+    JSON.stringify(Object.fromEntries(Object.entries(skeleton.layers).filter(([id]) => !(skeleton.removed ?? []).includes(id)))),
     "",
     "Allowed values (layer.field: ids):",
     fieldMenu(),

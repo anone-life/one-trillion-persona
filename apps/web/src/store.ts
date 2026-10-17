@@ -15,6 +15,12 @@ export interface SavedCharacter {
   createdAt: string;
   /** 选的 anone.life 脸（套名，来自 /v1/1t/faces）。没选就是纯文字。 */
   avatarId?: string;
+  /** 人设和聊天用的语言；旧角色没有这一项，按英文算 */
+  lang?: "en" | "zh" | "ja";
+  /** 「告诉 Elise」改之前的那一版人设（撤销用，只留一份） */
+  previousPersona?: string;
+  /** 「告诉 Elise」改过几次、每次改了什么 */
+  retunes?: { at: string; complaint: string; changed: string[]; summary: string }[];
   /** 和她的打字聊天记录 */
   chat: { role: "user" | "assistant"; content: string }[];
 }

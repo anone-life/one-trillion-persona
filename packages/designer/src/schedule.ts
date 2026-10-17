@@ -59,7 +59,7 @@ const SHAPE = {
   classical: '{"blocks":[{"phase":"sleep","from":"HH:MM","to":"HH:MM","say":"…"},{"phase":"morning","from":"HH:MM","to":"HH:MM","say":"…"},{"phase":"work","from":"HH:MM","to":"HH:MM","say":"…"},{"phase":"evening","from":"HH:MM","to":"HH:MM","say":"…"}],"apart":"…","work":{"summary":"…","routine":["…"],"troubles":["…"]}}',
 };
 
-export async function generateSchedule(model: Model, name: string, s: PersonaSlots, k: Skeleton): Promise<Schedule> {
+export async function generateSchedule(model: Model, name: string, s: PersonaSlots, k: Skeleton, language = "English"): Promise<Schedule> {
   const era = eraOf(k);
   const system = [
     "Write one day of this character's routine. Output one JSON object and nothing else.",
@@ -70,7 +70,7 @@ export async function generateSchedule(model: Model, name: string, s: PersonaSlo
       ? "The work block needs: where (a place, one phrase), doing (\"at the …\", under six words), contact (how to reach them then, one sentence), label (a 2-4 word status like \"at the clinic\"). Other blocks have only phase/from/to."
       : "This is a historical setting: no phones, no office hours. Every block has `say` (what they're doing and who's around, one or two sentences, no clock times). Add `apart`: what separates them from the other person when apart and how they'd get word to each other.",
     "work.summary: one sentence on what they do. routine: 3-5 concrete things on an ordinary day. troubles: 2-4 concrete everyday frustrations.",
-    "Write in English.",
+    language === "English" ? "Write in English." : `Write the text values in ${language}. Keep the keys, the phase names and the HH:MM times as they are.`,
   ].join("\n");
   const user = [
     `Name: ${name}`, `Role: ${s.role}`, `Lives in: ${s.location}`, `In one line: ${s.coreSentence}`,

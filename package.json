@@ -7,7 +7,7 @@
     "apps/*"
   ],
   "scripts": {
-    "test": "node --test packages/*/test/*.test.ts",
+    "test": "node --test packages/*/test/*.test.ts apps/*/test/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "1t": "node packages/cli/src/main.ts",
     "web": "npm --workspace @1t-persona/web run dev",

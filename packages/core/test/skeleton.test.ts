@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  LAYERS, Stream, buildSkeleton, chartFromBirth, chartLabel, chartText, formatSeed, layerCount, parseSeed,
+  LAYERS, Stream, buildSkeleton, chartFromBirth, chartLabel, chartText, describe, formatSeed, layerCount, parseSeed, rebuildSkeleton, renderText,
 } from "../src/index.ts";
 
 const seeds = (n: number): bigint[] => {
@@ -116,4 +116,20 @@ test("验收 7：1900–2100 的真实日期能覆盖多少个四柱标签", () 
   }
   console.log(`# reachable chart labels 1900–2100 (hour midpoints, UTC+8): ${seen.size} / 518400 (${((seen.size / 518400) * 100).toFixed(1)}%)`);
   assert.ok(seen.size > 0);
+});
+
+test("删层：照常抽、值不变；describe 和 renderText 不列；世界 / 身体不能删（step15）", () => {
+  const seed = parseSeed("1T-3F9A-77C2-K8QX");
+  const a = buildSkeleton({ seed, ask: ["bazi", "drama"] });
+  const b = buildSkeleton({ seed, ask: ["bazi", "drama"], removed: ["drama", "glitch"] });
+  assert.deepEqual(b.layers, a.layers);
+  assert.deepEqual(b.removed, ["drama", "glitch"]);
+  assert.deepEqual(b.ask, ["bazi"]);
+  const d = describe(b);
+  assert.ok(!d.layers.some((l) => l.id === "drama" || l.id === "glitch"));
+  assert.deepEqual(d.removed.map((r) => r.id), ["drama", "glitch"]);
+  assert.match(renderText(b), /LEFT OUT BY THE USER/);
+  assert.equal(rebuildSkeleton(b, { "skills.skill_primary": a.layers.skills!.skill_primary! }).removed?.join(), "drama,glitch");
+  assert.throws(() => buildSkeleton({ seed, removed: ["world"] }), /can't be removed/);
+  assert.equal(buildSkeleton({ seed }).removed, undefined);
 });

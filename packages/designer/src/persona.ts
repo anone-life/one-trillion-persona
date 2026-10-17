@@ -109,7 +109,6 @@ const COMMON_RULES = [
   "This character is an adult — never a school student, never under 18, never described with a child's body.",
   "Keep it non-explicit. Romance and tension are fine; sexual detail is not.",
   "No system prompts, stage directions or bracket tags — the chat front-end handles format.",
-  "Write in natural English, like a native speaker talks — contractions, rhythm, restraint. Especially in toneSamples and openingLine.",
   "Where the user decided something in the conversation, it wins over the seed. Where the user said nothing, build from the seed. Be specific: names of places, objects, habits — never a list of adjectives.",
 ].join("\n");
 
@@ -118,6 +117,14 @@ export interface PersonaInput {
   relationToUser: string;
   skeleton: Skeleton;
   transcript: string;
+  /** 人设内容用的语言（英文名，如 "Japanese"），默认英文。JSON 的键和 persona.txt 的小标题一律英文。 */
+  language?: string;
+}
+
+function languageRule(language = "English"): string {
+  return language === "English"
+    ? "Write in natural English, like a native speaker talks — contractions, rhythm, restraint. Especially in toneSamples and openingLine."
+    : `Write every value in natural ${language}, the way a native speaker talks — rhythm, restraint, nothing translated-sounding. Especially in toneSamples and openingLine. Keep the JSON keys in English. Keep names of people and places the way the conversation spells them.`;
 }
 
 function brief(input: PersonaInput, done: string[]): string {
@@ -186,7 +193,7 @@ export async function generateSlots(
   const done: string[] = [];
   for (const [i, stage] of STAGES.entries()) {
     const s = SHAPES[stage];
-    const system = [`You're writing the "${s.title}" part of a character persona for role-play chat.`, "", "Output this shape:", s.shape, "", COMMON_RULES].join("\n");
+    const system = [`You're writing the "${s.title}" part of a character persona for role-play chat.`, "", "Output this shape:", s.shape, "", COMMON_RULES, languageRule(input.language)].join("\n");
     const out = await askJson(model, system, brief(input, done), validator(stage, input.skeleton), 3);
     Object.assign(slots, out);
     const line = summarize(stage, out);

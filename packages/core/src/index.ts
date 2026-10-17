@@ -6,3 +6,4 @@ export * from "./skeleton.ts";
 export * from "./describe.ts";
 export * from "./check.ts";
 export * from "./places.ts";
+export * from "./labels.ts";

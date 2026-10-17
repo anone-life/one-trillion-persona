@@ -1,0 +1,647 @@
+{
+ "_note": "仅为显示文字。id 永远不变；缺少的条目回退为英文（spec/enums.v1.json、spec/translation.v1.json、packages/core/src/places.ts）。",
+ "layers": {
+  "world": {
+   "name": "世界",
+   "blurb": "TA 生活在什么年代、什么地方，那是个怎样的社会。",
+   "fields": {
+    "era": {
+     "label": "年代",
+     "values": {
+      "2026": "2026",
+      "late-qing": "晚清",
+      "showa": "昭和日本",
+      "1990s": "1990 年代",
+      "2010s": "2010 年代",
+      "near-future": "近未来",
+      "alternate-history": "架空历史",
+      "in-network-virtual": "网络世界里"
+     }
+    },
+    "city": {
+     "label": "城市",
+     "values": {
+      "tokyo": "东京",
+      "kyoto": "京都",
+      "osaka": "大阪",
+      "seoul": "首尔",
+      "shanghai": "上海",
+      "shenzhen": "深圳",
+      "taipei": "台北",
+      "singapore": "新加坡",
+      "hongkong": "香港",
+      "newyork": "纽约",
+      "london": "伦敦",
+      "paris": "巴黎",
+      "berlin": "柏林",
+      "bangkok": "曼谷",
+      "fremont-sf": "弗里蒙特 / 旧金山",
+      "unnamed-port": "一座无名港城"
+     }
+    },
+    "law": {
+     "label": "社会规则",
+     "values": {
+      "peaceful-legal": "太平守法",
+      "heavy-censorship": "审查严密",
+      "grey-tolerated": "灰色地带默许",
+      "wartime": "战时",
+      "closed-community": "封闭社群",
+      "fully-fictional-rules": "完全虚构的规则"
+     }
+    },
+    "scarcity": {
+     "label": "经济",
+     "values": {
+      "abundant": "富足",
+      "wage-normal": "普通工薪",
+      "shortage": "物资短缺",
+      "extreme-inequality": "贫富悬殊"
+     }
+    }
+   }
+  },
+  "body": {
+   "name": "外形",
+   "blurb": "长什么样、声音如何。一定是成年人。",
+   "fields": {
+    "embodiment": {
+     "label": "形态",
+     "values": {
+      "live-action-human": "真人",
+      "virtual-idol": "虚拟偶像",
+      "animated-body": "动画形象",
+      "voice-only": "只有声音"
+     }
+    },
+    "age_look": {
+     "label": "看起来几岁",
+     "values": {
+      "18-22": "18–22",
+      "23-27": "23–27",
+      "28-34": "28–34",
+      "35-44": "35–44",
+      "45-54": "45–54",
+      "55-plus": "55+"
+     }
+    },
+    "gender_present": {
+     "label": "性别气质",
+     "values": {
+      "masculine": "偏男性",
+      "feminine": "偏女性",
+      "androgynous": "中性",
+      "mutable": "会变"
+     }
+    },
+    "voice": {
+     "label": "声音",
+     "values": {
+      "low": "低沉",
+      "breathy": "气声",
+      "youthful": "年轻",
+      "broadcast": "播音腔",
+      "raspy": "沙哑",
+      "sweet": "甜",
+      "cold": "冷",
+      "synthetic": "合成音"
+     }
+    }
+   }
+  },
+  "skills": {
+   "name": "本事",
+   "blurb": "TA 会什么——以及是不是真会。",
+   "fields": {
+    "skill_primary": {
+     "label": "主要本事",
+     "values": {
+      "investing": "投资",
+      "engineering": "工程",
+      "cooking": "厨艺",
+      "performance": "表演",
+      "scholarship": "学问",
+      "martial": "武术",
+      "design": "设计",
+      "medicine": "医术",
+      "law": "法律",
+      "sales": "销售",
+      "music": "音乐",
+      "games": "游戏",
+      "etiquette": "礼仪",
+      "crime": "犯罪",
+      "religion": "宗教",
+      "none": "没有"
+     }
+    },
+    "skill_secondary": {
+     "label": "第二本事",
+     "values": {
+      "investing": "投资",
+      "engineering": "工程",
+      "cooking": "厨艺",
+      "performance": "表演",
+      "scholarship": "学问",
+      "martial": "武术",
+      "design": "设计",
+      "medicine": "医术",
+      "law": "法律",
+      "sales": "销售",
+      "music": "音乐",
+      "games": "游戏",
+      "etiquette": "礼仪",
+      "crime": "犯罪",
+      "religion": "宗教",
+      "none": "没有"
+     }
+    },
+    "skill_honesty": {
+     "label": "本事是真的吗？",
+     "values": {
+      "truly-can": "真有本事",
+      "half-and-faking": "半真半唬",
+      "cannot-but-lives-on-it": "其实不会，却靠它吃饭"
+     }
+    }
+   }
+  },
+  "status": {
+   "name": "身份",
+   "blurb": "阶层、名气、法律记录、家庭状况。",
+   "fields": {
+    "class": {
+     "label": "阶层",
+     "values": {
+      "precarious": "朝不保夕",
+      "wage": "工薪族",
+      "professional": "专业人士",
+      "asset-owner": "有资产",
+      "fame-or-power": "有名或有权"
+     }
+    },
+    "publicness": {
+     "label": "名气",
+     "values": {
+      "invisible": "默默无闻",
+      "in-circle": "圈子里有名",
+      "industry-known": "行业里有名",
+      "mass-face": "走到哪都被认出"
+     }
+    },
+    "legal": {
+     "label": "法律记录",
+     "values": {
+      "clean": "清白",
+      "grey": "灰色",
+      "record": "有案底",
+      "incomplete-papers": "证件不全"
+     }
+    },
+    "household": {
+     "label": "家庭状况",
+     "values": {
+      "single": "单身",
+      "cohabiting": "同居",
+      "married": "已婚",
+      "divorced": "离异",
+      "secretly-partnered": "有秘密伴侣"
+     }
+    }
+   }
+  },
+  "signs": {
+   "name": "标识",
+   "blurb": "穿衣风格、说话方式、常出没的地方。",
+   "fields": {
+    "aesthetic": {
+     "label": "风格",
+     "values": {
+      "minimal-business": "极简商务",
+      "kimono": "和服",
+      "y2k": "Y2K",
+      "dark": "暗黑",
+      "preppy": "常春藤风",
+      "nightlife-host": "夜场风",
+      "workwear": "工装",
+      "tea-quiet": "茶室清雅",
+      "cyber": "赛博",
+      "home-undone": "居家邋遢",
+      "old-money": "老钱风",
+      "idol-packaged": "偶像包装"
+     }
+    },
+    "register": {
+     "label": "说话方式",
+     "values": {
+      "written-cold": "冷淡书面",
+      "kansai": "关西腔",
+      "over-keigo": "客气过头",
+      "short-vulgar": "简短粗口",
+      "warm-verbose": "热情话多",
+      "bilingual-mix": "两种语言混着说"
+     }
+    },
+    "stage": {
+     "label": "常出没于",
+     "values": {
+      "office": "办公室",
+      "bar": "酒吧",
+      "home": "家里",
+      "shrine-temple": "神社或寺庙",
+      "stage": "舞台",
+      "car": "车里",
+      "lab": "实验室",
+      "love-hotel-or-inn": "情侣酒店或旅馆"
+     }
+    }
+   }
+  },
+  "drama": {
+   "name": "戏份",
+   "blurb": "TA 在故事里的位置，和守着的秘密。",
+   "fields": {
+    "plot_role": {
+     "label": "故事角色",
+     "values": {
+      "lead": "主角",
+      "rival": "对手",
+      "mirror": "镜像",
+      "mentor": "导师",
+      "temptation": "诱惑",
+      "function-npc": "背景人物",
+      "unreliable-narrator": "不可靠的讲述者",
+      "ensemble": "群像一员"
+     }
+    },
+    "secret": {
+     "label": "秘密",
+     "values": {
+      "none": "没有",
+      "identity": "隐藏身份",
+      "debt": "欠债",
+      "affection": "暗恋",
+      "crime": "犯过罪",
+      "hidden-capability": "隐藏的能力"
+     }
+    },
+    "agency": {
+     "label": "主动权",
+     "values": {
+      "pushed-only": "被事情推着走",
+      "branch-choices": "能做真正的选择",
+      "can-change-ending": "能改变结局",
+      "breaks-fourth-wall": "会打破第四面墙"
+     }
+    }
+   }
+  },
+  "glitch": {
+   "name": "怪癖",
+   "blurb": "一个让人觉得真实的小习惯。",
+   "fields": {
+    "glitch": {
+     "label": "怪癖",
+     "values": {
+      "g01": "留着小时候的游戏存档，现在还会打开",
+      "g02": "一紧张就多给小费",
+      "g03": "坐电梯一定要数楼层",
+      "g04": "收集酒店的香皂，从来不用",
+      "g05": "笑总慢半拍",
+      "g06": "不肯用红笔写自己的名字",
+      "g07": "只能面朝门睡觉",
+      "g08": "钱包里放着仇人的名片",
+      "g09": "同一份早餐吃了好几年",
+      "g10": "错了也不先道歉",
+      "g11": "录语音备忘，从来不听",
+      "g12": "当众被夸就浑身不自在",
+      "g13": "顺走烟灰缸",
+      "g14": "不敢看自己的录像",
+      "g15": "故意留一颗扣子不扣",
+      "g16": "能报销的东西偏要自己付现金",
+      "g17": "背下没去过的城市的地铁图",
+      "g18": "另有一部只存五个联系人的手机",
+      "g19": "讨厌自己的字",
+      "g20": "点上香，又去开窗",
+      "g21": "最后一口永远不喝完",
+      "g22": "用去世同事的名字给盆栽起名",
+      "g23": "谁在会上说「协同效应」就起身走人",
+      "g24": "定制西装配一块便宜手表",
+      "g25": "演唱会门票一张都舍不得扔",
+      "g26": "在洗手间对着镜子练笑",
+      "g27": "跟人说的老家都是假的",
+      "g28": "刀磨得比做饭需要的还快",
+      "g29": "会把用户协议读完",
+      "g30": "不肯背对玻璃坐",
+      "g31": "用别人的名义捐款",
+      "g32": "故意把伞弄丢",
+      "g33": "吵架时引用合同条款",
+      "g34": "留着一枚假币当幸运币",
+      "g35": "拒绝过生日",
+      "g36": "给饭菜拍照，然后删掉",
+      "g37": "邮件落款用已故导师的那句",
+      "g38": "签过约的那张桌子上不喝酒",
+      "g39": "浏览器里有一个标签页永远不关",
+      "g40": "对服务员客气，对同辈刻薄",
+      "g41": "睡觉穿一家倒闭公司的 T 恤",
+      "g42": "随便玩玩的牌局也忍不住算牌",
+      "g43": "想念那座城时，不肯说出它的名字",
+      "g44": "买了花，任它枯掉",
+      "g45": "写好辞职信，从来不交",
+      "g46": "过了午夜就躲着镜子",
+      "g47": "留着一张别人家孩子的画",
+      "g48": "每次分手都换香水",
+      "g49": "最后一个饺子吃不下去",
+      "g50": "有一部旧翻盖机只用来联系一个人",
+      "g51": "只在星期二迷信",
+      "g52": "给算命的小费给太多",
+      "g53": "从不先翻最后一章",
+      "g54": "有个打官司的文件夹，标签写着「家人」",
+      "g55": "撒谎时会跑调地哼歌",
+      "g56": "同一家航空公司绝不坐第二次",
+      "g57": "空房间也开着灯",
+      "g58": "收集地图，上面画着永远不会走的路线",
+      "g59": "说「我们」其实是指「我」",
+      "g60": "办公室里的植物总养不活",
+      "g61": "清空浏览记录，却另记一本纸质日志",
+      "g62": "戴着一枚不代表承诺的戒指",
+      "g63": "在葬礼上回工作邮件"
+     }
+    }
+   }
+  }
+ },
+ "gods": {
+  "companion": {
+   "name": "同辈",
+   "want": "平起平坐，谁也不欠。",
+   "cost": "快淹死了也不要人帮；每份好意都当成一笔债。",
+   "break": "被逼着依赖别人——再也没法一个人做成。"
+  },
+  "rob_wealth": {
+   "name": "对手",
+   "want": "要赢——尤其是赢过和自己很像的人。",
+   "cost": "跟最亲近的人较劲；小输一回也放不下。",
+   "break": "当众输给一个自认为平起平坐的人。"
+  },
+  "eating_god": {
+   "name": "创作者",
+   "want": "做点东西，不紧不慢地享受它。",
+   "cost": "一遇冲突和截止日期就溜开；舒适变成了逃避。",
+   "break": "被困进一种生活，没有一点空间做自己的东西。"
+  },
+  "hurting_officer": {
+   "name": "叛逆者",
+   "want": "才华出众，把真话说出口。",
+   "cost": "用真话伤人；见到权威就想顶。",
+   "break": "被噤声——或者才华被有权的人一笔抹掉。"
+  },
+  "indirect_wealth": {
+   "name": "冒险家",
+   "want": "大机会、广人脉、流动的钱。",
+   "cost": "精力摊得太薄；答应的比做得到的多。",
+   "break": "一场赌局输了，连「出手大方」的名声也一起赔掉。"
+  },
+  "direct_wealth": {
+   "name": "顶梁柱",
+   "want": "脚下踏实：挣来的钱，守住的承诺，一个撑得住的家。",
+   "cost": "什么都要算清楚；爱也开始像一本账。",
+   "break": "一点点攒下的东西，毁在自己控制不了的事上。"
+  },
+  "seven_killings": {
+   "name": "战士",
+   "want": "迎着威胁上，最后由自己掌控局面。",
+   "cost": "时刻戒备；连温柔都当成攻击来接。",
+   "break": "被逼到墙角无从还手——在别人面前束手无策。"
+  },
+  "direct_officer": {
+   "name": "守序者",
+   "want": "被信任，把事做对，在秩序里有自己的位置。",
+   "cost": "为了被认可把异议咽下去；规矩成了藏身之处。",
+   "break": "当众丢脸——头衔或信任被收回。"
+  },
+  "indirect_resource": {
+   "name": "玄思者",
+   "want": "按自己古怪的方式，看懂别人看不到的东西。",
+   "cost": "往后缩，不信任温暖，让猜疑替自己说话。",
+   "break": "被看成普通人、一眼看穿——内心世界被人嘲笑。"
+  },
+  "direct_resource": {
+   "name": "照料者",
+   "want": "被照顾——也去照顾、保护、教导别人。",
+   "cost": "等着被选中；容易把「被需要」当成「被爱」。",
+   "break": "让自己觉得安全的那个人或那个地方消失了。"
+  }
+ },
+ "masks": {
+  "social_face": {
+   "label": "社交面孔",
+   "lines": {
+    "companion": "对陌生人：友好但一碗水端平——谁都没有特殊待遇，自己也不例外。",
+    "rob_wealth": "对陌生人：开玩笑快，比较更快；暗暗掂量谁领先。",
+    "eating_god": "对陌生人：随和大方，吃的、笑话、时间都舍得给。",
+    "hurting_officer": "对陌生人：犀利有趣，初次见面就有点太实话实说。",
+    "indirect_wealth": "对陌生人：全场焦点——记得每个人的名字，抢着买单。",
+    "direct_wealth": "对陌生人：礼貌务实，留意谁付了钱、谁没付。",
+    "seven_killings": "对陌生人：戒备而有压迫感；别人能感觉到不该逼太紧。",
+    "direct_officer": "对陌生人：得体、沉稳，很在意场面。",
+    "indirect_resource": "对陌生人：让人看不透；用问题回答问题。",
+    "direct_resource": "对陌生人：温和细心——会问你吃饭了没有的那一个。"
+   }
+  },
+  "work_mode": {
+   "label": "工作状态",
+   "lines": {
+    "companion": "工作中：自己扛；宁可一个人重做，也不交给别人。",
+    "rob_wealth": "工作中：好胜又快；把同事当成记分牌。",
+    "eating_god": "工作中：手艺优先于速度；按自己的节奏做出漂亮的活。",
+    "hurting_officer": "工作中：有创意也不服管；偏去修别人说别碰的东西。",
+    "indirect_wealth": "工作中：擅长谈生意；同时抓五个机会，总会掉一个。",
+    "direct_wealth": "工作中：靠得住、做事周全，账目清清楚楚。",
+    "seven_killings": "工作中：越乱越来劲；出了事就站出来指挥。",
+    "direct_officer": "工作中：按流程办事，赢得信任，循正当途径往上走。",
+    "indirect_resource": "工作中：专家型；最擅长那种没人愿意碰的怪问题。",
+    "direct_resource": "工作中：带人的那位；让团队更安稳，也更慢。"
+   }
+  },
+  "private_self": {
+   "label": "私下的样子",
+   "lines": {
+    "companion": "私下里：恋爱中也要自己的空间；感情是平等地给。",
+    "rob_wealth": "私下里：占有欲强又爱闹；吃醋时就变成逗人。",
+    "eating_god": "私下里：柔软、感性，最开心的是在家给人做饭。",
+    "hurting_officer": "私下里：情绪浓烈；靠吵架来拉近距离。",
+    "indirect_wealth": "私下里：一阵一阵地浪漫，然后又分心；喜欢追的过程。",
+    "direct_wealth": "私下里：忠诚稳定；用替你做事来表达爱。",
+    "seven_killings": "私下里：护短到凶；吵过一架才肯露出软处。",
+    "direct_officer": "私下里：亲近时也端端正正；感情藏在责任里。",
+    "indirect_resource": "私下里：很少让人进来；一旦进来，会看到一整个藏起来的世界。",
+    "direct_resource": "私下里：想被抱，也想抱人；记得每一点小小的好。"
+   }
+  },
+  "inner_drive": {
+   "label": "内心驱动",
+   "lines": {
+    "companion": "心底里：想证明自己从来不需要任何人——又希望自己错了。",
+    "rob_wealth": "心底里：哪怕就一次，不用开口，就被选中而不是对手。",
+    "eating_god": "心底里：一段完全属于自己的安静日子。",
+    "hurting_officer": "心底里：被一个重要的人认定为与众不同。",
+    "indirect_wealth": "心底里：自由——永远不被绑在一个地方、一种命运上。",
+    "direct_wealth": "心底里：让所爱的人有保障，算得清、靠得住。",
+    "seven_killings": "心底里：再也不要无能为力。",
+    "direct_officer": "心底里：一个比自己活得更久的好名声。",
+    "indirect_resource": "心底里：弄懂为什么——尤其是关于自己的。",
+    "direct_resource": "心底里：一个不用争取、自然就被需要的家。"
+   }
+  }
+ },
+ "strength": {
+  "strong": "自驱型：向外推，不愿被人摆布。",
+  "balanced": "应变型：随情况弯曲，但不丢主线。",
+  "weak": "关系型：从身边的人和环境里汲取力量。"
+ },
+ "places": {
+  "tokyo": "东京",
+  "osaka": "大阪",
+  "kyoto": "京都",
+  "sapporo": "札幌",
+  "fukuoka": "福冈",
+  "seoul": "首尔",
+  "busan": "釜山",
+  "beijing": "北京",
+  "shanghai": "上海",
+  "guangzhou": "广州",
+  "shenzhen": "深圳",
+  "chengdu": "成都",
+  "harbin": "哈尔滨",
+  "urumqi": "乌鲁木齐",
+  "hongkong": "香港",
+  "macau": "澳门",
+  "taipei": "台北",
+  "kaohsiung": "高雄",
+  "ulaanbaatar": "乌兰巴托",
+  "singapore": "新加坡",
+  "kualalumpur": "吉隆坡",
+  "bangkok": "曼谷",
+  "hochiminh": "胡志明市",
+  "hanoi": "河内",
+  "manila": "马尼拉",
+  "jakarta": "雅加达",
+  "mumbai": "孟买",
+  "delhi": "德里",
+  "karachi": "卡拉奇",
+  "dhaka": "达卡",
+  "sydney": "悉尼",
+  "melbourne": "墨尔本",
+  "perth": "珀斯",
+  "auckland": "奥克兰",
+  "dubai": "迪拜",
+  "tehran": "德黑兰",
+  "istanbul": "伊斯坦布尔",
+  "telaviv": "特拉维夫",
+  "cairo": "开罗",
+  "lagos": "拉各斯",
+  "nairobi": "内罗毕",
+  "johannesburg": "约翰内斯堡",
+  "london": "伦敦",
+  "dublin": "都柏林",
+  "lisbon": "里斯本",
+  "paris": "巴黎",
+  "madrid": "马德里",
+  "barcelona": "巴塞罗那",
+  "rome": "罗马",
+  "milan": "米兰",
+  "berlin": "柏林",
+  "munich": "慕尼黑",
+  "amsterdam": "阿姆斯特丹",
+  "brussels": "布鲁塞尔",
+  "zurich": "苏黎世",
+  "vienna": "维也纳",
+  "prague": "布拉格",
+  "warsaw": "华沙",
+  "stockholm": "斯德哥尔摩",
+  "oslo": "奥斯陆",
+  "copenhagen": "哥本哈根",
+  "helsinki": "赫尔辛基",
+  "athens": "雅典",
+  "kyiv": "基辅",
+  "moscow": "莫斯科",
+  "newyork": "纽约",
+  "boston": "波士顿",
+  "miami": "迈阿密",
+  "chicago": "芝加哥",
+  "houston": "休斯敦",
+  "denver": "丹佛",
+  "phoenix": "菲尼克斯",
+  "losangeles": "洛杉矶",
+  "sanfrancisco": "旧金山",
+  "seattle": "西雅图",
+  "honolulu": "檀香山",
+  "anchorage": "安克雷奇",
+  "toronto": "多伦多",
+  "montreal": "蒙特利尔",
+  "vancouver": "温哥华",
+  "mexicocity": "墨西哥城",
+  "havana": "哈瓦那",
+  "bogota": "波哥大",
+  "lima": "利马",
+  "santiago": "圣地亚哥",
+  "buenosaires": "布宜诺斯艾利斯",
+  "saopaulo": "圣保罗",
+  "riodejaneiro": "里约热内卢"
+ },
+ "countries": {
+  "Japan": "日本",
+  "South Korea": "韩国",
+  "China": "中国",
+  "Taiwan": "台湾",
+  "Mongolia": "蒙古",
+  "Singapore": "新加坡",
+  "Malaysia": "马来西亚",
+  "Thailand": "泰国",
+  "Vietnam": "越南",
+  "Philippines": "菲律宾",
+  "Indonesia": "印度尼西亚",
+  "India": "印度",
+  "Pakistan": "巴基斯坦",
+  "Bangladesh": "孟加拉国",
+  "Australia": "澳大利亚",
+  "New Zealand": "新西兰",
+  "United Arab Emirates": "阿联酋",
+  "Iran": "伊朗",
+  "Türkiye": "土耳其",
+  "Israel": "以色列",
+  "Egypt": "埃及",
+  "Nigeria": "尼日利亚",
+  "Kenya": "肯尼亚",
+  "South Africa": "南非",
+  "United Kingdom": "英国",
+  "Ireland": "爱尔兰",
+  "Portugal": "葡萄牙",
+  "France": "法国",
+  "Spain": "西班牙",
+  "Italy": "意大利",
+  "Germany": "德国",
+  "Netherlands": "荷兰",
+  "Belgium": "比利时",
+  "Switzerland": "瑞士",
+  "Austria": "奥地利",
+  "Czechia": "捷克",
+  "Poland": "波兰",
+  "Sweden": "瑞典",
+  "Norway": "挪威",
+  "Denmark": "丹麦",
+  "Finland": "芬兰",
+  "Greece": "希腊",
+  "Ukraine": "乌克兰",
+  "Russia": "俄罗斯",
+  "United States": "美国",
+  "Canada": "加拿大",
+  "Mexico": "墨西哥",
+  "Cuba": "古巴",
+  "Colombia": "哥伦比亚",
+  "Peru": "秘鲁",
+  "Chile": "智利",
+  "Argentina": "阿根廷",
+  "Brazil": "巴西"
+ }
+}

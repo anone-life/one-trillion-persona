@@ -1,0 +1,647 @@
+{
+ "_note": "表示用テキストのみ。id は変わらない。項目が欠けている場合は英語にフォールバックする（spec/enums.v1.json、spec/translation.v1.json、packages/core/src/places.ts）。",
+ "layers": {
+  "world": {
+   "name": "世界",
+   "blurb": "いつ、どこで暮らしているか。どんな社会か。",
+   "fields": {
+    "era": {
+     "label": "時代",
+     "values": {
+      "2026": "2026年",
+      "late-qing": "清朝末期",
+      "showa": "昭和の日本",
+      "1990s": "1990年代",
+      "2010s": "2010年代",
+      "near-future": "近未来",
+      "alternate-history": "もうひとつの歴史",
+      "in-network-virtual": "ネットワークの中"
+     }
+    },
+    "city": {
+     "label": "都市",
+     "values": {
+      "tokyo": "東京",
+      "kyoto": "京都",
+      "osaka": "大阪",
+      "seoul": "ソウル",
+      "shanghai": "上海",
+      "shenzhen": "深圳",
+      "taipei": "台北",
+      "singapore": "シンガポール",
+      "hongkong": "香港",
+      "newyork": "ニューヨーク",
+      "london": "ロンドン",
+      "paris": "パリ",
+      "berlin": "ベルリン",
+      "bangkok": "バンコク",
+      "fremont-sf": "フリーモント／サンフランシスコ",
+      "unnamed-port": "名もない港町"
+     }
+    },
+    "law": {
+     "label": "社会のルール",
+     "values": {
+      "peaceful-legal": "平和で法が機能している",
+      "heavy-censorship": "検閲が厳しい",
+      "grey-tolerated": "グレーゾーンに寛容",
+      "wartime": "戦時中",
+      "closed-community": "閉ざされた共同体",
+      "fully-fictional-rules": "完全に架空のルール"
+     }
+    },
+    "scarcity": {
+     "label": "経済",
+     "values": {
+      "abundant": "豊か",
+      "wage-normal": "ふつうの賃金",
+      "shortage": "物不足",
+      "extreme-inequality": "極端な格差"
+     }
+    }
+   }
+  },
+  "body": {
+   "name": "身体",
+   "blurb": "見た目と声。必ず成人。",
+   "fields": {
+    "embodiment": {
+     "label": "姿",
+     "values": {
+      "live-action-human": "実写の人間",
+      "virtual-idol": "バーチャルアイドル",
+      "animated-body": "アニメの身体",
+      "voice-only": "声だけ"
+     }
+    },
+    "age_look": {
+     "label": "見た目の年齢",
+     "values": {
+      "18-22": "18〜22",
+      "23-27": "23〜27",
+      "28-34": "28〜34",
+      "35-44": "35〜44",
+      "45-54": "45〜54",
+      "55-plus": "55以上"
+     }
+    },
+    "gender_present": {
+     "label": "見え方",
+     "values": {
+      "masculine": "男性的",
+      "feminine": "女性的",
+      "androgynous": "中性的",
+      "mutable": "変わる"
+     }
+    },
+    "voice": {
+     "label": "声",
+     "values": {
+      "low": "低い",
+      "breathy": "息まじり",
+      "youthful": "若々しい",
+      "broadcast": "アナウンサー風",
+      "raspy": "かすれ声",
+      "sweet": "甘い",
+      "cold": "冷たい",
+      "synthetic": "合成音声"
+     }
+    }
+   }
+  },
+  "skills": {
+   "name": "スキル",
+   "blurb": "何ができるか。そして、本当にできるのか。",
+   "fields": {
+    "skill_primary": {
+     "label": "メインスキル",
+     "values": {
+      "investing": "投資",
+      "engineering": "エンジニアリング",
+      "cooking": "料理",
+      "performance": "パフォーマンス",
+      "scholarship": "学問",
+      "martial": "武術",
+      "design": "デザイン",
+      "medicine": "医療",
+      "law": "法律",
+      "sales": "営業",
+      "music": "音楽",
+      "games": "ゲーム",
+      "etiquette": "礼儀作法",
+      "crime": "犯罪",
+      "religion": "宗教",
+      "none": "なし"
+     }
+    },
+    "skill_secondary": {
+     "label": "サブスキル",
+     "values": {
+      "investing": "投資",
+      "engineering": "エンジニアリング",
+      "cooking": "料理",
+      "performance": "パフォーマンス",
+      "scholarship": "学問",
+      "martial": "武術",
+      "design": "デザイン",
+      "medicine": "医療",
+      "law": "法律",
+      "sales": "営業",
+      "music": "音楽",
+      "games": "ゲーム",
+      "etiquette": "礼儀作法",
+      "crime": "犯罪",
+      "religion": "宗教",
+      "none": "なし"
+     }
+    },
+    "skill_honesty": {
+     "label": "腕前は本物？",
+     "values": {
+      "truly-can": "本物の腕前",
+      "half-and-faking": "半分本物、半分はったり",
+      "cannot-but-lives-on-it": "実はできない——でもそれで食べている"
+     }
+    }
+   }
+  },
+  "status": {
+   "name": "立場",
+   "blurb": "階層、知名度、法的な経歴、暮らし方。",
+   "fields": {
+    "class": {
+     "label": "階層",
+     "values": {
+      "precarious": "不安定",
+      "wage": "給与所得者",
+      "professional": "専門職",
+      "asset-owner": "資産持ち",
+      "fame-or-power": "有名人・権力者"
+     }
+    },
+    "publicness": {
+     "label": "知名度",
+     "values": {
+      "invisible": "無名",
+      "in-circle": "仲間内で有名",
+      "industry-known": "業界で有名",
+      "mass-face": "誰もが知る顔"
+     }
+    },
+    "legal": {
+     "label": "法的な経歴",
+     "values": {
+      "clean": "潔白",
+      "grey": "グレー",
+      "record": "前科あり",
+      "incomplete-papers": "書類が不完全"
+     }
+    },
+    "household": {
+     "label": "暮らし",
+     "values": {
+      "single": "独身",
+      "cohabiting": "同棲中",
+      "married": "既婚",
+      "divorced": "離婚歴あり",
+      "secretly-partnered": "秘密の相手がいる"
+     }
+    }
+   }
+  },
+  "signs": {
+   "name": "しるし",
+   "blurb": "スタイル、話し方、よくいる場所。",
+   "fields": {
+    "aesthetic": {
+     "label": "スタイル",
+     "values": {
+      "minimal-business": "ミニマルなビジネス",
+      "kimono": "着物",
+      "y2k": "Y2K",
+      "dark": "ダーク",
+      "preppy": "プレッピー",
+      "nightlife-host": "夜の街のホスト風",
+      "workwear": "ワークウェア",
+      "tea-quiet": "静かな茶室風",
+      "cyber": "サイバー",
+      "home-undone": "家でだらしない",
+      "old-money": "オールドマネー",
+      "idol-packaged": "アイドル仕立て"
+     }
+    },
+    "register": {
+     "label": "話し方",
+     "values": {
+      "written-cold": "冷たく硬い",
+      "kansai": "関西弁",
+      "over-keigo": "丁寧すぎる敬語",
+      "short-vulgar": "ぶっきらぼうで粗い",
+      "warm-verbose": "あたたかくおしゃべり",
+      "bilingual-mix": "二か国語まじり"
+     }
+    },
+    "stage": {
+     "label": "よくいる場所",
+     "values": {
+      "office": "オフィス",
+      "bar": "バー",
+      "home": "自宅",
+      "shrine-temple": "神社・寺",
+      "stage": "舞台",
+      "car": "車の中",
+      "lab": "研究室",
+      "love-hotel-or-inn": "ラブホテル・旅館"
+     }
+    }
+   }
+  },
+  "drama": {
+   "name": "ドラマ",
+   "blurb": "物語の中での位置と、抱えている秘密。",
+   "fields": {
+    "plot_role": {
+     "label": "物語での役",
+     "values": {
+      "lead": "主役",
+      "rival": "ライバル",
+      "mirror": "鏡像",
+      "mentor": "導き手",
+      "temptation": "誘惑",
+      "function-npc": "脇役",
+      "unreliable-narrator": "信頼できない語り手",
+      "ensemble": "群像の一人"
+     }
+    },
+    "secret": {
+     "label": "秘密",
+     "values": {
+      "none": "なし",
+      "identity": "隠された正体",
+      "debt": "借金",
+      "affection": "秘めた恋",
+      "crime": "罪",
+      "hidden-capability": "隠れた能力"
+     }
+    },
+    "agency": {
+     "label": "物語への関わり",
+     "values": {
+      "pushed-only": "流されるまま",
+      "branch-choices": "自分で選ぶ",
+      "can-change-ending": "結末を変えられる",
+      "breaks-fourth-wall": "第四の壁を破る"
+     }
+    }
+   }
+  },
+  "glitch": {
+   "name": "クセ",
+   "blurb": "その人を本物に感じさせる、小さな習慣ひとつ。",
+   "fields": {
+    "glitch": {
+     "label": "クセ",
+     "values": {
+      "g01": "子どもの頃のゲームのセーブデータを今も開く",
+      "g02": "緊張するとチップを払いすぎる",
+      "g03": "エレベーターでは階数を数えずにいられない",
+      "g04": "ホテルの石けんを集めて、一度も使わない",
+      "g05": "笑うのがワンテンポ遅い",
+      "g06": "自分の名前を赤で書くのを拒む",
+      "g07": "ドアのほうを向いてしか眠れない",
+      "g08": "敵の名刺を財布に入れている",
+      "g09": "何年も同じ朝食を食べている",
+      "g10": "自分が悪くても先に謝らない",
+      "g11": "ボイスメモを録っては一度も聞き返さない",
+      "g12": "人前で褒められるのが苦手",
+      "g13": "灰皿を持ち帰る",
+      "g14": "自分の映った録画を見られない",
+      "g15": "わざとボタンをひとつ外している",
+      "g16": "経費で落とせるものを現金で払う",
+      "g17": "行ったことのない街の路線図を暗記している",
+      "g18": "連絡先が五件だけの二台目の携帯を持っている",
+      "g19": "自分の字が嫌い",
+      "g20": "お香を焚いてから窓を開ける",
+      "g21": "最後のひと口を必ず残す",
+      "g22": "観葉植物に亡くなった同僚の名前をつける",
+      "g23": "「シナジー」という言葉が出た会議は途中で出ていく",
+      "g24": "仕立てのいいスーツに安い腕時計",
+      "g25": "ライブのチケットを捨てられない",
+      "g26": "洗面所で笑顔の練習をする",
+      "g27": "出身地を偽って答える",
+      "g28": "台所に必要な以上に鋭いナイフを持っている",
+      "g29": "利用規約を読む",
+      "g30": "ガラスを背にして座らない",
+      "g31": "他人の名義で寄付する",
+      "g32": "傘をわざとなくす",
+      "g33": "恋人とのけんかで契約書の条文を持ち出す",
+      "g34": "お守りのコインが偽造硬貨",
+      "g35": "誕生日を祝わせない",
+      "g36": "食事の写真を撮っては消す",
+      "g37": "亡くなった恩師のメール署名を使っている",
+      "g38": "契約を結んだテーブルでは酒が飲めない",
+      "g39": "ブラウザにずっと開きっぱなしのタブがひとつある",
+      "g40": "店員にはやさしく、同僚には冷酷",
+      "g41": "つぶれた会社のTシャツで寝る",
+      "g42": "遊びのカードゲームでもカウンティングをやめない",
+      "g43": "恋しい街の名前を口にしない",
+      "g44": "花を買っては枯らす",
+      "g45": "出さない辞表を書く",
+      "g46": "深夜零時を過ぎると鏡を避ける",
+      "g47": "自分の子ではない子どもの絵を取ってある",
+      "g48": "別れるたびに香水を変える",
+      "g49": "最後の餃子に手をつけられない",
+      "g50": "古いガラケーをひとりのためだけに使う",
+      "g51": "火曜日だけ縁起をかつぐ",
+      "g52": "占い師に多めに払う",
+      "g53": "最終章を先に読むことは絶対にしない",
+      "g54": "「家族」と書いたファイルに訴訟の書類を入れている",
+      "g55": "嘘をつくと音程を外して鼻歌を歌う",
+      "g56": "同じ航空会社には二度と乗らない",
+      "g57": "誰もいない部屋の電気をつけっぱなしにする",
+      "g58": "行くつもりのないルートを書き込んだ地図を集める",
+      "g59": "「私」と言うべきところで「私たち」と言う",
+      "g60": "オフィスでは植物を育てられない",
+      "g61": "閲覧履歴を消して、紙に記録をつける",
+      "g62": "約束の意味のない指輪をはめている",
+      "g63": "葬儀の最中に仕事のメールに返信する"
+     }
+    }
+   }
+  }
+ },
+ "gods": {
+  "companion": {
+   "name": "対等な人",
+   "want": "誰とも対等に立ち、誰にも借りをつくらないこと。",
+   "cost": "溺れかけていても助けを断る。親切はすべて借りとして数える。",
+   "break": "人に頼らざるを得なくされること——ひとりでやる力を奪われること。"
+  },
+  "rob_wealth": {
+   "name": "ライバル",
+   "want": "勝つこと——とくに自分によく似た相手に。",
+   "cost": "いちばん身近な人と張り合う。小さな負けも水に流せない。",
+   "break": "対等だと思っていた相手に、人前で負けること。"
+  },
+  "eating_god": {
+   "name": "つくり手",
+   "want": "ものをつくり、急がずに味わうこと。",
+   "cost": "衝突や締め切りから遠ざかる。心地よさが逃げ道になる。",
+   "break": "自分のものを何ひとつつくる余地のない暮らしに押し込まれること。"
+  },
+  "hurting_officer": {
+   "name": "反逆者",
+   "want": "才気を放ち、本当のことを声に出して言うこと。",
+   "cost": "真実で人を傷つける。権威と見れば噛みつく。",
+   "break": "黙らされること——あるいは力を持つ誰かに才能を一蹴されること。"
+  },
+  "indirect_wealth": {
+   "name": "冒険家",
+   "want": "大きなチャンス、広い人脈、動くお金。",
+   "cost": "気が散って薄くなる。守れる以上の約束をする。",
+   "break": "賭けに失敗し、気前のいい人という評判まで一緒に失うこと。"
+  },
+  "direct_wealth": {
+   "name": "支え手",
+   "want": "確かな足場——稼いだお金、守られた約束、崩れない家。",
+   "cost": "何でも勘定する。愛まで帳簿のように見えてくる。",
+   "break": "少しずつ築いたものを、自分ではどうにもならない何かに奪われること。"
+  },
+  "seven_killings": {
+   "name": "戦士",
+   "want": "脅威に正面から向き合い、主導権を握って切り抜けること。",
+   "cost": "いつも臨戦態勢。やさしさを攻撃のように受け止めてしまう。",
+   "break": "戦う手立てもなく追い詰められること——人前で無力になること。"
+  },
+  "direct_officer": {
+   "name": "守り手",
+   "want": "信頼されること、正しくやること、秩序の中に居場所を持つこと。",
+   "cost": "認められるために反論をのみ込む。規則が隠れ場所になる。",
+   "break": "公の恥辱——肩書きや信頼を取り上げられること。"
+  },
+  "indirect_resource": {
+   "name": "神秘家",
+   "want": "他人が見落とすものを、自分なりの風変わりなやり方で理解すること。",
+   "cost": "引きこもり、ぬくもりを疑い、猜疑心に語らせる。",
+   "break": "ありきたりで見透かされる存在にされること——内なる世界を笑われること。"
+  },
+  "direct_resource": {
+   "name": "育む人",
+   "want": "大切にされること——そして世話をし、守り、教えること。",
+   "cost": "選ばれるのを待つ。必要とされることを愛されることと取り違える。",
+   "break": "安心をくれた人や場所が消えてしまうこと。"
+  }
+ },
+ "masks": {
+  "social_face": {
+   "label": "人前の顔",
+   "lines": {
+    "companion": "初対面では：親しげだが分け隔てがない——自分も含めて、誰も特別扱いしない。",
+    "rob_wealth": "初対面では：すぐ冗談を言い、それ以上にすぐ比べる。誰が上かを見定める。",
+    "eating_god": "初対面では：おおらかで、食べ物にも冗談にも時間にも気前がいい。",
+    "hurting_officer": "初対面では：鋭くて面白い。初めて会うにはちょっと正直すぎる。",
+    "indirect_wealth": "初対面では：場の中心。名前を覚え、会計を持つ。",
+    "direct_wealth": "初対面では：礼儀正しく現実的。誰が払って誰が払わないかを見ている。",
+    "seven_killings": "初対面では：警戒心が強く、張りつめている。踏み込まないほうがいいと周りが察する。",
+    "direct_officer": "初対面では：きちんとして落ち着いていて、体裁に気を配る。",
+    "indirect_resource": "初対面では：読みにくい。質問に質問で返す。",
+    "direct_resource": "初対面では：穏やかで気が利く——「ご飯食べた？」と聞いてくる人。"
+   }
+  },
+  "work_mode": {
+   "label": "仕事モード",
+   "lines": {
+    "companion": "仕事では：自立している。人に任せるくらいなら、ひとりでやり直す。",
+    "rob_wealth": "仕事では：負けず嫌いで速い。同僚をスコアボードのように見る。",
+    "eating_god": "仕事では：速さより出来。自分のペースで美しい仕事をする。",
+    "hurting_officer": "仕事では：革新的で言うことを聞かない。触るなと言われたものを直してしまう。",
+    "indirect_wealth": "仕事では：まとめ役の交渉人。五つのチャンスを回して、ひとつ落とす。",
+    "direct_wealth": "仕事では：頼れて抜かりがない。帳簿をきっちり合わせる。",
+    "seven_killings": "仕事では：危機に強い。うまくいかないときに指揮を執る。",
+    "direct_officer": "仕事では：手順を守り、信頼を得て、正規の道筋で昇っていく。",
+    "indirect_resource": "仕事では：専門家。誰も手をつけたがらない奇妙な問題に冴えを見せる。",
+    "direct_resource": "仕事では：面倒見役。チームを安全にし、そのぶん遅くする。"
+   }
+  },
+  "private_self": {
+   "label": "素顔",
+   "lines": {
+    "companion": "ふたりきりでは：恋をしていても自分の空間が要る。愛情は対等な者同士として渡す。",
+    "rob_wealth": "ふたりきりでは：独占欲が強くて茶目っ気がある。嫉妬はからかいになって出る。",
+    "eating_god": "ふたりきりでは：やわらかく官能的。家で誰かのために料理しているときがいちばん幸せ。",
+    "hurting_officer": "ふたりきりでは：感情が鮮やか。言い争うことで近さを感じる。",
+    "indirect_wealth": "ふたりきりでは：ときおり燃え上がり、すぐ気が散る。追いかけることが好き。",
+    "direct_wealth": "ふたりきりでは：誠実で安定している。何かをしてあげることで愛を示す。",
+    "seven_killings": "ふたりきりでは：激しく守ろうとする。弱さを見せるのは、ぶつかり合ったあとだけ。",
+    "direct_officer": "ふたりきりでは：親しくなっても折り目正しい。気持ちは責任という形で表す。",
+    "indirect_resource": "ふたりきりでは：心を許す相手はごくわずか。入れてもらえたら、隠された世界がまるごと見える。",
+    "direct_resource": "ふたりきりでは：抱きしめられたいし、抱きしめたい。小さな親切をひとつ残らず覚えている。"
+   }
+  },
+  "inner_drive": {
+   "label": "心の奥の衝動",
+   "lines": {
+    "companion": "心の奥では：誰も必要なかったと証明したい——そして、それが間違いであってほしい。",
+    "rob_wealth": "心の奥では：一度でいいから、頼まなくてもライバルより自分を選んでほしい。",
+    "eating_god": "心の奥では：まるごと自分のものである、静かな暮らし。",
+    "hurting_officer": "心の奥では：大切な誰かに、特別な存在だと認められたい。",
+    "indirect_wealth": "心の奥では：自由——ひとつの場所にも、ひとつの運命にも縛られないこと。",
+    "direct_wealth": "心の奥では：愛する人たちの安心を、数字で測れる確かな形で守りたい。",
+    "seven_killings": "心の奥では：二度と無力にならないこと。",
+    "direct_officer": "心の奥では：自分がいなくなっても残る、誇れる名前。",
+    "indirect_resource": "心の奥では：「なぜ」を理解したい——何より自分自身について。",
+    "direct_resource": "心の奥では：何かと引き換えにしなくても求めてもらえる居場所。"
+   }
+  }
+ },
+ "strength": {
+  "strong": "自分で動く型：外へ押し出し、操られるのを拒む。",
+  "balanced": "適応型：状況に合わせてしなやかに曲がり、それでも筋は失わない。",
+  "weak": "関係型：周りの人や仕組みから力を得る。"
+ },
+ "places": {
+  "tokyo": "東京",
+  "osaka": "大阪",
+  "kyoto": "京都",
+  "sapporo": "札幌",
+  "fukuoka": "福岡",
+  "seoul": "ソウル",
+  "busan": "釜山",
+  "beijing": "北京",
+  "shanghai": "上海",
+  "guangzhou": "広州",
+  "shenzhen": "深圳",
+  "chengdu": "成都",
+  "harbin": "ハルビン",
+  "urumqi": "ウルムチ",
+  "hongkong": "香港",
+  "macau": "マカオ",
+  "taipei": "台北",
+  "kaohsiung": "高雄",
+  "ulaanbaatar": "ウランバートル",
+  "singapore": "シンガポール",
+  "kualalumpur": "クアラルンプール",
+  "bangkok": "バンコク",
+  "hochiminh": "ホーチミン",
+  "hanoi": "ハノイ",
+  "manila": "マニラ",
+  "jakarta": "ジャカルタ",
+  "mumbai": "ムンバイ",
+  "delhi": "デリー",
+  "karachi": "カラチ",
+  "dhaka": "ダッカ",
+  "sydney": "シドニー",
+  "melbourne": "メルボルン",
+  "perth": "パース",
+  "auckland": "オークランド",
+  "dubai": "ドバイ",
+  "tehran": "テヘラン",
+  "istanbul": "イスタンブール",
+  "telaviv": "テルアビブ",
+  "cairo": "カイロ",
+  "lagos": "ラゴス",
+  "nairobi": "ナイロビ",
+  "johannesburg": "ヨハネスブルグ",
+  "london": "ロンドン",
+  "dublin": "ダブリン",
+  "lisbon": "リスボン",
+  "paris": "パリ",
+  "madrid": "マドリード",
+  "barcelona": "バルセロナ",
+  "rome": "ローマ",
+  "milan": "ミラノ",
+  "berlin": "ベルリン",
+  "munich": "ミュンヘン",
+  "amsterdam": "アムステルダム",
+  "brussels": "ブリュッセル",
+  "zurich": "チューリッヒ",
+  "vienna": "ウィーン",
+  "prague": "プラハ",
+  "warsaw": "ワルシャワ",
+  "stockholm": "ストックホルム",
+  "oslo": "オスロ",
+  "copenhagen": "コペンハーゲン",
+  "helsinki": "ヘルシンキ",
+  "athens": "アテネ",
+  "kyiv": "キーウ",
+  "moscow": "モスクワ",
+  "newyork": "ニューヨーク",
+  "boston": "ボストン",
+  "miami": "マイアミ",
+  "chicago": "シカゴ",
+  "houston": "ヒューストン",
+  "denver": "デンバー",
+  "phoenix": "フェニックス",
+  "losangeles": "ロサンゼルス",
+  "sanfrancisco": "サンフランシスコ",
+  "seattle": "シアトル",
+  "honolulu": "ホノルル",
+  "anchorage": "アンカレッジ",
+  "toronto": "トロント",
+  "montreal": "モントリオール",
+  "vancouver": "バンクーバー",
+  "mexicocity": "メキシコシティ",
+  "havana": "ハバナ",
+  "bogota": "ボゴタ",
+  "lima": "リマ",
+  "santiago": "サンティアゴ",
+  "buenosaires": "ブエノスアイレス",
+  "saopaulo": "サンパウロ",
+  "riodejaneiro": "リオデジャネイロ"
+ },
+ "countries": {
+  "Japan": "日本",
+  "South Korea": "韓国",
+  "China": "中国",
+  "Taiwan": "台湾",
+  "Mongolia": "モンゴル",
+  "Singapore": "シンガポール",
+  "Malaysia": "マレーシア",
+  "Thailand": "タイ",
+  "Vietnam": "ベトナム",
+  "Philippines": "フィリピン",
+  "Indonesia": "インドネシア",
+  "India": "インド",
+  "Pakistan": "パキスタン",
+  "Bangladesh": "バングラデシュ",
+  "Australia": "オーストラリア",
+  "New Zealand": "ニュージーランド",
+  "United Arab Emirates": "アラブ首長国連邦",
+  "Iran": "イラン",
+  "Türkiye": "トルコ",
+  "Israel": "イスラエル",
+  "Egypt": "エジプト",
+  "Nigeria": "ナイジェリア",
+  "Kenya": "ケニア",
+  "South Africa": "南アフリカ",
+  "United Kingdom": "イギリス",
+  "Ireland": "アイルランド",
+  "Portugal": "ポルトガル",
+  "France": "フランス",
+  "Spain": "スペイン",
+  "Italy": "イタリア",
+  "Germany": "ドイツ",
+  "Netherlands": "オランダ",
+  "Belgium": "ベルギー",
+  "Switzerland": "スイス",
+  "Austria": "オーストリア",
+  "Czechia": "チェコ",
+  "Poland": "ポーランド",
+  "Sweden": "スウェーデン",
+  "Norway": "ノルウェー",
+  "Denmark": "デンマーク",
+  "Finland": "フィンランド",
+  "Greece": "ギリシャ",
+  "Ukraine": "ウクライナ",
+  "Russia": "ロシア",
+  "United States": "アメリカ",
+  "Canada": "カナダ",
+  "Mexico": "メキシコ",
+  "Cuba": "キューバ",
+  "Colombia": "コロンビア",
+  "Peru": "ペルー",
+  "Chile": "チリ",
+  "Argentina": "アルゼンチン",
+  "Brazil": "ブラジル"
+ }
+}

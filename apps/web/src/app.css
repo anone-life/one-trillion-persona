@@ -135,3 +135,208 @@ h2 { font-family: var(--mincho); font-weight: 500; font-size: 20px; margin: 28px
 .foot .missing { color: var(--ink-2); font-size: 12.5px; margin-top: 2px; }
 .foot .missing:empty { display: none; }
 .basics-line { margin-top: 10px; }
+
+/* 语言切换（顶栏右侧） */
+.masthead nav { align-items: center; }
+.masthead .langs { display: flex; gap: 2px; margin-left: 6px; padding-left: 8px; border-left: 1px solid var(--rule); }
+.masthead .lang { border: 0; background: none; font-size: 12px; color: var(--ink-3); padding: 4px 6px; border-radius: var(--radius-sm); cursor: pointer; }
+.masthead .lang:hover, .masthead .lang.on { color: var(--shu); }
+@media (max-width: 560px) {
+  .masthead { flex-wrap: wrap; }
+  .masthead nav { flex-wrap: wrap; justify-content: flex-end; }
+}
+
+/* ── 首页 #/about（第 11 步）──────────────────────────────────────────────
+   朱只给按钮；图里核心的描边用金（不能点）。图在窄屏上不缩成看不清，图框里横向滑动。 */
+a.mark { display: block; }
+.about-hero { padding: 28px 0 8px; }
+.about-h1 { font-size: clamp(38px, 7.5vw, 66px); line-height: 1.12; margin: 6px 0 0; }
+.about-hero .lead { font-size: 17px; max-width: 40em; }
+.about-points { list-style: none; padding: 0; margin: 22px 0 24px; display: grid; gap: 12px; }
+.about-points li { padding-left: 14px; border-left: 2px solid var(--gold); color: var(--ink-2); font-size: 15px; line-height: 1.65; }
+.about-points b { color: var(--ink); font-family: var(--mincho); font-weight: 600; font-size: 16.5px; }
+.about-cta { font-size: 15px; padding: 13px 22px; }
+
+.about-scale { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; margin: 40px 0 8px; }
+.scale-item { background: var(--paper-2); padding: 18px 16px; }
+.scale-item.big { background: var(--paper-3); }
+.scale-num { font-family: var(--mincho); font-size: clamp(24px, 3.2vw, 31px); line-height: 1.15; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.scale-item.big .scale-num { color: var(--gold); }
+.pow sup { font-size: 0.55em; vertical-align: super; line-height: 0; }
+.scale-what { margin-top: 8px; font-size: 13.5px; color: var(--ink); }
+.scale-like { font-size: 12.5px; color: var(--ink-3); }
+
+.about-sec { margin-top: 64px; }
+.about-sec h2 { font-size: clamp(24px, 4vw, 32px); margin: 4px 0 10px; }
+
+.layers-fig { margin: 22px 0 0; width: min(1100px, calc(100vw - 32px)); position: relative; left: 50%; transform: translateX(-50%); }
+.layers-fig figcaption { max-width: 720px; margin-left: auto; margin-right: auto; }
+.layers-svg { display: block; width: 100%; height: auto; }
+.layers-fig figcaption { margin-top: 8px; font-size: 12.5px; }
+.layers-svg text { font-family: var(--gothic); }
+.layers-svg .d-card { fill: var(--paper-2); stroke: var(--rule); }
+.layers-svg .d-link { stroke: var(--rule); stroke-dasharray: 3 5; }
+.layers-svg .d-rule { stroke: var(--rule); }
+.layers-svg .d-core { fill: var(--paper-3); stroke: var(--gold); stroke-width: 1.5; }
+.layers-svg .d-name { font-family: var(--mincho); font-size: 19px; font-weight: 600; fill: var(--ink); }
+.layers-svg .d-core-name { font-family: var(--mincho); font-size: 22px; font-weight: 600; fill: var(--ink); }
+.layers-svg .d-count { font-family: var(--mono); font-size: 14px; fill: var(--ink-3); }
+.layers-svg .d-what { font-size: 12.5px; fill: var(--ink-2); }
+.layers-svg .d-strong { font-size: 13.5px; fill: var(--ink); }
+.layers-svg .d-theory { font-size: 12px; font-style: italic; fill: var(--gold); }
+
+.about-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+.about-card { background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: 18px; }
+.about-card h3 { margin: 0 0 8px; font-family: var(--mincho); font-weight: 600; font-size: 18px; }
+.about-card p { margin: 0; font-size: 14.5px; line-height: 1.7; color: var(--ink-2); }
+.about-card .about-cite { margin-top: 10px; font-size: 12px; font-style: italic; color: var(--gold); }
+
+.about-steps { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 14px; }
+.about-steps li { display: flex; gap: 16px; align-items: flex-start; }
+.step-n { font-family: var(--mincho); font-size: 30px; line-height: 1; color: var(--gold); min-width: 26px; }
+.about-steps b { font-family: var(--mincho); font-size: 17px; font-weight: 600; }
+.about-steps p { margin: 4px 0 0; color: var(--ink-2); font-size: 14.5px; line-height: 1.65; }
+
+.about-nots { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 10px; color: var(--ink-2); font-size: 14.5px; line-height: 1.7; }
+.about-refs { margin: 12px 0 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-3); font-size: 12.5px; line-height: 1.55; }
+.about-final { margin: 72px 0 24px; padding: 40px 0; border-top: 1px solid var(--rule); text-align: center; }
+.about-final-line { font-family: var(--mincho); font-size: clamp(22px, 4vw, 30px); margin: 0 0 18px; }
+
+@media (max-width: 640px) {
+  .about-scale { grid-template-columns: 1fr; }
+  .about-cards { grid-template-columns: 1fr; }
+}
+
+/* 八层图的窄屏版：一列卡片。宽屏只显示环形图。 */
+.layers-list { display: none; }
+@media (max-width: 700px) {
+  .layers-fig { width: auto; left: 0; transform: none; }
+  .layers-svg { display: none; }
+  .layers-list { display: grid; gap: 8px; }
+}
+.ll-card { background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: 12px 14px; }
+.ll-core { background: var(--paper-3); border-color: var(--gold); }
+.ll-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.ll-name { font-family: var(--mincho); font-weight: 600; font-size: 17px; }
+.ll-count { font-family: var(--mono); font-size: 13px; color: var(--ink-3); }
+.ll-what { font-size: 13.5px; color: var(--ink-2); }
+.ll-strong { color: var(--ink); margin-top: 6px; }
+.ll-theory { font-size: 12px; font-style: italic; color: var(--gold); }
+.ll-sep { text-align: center; font-size: 12px; color: var(--ink-3); padding: 4px 0; }
+
+/* 「告诉 Elise」（第 10 步）：回复旁的小按钮 + 聊天记录下面的面板 */
+.bubble-tool { display: block; margin-top: 6px; border: none; background: none; padding: 0; font-size: 11.5px; color: var(--ink-3); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.bubble-tool:hover { color: var(--shu); }
+.chat:has(+ div > .retune) { margin-bottom: 12px; } /* 面板接替聊天记录给输入框让位的那 120px */
+.retune { margin: 4px 0 130px; padding: 14px; background: var(--paper-2); border: 1px solid var(--gold); border-radius: var(--radius); }
+.retune-head { display: flex; justify-content: space-between; align-items: center; }
+.retune-head .who { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.retune-close { padding: 4px 10px; font-size: 12px; }
+.retune-quote { margin: 10px 0; padding-left: 10px; border-left: 2px solid var(--rule); color: var(--ink-2); font-size: 14px; white-space: pre-wrap; }
+.retune-body .row { margin: 8px 0; }
+.retune-body textarea { width: 100%; margin-top: 6px; }
+.retune-elise { font-family: var(--mincho); font-size: 16px; line-height: 1.6; margin: 6px 0 10px; }
+.retune-opt { display: block; width: 100%; text-align: left; margin: 6px 0; }
+.retune-diff { white-space: pre-wrap; font-size: 12px; max-height: 240px; overflow: auto; background: var(--paper); border: 1px solid var(--rule-soft); border-radius: var(--radius-sm); padding: 8px; }
+
+/* anone.life 的功能短片（promo.ts）：竖版 9:16，先放封面，点了才加载视频 */
+.promo { margin: 26px 0 8px; }
+.promo-head { font-family: var(--mincho); font-size: 18px; color: var(--ink); }
+.promo-note { font-size: 13px; color: var(--ink-3); margin: 4px 0 12px; line-height: 1.6; }
+.promo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 560px) { .promo-grid { grid-template-columns: repeat(2, 1fr); } }
+.promo-card { margin: 0; min-width: 0; }
+.promo-cover, .promo-card video { display: block; width: 100%; aspect-ratio: 9 / 16; border-radius: var(--radius); overflow: hidden; background: #000; }
+.promo-cover { position: relative; padding: 0; border: 1px solid var(--rule); cursor: pointer; }
+.promo-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.promo-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(0, 0, 0, .55); color: #fff; display: grid; place-items: center; font-size: 16px; padding-left: 3px; }
+.promo-len { position: absolute; right: 6px; bottom: 6px; background: rgba(0, 0, 0, .6); color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 3px; }
+.promo-card figcaption { margin-top: 6px; font-size: 12.5px; line-height: 1.5; }
+.promo-card figcaption b { display: block; color: var(--ink); }
+.promo-card figcaption span { color: var(--ink-3); }
+.promo-more { display: inline-block; margin-top: 10px; font-size: 13px; color: var(--shu); text-decoration: none; }
+.promo-peek { max-width: 180px; margin-top: 8px; }
+.promo-peek:empty { display: none; }
+.linkish { border: 0; background: none; padding: 0; color: var(--shu); cursor: pointer; font: inherit; text-decoration: underline; }
+
+/* 介绍页「问题」一节（problems.ts）：横条 = 占抱怨帖的比例；标签 = 谁解决。朱给 1T，金给 anone.life */
+.problems { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 14px; }
+.pb-row { padding: 12px 16px; background: var(--paper-2); border: 1px solid var(--rule-soft); border-radius: var(--radius); }
+.pb-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
+.pb-name { flex: 1 1 15em; font-family: var(--mincho); font-size: 17px; color: var(--ink); }
+.pb-tag { flex: none; font-size: 11px; letter-spacing: .08em; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.pb-1t .pb-tag { color: var(--shu); }
+.pb-anone .pb-tag { color: var(--gold); }
+.pb-partial .pb-tag { color: var(--shu); border-style: dashed; }
+.pb-none .pb-tag { color: var(--ink-3); }
+.pb-barline { display: flex; align-items: center; gap: 12px; margin: 10px 0 6px; }
+.pb-track { flex: 1; height: 8px; background: var(--paper-3); border-radius: 4px; overflow: hidden; }
+.pb-bar { height: 100%; border-radius: 4px; background: var(--ink-3); }
+.pb-1t .pb-bar, .pb-partial .pb-bar { background: var(--shu); }
+.pb-anone .pb-bar { background: var(--gold); }
+.pb-num { flex: none; min-width: 84px; text-align: right; font-variant-numeric: tabular-nums; font-size: 15px; color: var(--ink); }
+.pb-num small { font-size: 12px; color: var(--ink-3); }
+.pb-how { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+.pb-how a { color: var(--shu); white-space: nowrap; }
+.pb-method { margin: 14px 0 0; font-size: 12.5px; line-height: 1.7; color: var(--ink-3); }
+.pb-both .pb-tag { color: var(--shu); background: linear-gradient(90deg, var(--shu-soft), transparent); }
+.pb-both .pb-bar { background: linear-gradient(90deg, var(--shu), var(--gold)); }
+.pb-anonePartial .pb-tag { color: var(--gold); border-style: dashed; }
+.pb-anonePartial .pb-bar { background: var(--gold); }
+
+/* 「问题」一节的总览：按谁解决分段的堆叠条 + 图例 + 三条发现 */
+.pb-summary { margin: 20px 0 28px; }
+.pb-stack { display: flex; height: 18px; border-radius: 9px; overflow: hidden; background: var(--paper-3); }
+.pb-seg { height: 100%; }
+.pb-seg + .pb-seg { border-left: 2px solid var(--paper); }
+.pb-seg.pb-1t, .pb-legend .pb-1t i { background: var(--shu); }
+.pb-seg.pb-partial, .pb-legend .pb-partial i { background: repeating-linear-gradient(135deg, var(--shu) 0 4px, var(--shu-soft) 4px 7px); }
+.pb-seg.pb-both, .pb-legend .pb-both i { background: linear-gradient(90deg, var(--shu), var(--gold)); }
+.pb-seg.pb-anone, .pb-legend .pb-anone i { background: var(--gold); }
+.pb-seg.pb-anonePartial, .pb-legend .pb-anonePartial i { background: repeating-linear-gradient(135deg, var(--gold) 0 4px, transparent 4px 7px); }
+.pb-seg.pb-none, .pb-legend .pb-none i { background: var(--ink-3); }
+.pb-seg.pb-other, .pb-legend .pb-other i { background: var(--paper-3); }
+.pb-legend { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.pb-legend li { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.pb-legend i { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--rule); }
+.pb-legend b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pb-findings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+.pb-finding { padding: 14px 16px; border-top: 2px solid var(--shu); background: var(--paper-2); border-radius: 0 0 var(--radius) var(--radius); }
+.pb-finding:last-child { border-top-color: var(--gold); }
+.pb-big { font-family: var(--mincho); font-size: 30px; line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pb-finding p { margin: 6px 0 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+@media (max-width: 700px) { .pb-findings { grid-template-columns: 1fr; } }
+
+/* 「问题」一节末尾：1T 的方法论（问题 → 方法） */
+.pb-method-bridge { margin: 28px 0 8px; padding: 22px 22px 20px; border: 1px solid var(--shu); border-radius: var(--radius); background: var(--paper-2); }
+.pb-method-bridge h3 { font-family: var(--mincho); font-size: clamp(20px, 3vw, 24px); margin: 0 0 10px; color: var(--ink); }
+.pb-mb-lead { margin: 0 0 16px; font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+.pb-mb-list { list-style: none; padding: 0; margin: 0 0 18px; display: grid; gap: 10px; }
+.pb-mb-list li { display: grid; grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1.4fr); gap: 12px; align-items: baseline; padding-bottom: 10px; border-bottom: 1px solid var(--rule-soft); }
+.pb-mb-problem { font-size: 14px; color: var(--ink-3); }
+.pb-mb-arrow { color: var(--shu); }
+.pb-mb-method { font-size: 15px; color: var(--ink); line-height: 1.55; }
+@media (max-width: 700px) {
+  .pb-mb-list li { grid-template-columns: 1fr; gap: 2px; }
+  .pb-mb-arrow { display: none; }
+}
+
+/* 首页「TA 是 男 / 女」必选（第 14 步） */
+.seg-row { gap: 8px; }
+.btn.seg { min-width: 96px; }
+.btn.seg.on { background: var(--shu); color: var(--on-shu); border-color: var(--shu); }
+
+/* 陌生人页：每个字段可改、五层可整层删（第 15 步） */
+.edit-hint { margin: 4px 0 0; }
+.kv.edit { align-items: center; }
+.kv.edit dd { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.edit-sel { padding: 4px 8px; font-size: 14px; max-width: 100%; }
+.kv.edit .yours { font-size: 11px; color: var(--shu); letter-spacing: .05em; }
+.kv.edit dd.changed .edit-sel { border-color: var(--gold); box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 30%, transparent); }
+.card.flashed { border-color: var(--gold); }
+.edit-flash { margin: 10px 0 0; font-size: 13px; color: var(--ink-2); }
+.card h3 .remove-layer { margin-left: auto; }
+.btn-link { border: none; background: none; padding: 0; font: inherit; font-size: 12px; color: var(--ink-3); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.btn-link:hover { color: var(--shu); }
+.removed-row { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 12px 0; padding: 10px 14px; border: 1px dashed var(--rule); border-radius: var(--radius); font-size: 13px; color: var(--ink-3); }
+.edit-note a { color: var(--shu); }

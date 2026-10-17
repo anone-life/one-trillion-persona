@@ -61,7 +61,7 @@ export function listFaces(s: AnoneSettings): Promise<Face[]> {
 }
 export const resetFaces = () => { facesCache = null; };
 
-export function speak(s: AnoneSettings, body: { text: string; emotion: Emotion; faceId: string }): Promise<Spoken> {
+export function speak(s: AnoneSettings, body: { text: string; emotion: Emotion; faceId: string; lang?: "en" | "zh" | "ja" }): Promise<Spoken> {
   return call<Spoken>(s, "/v1/1t/speak", { method: "POST", body: JSON.stringify(body) });
 }
 

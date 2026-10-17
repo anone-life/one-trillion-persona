@@ -22,7 +22,8 @@ export function skeletonBrief(k: Skeleton): string {
   const lines: string[] = [];
   if (d.birth) {
     const city = d.layers.find((l) => l.id === "world")?.fields.find((f) => f.id === "city")?.valueLabel;
-    lines.push(`FILLED IN BY THE USER BEFORE THIS CHAT — don't ask for these again: ${d.birth.line}. Lives in ${city}.`);
+    const gender = "body.gender_present" in k.overrides ? ` Presents as ${d.layers.find((l) => l.id === "body")?.fields.find((f) => f.id === "gender_present")?.valueLabel}.` : "";
+    lines.push(`FILLED IN BY THE USER BEFORE THIS CHAT — don't ask for these again: ${d.birth.line}. Lives in ${city}.${gender}`);
     lines.push("  (If the user brings up moving somewhere else, that's fine. The birthday and the age stay as they are.)");
   }
   lines.push(`INNER LIFE — ${i.asked ? "ASK about this" : "keep unless the user brings it up"}`);
@@ -33,8 +34,9 @@ export function skeletonBrief(k: Skeleton): string {
   for (const m of i.masks) lines.push(`  ${m.position}: ${m.line}`);
   for (const l of d.layers) {
     lines.push(`${l.name.toUpperCase()} — ${l.asked ? "ASK about this" : "keep unless the user brings it up"}`);
-    for (const f of l.fields) lines.push(`  ${f.label}: ${f.valueLabel}`);
+    for (const f of l.fields) lines.push(`  ${f.label}: ${f.valueLabel}${f.pinned ? "  (set by the user — keep it, don't ask)" : ""}`);
   }
+  if (d.removed.length) lines.push(`REMOVED BY THE USER — leave these out entirely, don't ask or invent them: ${d.removed.map((r) => r.name).join(", ")}`);
   return lines.join("\n");
 }
 
@@ -51,7 +53,8 @@ export function pacingNote(exchange: number): string {
   return lines.join("\n");
 }
 
-export function designerSystemPrompt(k: Skeleton, exchange = 0): string {
+/** language：和用户说话用的语言（英文名，如 "Japanese"）。提示词本身一律用英文写。 */
+export function designerSystemPrompt(k: Skeleton, exchange = 0, language = "English"): string {
   const p = pronounsFor(k);
   const asked = describe(k).layers.filter((l) => l.asked).map((l) => l.name.toLowerCase());
   if (k.ask.includes("bazi")) asked.unshift("inner life");
@@ -102,21 +105,21 @@ export function designerSystemPrompt(k: Skeleton, exchange = 0): string {
     "## Hard lines",
     `- **This character is an adult. Always.** If the user steers toward someone under 18 — a school student, \"just turned 17\", a child's body — say plainly that you only make adults here, and steer back. Don't work around it and don't pretend you didn't hear.`,
     "- Keep it non-explicit. Romance, tension and longing are fine; sexual detail is not your job.",
-    "- Write in English unless the user writes in another language — then follow them.",
+    `- Write in ${language} unless the user clearly writes in another language — then follow them.${language === "English" ? "" : ` Your very first message is in ${language} too. Keep the name Elise as it is.`}`,
     "- This is a text chat: plain prose, no stage directions, no lists of options longer than two.",
     ...(exchange > 0 ? ["", pacingNote(exchange)] : []),
   ].join("\n");
 }
 
 /** 第一条消息的指令。开场由模型按这个陌生人写，但形状固定。 */
-export function openingInstruction(k: Skeleton): string {
+export function openingInstruction(k: Skeleton, language = "English"): string {
   const first = k.ask.includes("bazi") ? "their inner life" : (describe(k).layers.find((l) => l.asked)?.name.toLowerCase() ?? "a name");
   return [
     "Write your first message now.",
     `- One short line saying who you are (${DESIGNER_NAME}, the designer).`,
     "- Then introduce the stranger in two or three sentences: lead with the sharpest contradiction you can see, in plain words. No list, no jargon, no Bazi terms.",
     `- Then ask exactly one question to start — about ${first}.`,
-    "All three parts are required. Under 90 words in total.",
+    language === "English" ? "All three parts are required. Under 90 words in total." : `All three parts are required. Write it in ${language}, about as long as 90 English words.`,
   ].join("\n");
 }
 
@@ -128,16 +131,20 @@ export class DesignerSession {
   skeleton: Skeleton;
   private readonly model: Model;
 
-  constructor(skeleton: Skeleton, model: Model) {
+  /** 和用户说话用的语言（英文名，如 "Japanese"） */
+  readonly language: string;
+
+  constructor(skeleton: Skeleton, model: Model, language = "English") {
     this.skeleton = skeleton;
     this.model = model;
+    this.language = language;
   }
 
   // 「写第一条消息」的指令永远垫在最前面当第一条 user：有些服务（DeepSeek 一类）不接受 system 之后直接跟 assistant。
   private messages(): ChatMessage[] {
     const msgs: ChatMessage[] = [
-      { role: "system", content: designerSystemPrompt(this.skeleton, this.turns.filter((t) => t.role === "user").length) },
-      { role: "user", content: openingInstruction(this.skeleton) },
+      { role: "system", content: designerSystemPrompt(this.skeleton, this.turns.filter((t) => t.role === "user").length, this.language) },
+      { role: "user", content: openingInstruction(this.skeleton, this.language) },
     ];
     for (const t of this.turns) msgs.push({ role: t.role === "designer" ? "assistant" : "user", content: t.text });
     return msgs;
@@ -157,7 +164,7 @@ export class DesignerSession {
     const msgs = this.messages();
     msgs.push({
       role: "user",
-      content: `(Note from the app, not from the user: the user tried to finish, but these are still missing: ${missing.join(", ")}. Ask for them now, briefly — one question. If it's the name and they seem unsure, offer two names that fit.)`,
+      content: `(Note from the app, not from the user: the user tried to finish, but these are still missing: ${missing.join(", ")}. Ask for them now, briefly — one question, in ${this.language}. If it's the name and they seem unsure, offer two names that fit.)`,
     });
     const text = await this.model.chat(msgs, { temperature: 0.8, maxTokens: 300 });
     this.turns.push({ role: "designer", text });

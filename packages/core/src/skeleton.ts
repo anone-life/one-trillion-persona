@@ -130,6 +130,8 @@ export interface Skeleton {
   ask: string[];
   /** 用户钉住的字段 */
   overrides: Overrides;
+  /** 用户整层删掉的外在层（照常抽、种子流不变，只是 describe 不再列出；step15_edit_stranger.md） */
+  removed?: string[];
   /** 给了生日才有：出生时刻、出生地，以及按年代算出的确切岁数 */
   birth?: BirthRecord;
 }
@@ -202,7 +204,12 @@ export interface SkeletonInput {
   overrides?: Overrides;
   /** 沿用已有骨架的八字（改其他层、重建骨架时用，不重新排盘） */
   keepChart?: { label: number; source: "seed" | "birth" };
+  /** 整层删掉的外在层，只能是 REMOVABLE_LAYERS 里的 */
+  removed?: string[];
 }
+
+/** 能整层删掉的外在层。世界、身体不能删：住处、性别、年代、年龄都在里面；内心是整套方法的核心。 */
+export const REMOVABLE_LAYERS = ["skills", "status", "signs", "drama", "glitch"];
 
 export function buildSkeleton(input: SkeletonInput): Skeleton {
   const { seed } = input;
@@ -217,6 +224,8 @@ export function buildSkeleton(input: SkeletonInput): Skeleton {
   validateOverrides(overrides);
   const ask = input.ask ?? DEFAULT_ASK;
   for (const id of ask) if (!ALL_LAYERS.includes(id)) throw new ConstraintError(`unknown layer "${id}" (layers: ${ALL_LAYERS.join(", ")})`);
+  const removed = LAYER_ORDER.filter((id) => (input.removed ?? []).includes(id));
+  for (const id of input.removed ?? []) if (!REMOVABLE_LAYERS.includes(id)) throw new ConstraintError(`layer "${id}" can't be removed (removable: ${REMOVABLE_LAYERS.join(", ")})`);
   let { picked, attempts } = drawLayers(seed, overrides);
 
   // 给了生日：年代要让这个人在「现在」是 18–90 岁，年龄段按确切岁数钉死。这两个是推出来的，不写进 overrides。
@@ -276,16 +285,17 @@ export function buildSkeleton(input: SkeletonInput): Skeleton {
     mbtiPrior: mbtiPrior(reading),
     layers: picked,
     attempts,
-    ask: ALL_LAYERS.filter((id) => ask.includes(id)),
+    ask: ALL_LAYERS.filter((id) => ask.includes(id) && !removed.includes(id)),
     overrides,
+    ...(removed.length ? { removed } : {}),
     ...(birth ? { birth } : {}),
   };
 }
 
 /** 改了某些层之后重建骨架：种子、八字、要问的层都沿用，只换钉住的值。 */
-export function rebuildSkeleton(k: Skeleton, overrides: Overrides): Skeleton {
+export function rebuildSkeleton(k: Skeleton, overrides: Overrides, removed: string[] = k.removed ?? []): Skeleton {
   return buildSkeleton({
-    seed: parseSeed(k.seed), ask: k.ask, overrides, keepChart: { label: k.chart.label, source: k.chart.source },
+    seed: parseSeed(k.seed), ask: k.ask, overrides, removed, keepChart: { label: k.chart.label, source: k.chart.source },
     ...(k.birth ? { birth: birthInputOf(k.birth) } : {}),
   });
 }
