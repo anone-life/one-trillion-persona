@@ -9,7 +9,8 @@ import type { Lang } from "@1t-persona/core";
 import { lang, t } from "./i18n.ts";
 
 const BASE = "https://d1gjo8gsizey84.cloudfront.net/anone/films/";
-export const ANONE_URL = "https://www.anone.life/";
+/** `?f=1t` 只是来源标记（anone.life 首页认它），不带任何用户数据。 */
+export const ANONE_URL = "https://www.anone.life/?f=1t";
 
 interface Clip { dir: "x" | "n"; name: Record<Lang, string>; line: Record<Lang, string>; seconds: Record<Lang, number> }
 

@@ -6,6 +6,8 @@ const target = process.env.ONE_T_DEV_TARGET;
 const key = process.env.ONE_T_DEV_KEY;
 
 export default defineConfig({
+  // 挂在子路径下时设 ONE_T_BASE（anone.life 托管的那份是 /1t/）；默认 /，本地开发和自己部署不用管。
+  base: process.env.ONE_T_BASE ?? "/",
   server: {
     port: 5190,
     proxy: target

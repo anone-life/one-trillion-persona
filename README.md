@@ -2,6 +2,8 @@
 
 **Every seed is someone.** Roll a stranger nobody has met. Shape them in a few lines of chat with Elise, our character designer. Keep them as a file you own, take them into SillyTavern, or give them a face and a voice.
 
+<p align="center"><b><a href="https://www.anone.life/1t/">Try it in your browser →</a></b><br><sub>Nothing to install. Bring your own model key.</sub></p>
+
 <p align="center"><img src="docs/assets/demo.gif" width="400" alt="Pick what to decide, talk to Elise, get a persona, then chat with it"></p>
 
 - **Characters that don't melt into the model.** Each one wants something, pays for it, and can say no, in rules the model can follow.
@@ -79,6 +81,8 @@ One inner life, seven outer layers. The split follows McAdams and Pals' integrat
 ## Play it
 
 The web app speaks **English, 中文 and 日本語** (switch at the top right). Elise talks to you in that language, and the persona is written in it.
+
+**Online:** open **[www.anone.life/1t](https://www.anone.life/1t/)**. It's this repository, built as a static page and hosted by anone.life. Your model key and your characters stay in your browser (in that site's local storage); nothing is uploaded. The hosted copy counts page opens anonymously. If you'd rather not go through anone.life at all, run it yourself:
 
 ```bash
 git clone <this repo> && cd one-trillion-persona
