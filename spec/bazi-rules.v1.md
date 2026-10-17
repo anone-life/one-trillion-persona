@@ -66,3 +66,14 @@ All text lives in `translation.v1.json`.
 - Code: `1T-XXXX-XXXX-XXXX`, 12 Crockford base32 characters = 60 bits. Parsing is case-insensitive and reads I/L as 1 and O as 0.
 - PRNG: splitmix64, computed with BigInt, so it is identical on every platform.
 - Each layer draws from its own stream: `seed XOR fnv1a64("1t-persona|v1|<layer>|<attempt>")`. Changing one layer's enum, or re-drawing it, never moves another layer. A birthday replaces only the bazi layer.
+
+## 7. A birthday also fixes the era and the age
+
+Added 2026-10-17, still `rulesVersion` 1. Seeds without a birthday produce exactly what they did before. Only seed + birthday changes, and only where the old result didn't add up (for example, someone born in 1998 living in the Late Qing).
+
+- Each era has a "present" year: Late Qing 1905, Shōwa 1975, 1990s 1995, 2010s 2015, 2026 2026, near future 2045, alternate history 2026, inside a network 2026.
+- Age = the present year − the birth year, counted on July 1 of the present year.
+- The age has to be 18–90. If the era the seed drew doesn't give that, the era changes: to 2026 if 2026 works, otherwise to the era whose present year is closest to birth year + 30. If you pinned the era yourself and it doesn't work, that is a constraint error.
+- `body.age_look` is set to the band that holds that age. Pinning a different band is a constraint error.
+- The era and age band that come from the birthday are not stored in `overrides`. They are worked out again on every rebuild. The skeleton stores the birthday, the birthplace, the story year and the exact age in `birth`.
+- The web app requires a birthday (date, time and birthplace) and where they live now (`world.city`). The time zone comes from the birthplace. The CLI's `--birth` is still optional.

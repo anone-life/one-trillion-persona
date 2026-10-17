@@ -16,7 +16,7 @@ tools/             dev-only scripts (data generation, acceptance runs)
 
 - A seed is `1T-XXXX-XXXX-XXXX`: 12 Crockford base32 characters, 60 bits.
 - Each layer draws from its own splitmix64 sub-stream. Changing or pinning one layer never moves another.
-- The inner life (Bazi layer) comes either from a chart label drawn by the seed (518,400 labels) or from a birthday. A birthday is converted with exact solar-term boundaries, the 23:00 day boundary, no daylight saving time, and optional true solar time.
+- The inner life (Bazi layer) comes either from a chart label drawn by the seed (518,400 labels) or from a birthday. A birthday is converted with exact solar-term boundaries, the 23:00 day boundary, no daylight saving time, and optional true solar time. A birthday also sets the era and the exact age ([`spec/bazi-rules.v1.md`](../spec/bazi-rules.v1.md) §7). The web app always asks for a birthday and a birthplace; the CLI's `--birth` is optional.
 - Every rule is written down in [`spec/bazi-rules.v1.md`](../spec/bazi-rules.v1.md). The same seed always gives the same person under the same `rulesVersion`.
 - Bazi × World × Body = 1.22 trillion nominal combinations. After constraints, 1.07 trillion are valid.
 

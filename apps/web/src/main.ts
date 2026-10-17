@@ -2,8 +2,8 @@
 // 结构见 docs/ARCHITECTURE.md。
 import "./app.css";
 import {
-  ALL_LAYERS, DEFAULT_ASK, LAYERS, buildSkeleton, describe, formatSeed, layerCount, parseSeed, randomSeed,
-  type BirthInput, type Skeleton,
+  ALL_LAYERS, BIRTHPLACES, DEFAULT_ASK, LAYERS, birthLine, buildSkeleton, describe, formatSeed, layerCount, parseSeed,
+  placeById, randomSeed, type Skeleton,
 } from "@1t-persona/core";
 import {
   DESIGNER_NAME, DesignerSession, finalize, generatePersona, generateSchedule, pronounsFor,
@@ -63,9 +63,24 @@ function page(active: string, ...children: Child[]) {
 const state = {
   ask: new Set<string>(DEFAULT_ASK),
   seedText: "",
-  birth: "",
-  tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  // 开聊前必填的四项（docs：根仓库 docs/1T-persona/steps/step8_birth_required.md）
+  birthDate: "",
+  birthTime: "",
+  birthPlace: "",
+  residence: "",
 };
+
+const CITIES = LAYERS.find((l) => l.id === "world")!.fields.find((f) => f.id === "city")!.values;
+
+/** 四项里还没填的，按表单顺序。 */
+function missingBasics(): string[] {
+  const out: string[] = [];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(state.birthDate)) out.push("birth date");
+  if (!/^\d{2}:\d{2}$/.test(state.birthTime)) out.push("birth time");
+  if (!placeById(state.birthPlace)) out.push("birthplace");
+  if (!CITIES.some((c) => c.id === state.residence)) out.push("where they live now");
+  return out;
+}
 
 function fmtCount(n: number): [string, string] {
   if (n < 1e4) return [n.toLocaleString("en-US"), "people"];
@@ -78,7 +93,7 @@ function fmtCount(n: number): [string, string] {
 }
 
 const LAYER_TEXT: Record<string, { name: string; what: string; parts: string[]; ask: string }> = {
-  bazi: { name: "Inner life", what: "What they want, what it costs them, what would break them — and how they are with strangers, at work, up close, and deep down.", parts: ["year pillar 60", "month 12", "day pillar 60", "hour 12"], ask: "Elise will ask: use your birthday, or a random moment?" },
+  bazi: { name: "Inner life", what: "What they want, what it costs them, what would break them — and how they are with strangers, at work, up close, and deep down.", parts: ["year pillar 60", "month 12", "day pillar 60", "hour 12"], ask: "Worked out from their birthday. Elise will talk it through with you." },
 };
 for (const l of LAYERS) {
   LAYER_TEXT[l.id] = { name: l.name, what: l.blurb, parts: l.fields.map((f) => `${f.label.toLowerCase()} ${f.values.length}`), ask: `Elise will ask about their ${l.name.toLowerCase()}.` };
@@ -88,12 +103,17 @@ function makeSkeleton(): Skeleton {
   let seed: bigint;
   try { seed = state.seedText.trim() ? parseSeed(state.seedText) : randomSeed(); } catch (e) { throw new Error((e as Error).message); }
   state.seedText = formatSeed(seed);
-  let birth: BirthInput | undefined;
-  if (state.birth) {
-    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(state.birth);
-    if (m) birth = { wall: { year: +m[1]!, month: +m[2]!, day: +m[3]!, hour: +m[4]!, minute: +m[5]! }, tz: state.tz };
-  }
-  return buildSkeleton({ seed, birth, ask: ALL_LAYERS.filter((id) => state.ask.has(id)) });
+  const missing = missingBasics();
+  if (missing.length) throw new Error(`Still needed: ${missing.join(", ")}.`);
+  const [year, month, day] = state.birthDate.split("-").map(Number) as [number, number, number];
+  const [hour, minute] = state.birthTime.split(":").map(Number) as [number, number];
+  const place = placeById(state.birthPlace)!;
+  return buildSkeleton({
+    seed,
+    birth: { wall: { year, month, day, hour, minute }, tz: place.tz, place: { id: place.id, label: `${place.label}, ${place.country}` } },
+    ask: ALL_LAYERS.filter((id) => state.ask.has(id)),
+    overrides: { "world.city": state.residence },
+  });
 }
 
 // ── 1. 选维度 ───────────────────────────────────────────────────────────────
@@ -107,8 +127,23 @@ function startView() {
 
   const seedInput = h("input", { class: "input mono", placeholder: "Seed, e.g. 1T-3F9A-77C2-K8QX (empty = random)", value: state.seedText,
     oninput: (e: Event) => { state.seedText = (e.target as HTMLInputElement).value; } });
-  const birthInput = h("input", { class: "input", type: "datetime-local", value: state.birth,
-    oninput: (e: Event) => { state.birth = (e.target as HTMLInputElement).value; } });
+  const missingTxt = h("div", { class: "missing" });
+  const onBasics = (key: "birthDate" | "birthTime" | "birthPlace" | "residence") => (e: Event) => {
+    state[key] = (e.target as HTMLInputElement | HTMLSelectElement).value;
+    err.textContent = "";
+    render();
+  };
+  const dateInput = h("input", { id: "b-date", class: "input", type: "date", min: "1900-01-01", max: "2100-12-31", value: state.birthDate, required: "",
+    oninput: onBasics("birthDate") });
+  const timeInput = h("input", { id: "b-time", class: "input", type: "time", value: state.birthTime, required: "", oninput: onBasics("birthTime") });
+  const countries = [...new Set(BIRTHPLACES.map((p) => p.country))].sort();
+  const placeSelect = h("select", { id: "b-place", class: "input", required: "", onchange: onBasics("birthPlace") },
+    h("option", { value: "" }, "Choose a city…"),
+    ...countries.map((c) => h("optgroup", { label: c }, ...BIRTHPLACES.filter((p) => p.country === c)
+      .map((p) => h("option", { value: p.id, ...(p.id === state.birthPlace ? { selected: "" } : {}) }, p.label)))));
+  const residenceSelect = h("select", { id: "b-home", class: "input", required: "", onchange: onBasics("residence") },
+    h("option", { value: "" }, "Choose a city…"),
+    ...CITIES.map((c) => h("option", { value: c.id, ...(c.id === state.residence ? { selected: "" } : {}) }, c.label)));
 
   function render() {
     const sel = ALL_LAYERS.filter((id) => state.ask.has(id));
@@ -139,6 +174,9 @@ function startView() {
       ? ["Elise will ask about ", h("b", {}, `${sel.length} layer${sel.length > 1 ? "s" : ""}, about ${rounds + 3} exchanges`), sel.length < ALL_LAYERS.length ? "; the seed decides the rest." : "."]
       : ["No questions — the seed hands you someone whole."]));
     goBtn.textContent = "Roll someone";
+    const missing = missingBasics();
+    (goBtn as HTMLButtonElement).disabled = missing.length > 0;
+    missingTxt.textContent = missing.length ? `Still needed: ${missing.join(", ")}` : "";
   }
   goBtn.onclick = () => {
     try {
@@ -158,12 +196,19 @@ function startView() {
     h("div", { class: "seedbox" },
       h("div", { class: "field" }, h("label", {}, "Seed (share it, and anyone gets the same person)"), h("div", { class: "row" }, seedInput,
         h("button", { class: "btn", onclick: () => { state.seedText = formatSeed(randomSeed()); seedInput.value = state.seedText; } }, "Random"))),
-      h("div", { class: "field" }, h("label", {}, `Or a birthday for their inner life (time zone: ${state.tz})`), birthInput),
+    ),
+    h("div", { class: "seedbox basics" },
+      h("div", { class: "label" }, "Before Elise asks anything: when and where they were born, and where they live now. All four are needed — the birthday and birthplace set their inner life, and their age."),
+      h("div", { class: "grid2" },
+        h("div", { class: "field" }, h("label", { for: "b-date" }, "Birth date"), dateInput),
+        h("div", { class: "field" }, h("label", { for: "b-time" }, "Birth time (local, where they were born)"), timeInput),
+        h("div", { class: "field" }, h("label", { for: "b-place" }, "Birthplace (city not listed? pick one in the same time zone)"), placeSelect),
+        h("div", { class: "field" }, h("label", { for: "b-home" }, "Lives in now"), residenceSelect)),
     ),
     list,
     err,
     h("p", { class: "note" }, "The numbers count combinations, not proven-different people. The inner life uses a Bazi-inspired structure: a grammar for fiction, not fortune-telling. Characters are always adults."),
-    h("div", { class: "foot" }, h("div", { class: "in" }, footTxt, goBtn)),
+    h("div", { class: "foot" }, h("div", { class: "in" }, h("div", { class: "txt" }, footTxt, missingTxt), goBtn)),
   );
 }
 
@@ -200,8 +245,9 @@ function strangerView() {
     h("h1", {}, "Someone ", h("em", {}, "nobody"), " has met yet."),
     h("div", { class: "row", style: "margin-top:12px" }, h("span", { class: "seedcode" }, k.seed),
       h("button", { class: "btn", onclick: async () => { try { await navigator.clipboard.writeText(link); copied.textContent = "link copied"; } catch { copied.textContent = link; } } }, "Copy link"),
-      h("button", { class: "btn", onclick: () => { state.seedText = ""; state.birth = ""; state.ask = new Set(k.ask); const nk = makeSkeleton(); saveDraft({ skeleton: nk, turns: [] }); strangerView(); } }, "Roll again"),
+      h("button", { class: "btn", onclick: () => { state.seedText = ""; state.ask = new Set(k.ask); try { const nk = makeSkeleton(); saveDraft({ skeleton: nk, turns: [] }); strangerView(); } catch { go("#/"); } } }, "Roll again"),
       copied),
+    ...(k.birth ? [h("p", { class: "lead basics-line" }, birthLine(k)!, " · lives in ", describe(k).layers.find((l) => l.id === "world")!.fields.find((f) => f.id === "city")!.valueLabel)] : []),
     ...strangerCards(k),
     h("div", { class: "foot" }, h("div", { class: "in" },
       h("div", { class: "txt" }, ...(k.ask.length ? ["Elise will start with ", h("b", {}, k.ask.includes("bazi") ? "their inner life" : (LAYER_TEXT[k.ask[0]!]?.name ?? "").toLowerCase()), "."] : ["Elise will only ask for a name and who you are to them."])),
@@ -551,7 +597,9 @@ function route() {
   const seed = /^#seed=([0-9A-Za-z-]+)/.exec(hash);
   if (seed) {
     try {
-      state.seedText = seed[1]!; state.birth = "";
+      // 分享来的种子：带上种子回首页，生日这几项还得自己填
+      state.seedText = seed[1]!;
+      if (missingBasics().length) { history.replaceState(null, "", "#/"); return startView(); }
       saveDraft({ skeleton: makeSkeleton(), turns: [] });
       history.replaceState(null, "", "#/stranger");
       return strangerView();

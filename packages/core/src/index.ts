@@ -5,3 +5,4 @@ export * from "./seed.ts";
 export * from "./skeleton.ts";
 export * from "./describe.ts";
 export * from "./check.ts";
+export * from "./places.ts";

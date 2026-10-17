@@ -22,6 +22,15 @@ export interface Described {
     typeLean: string;
   };
   layers: DescribedLayer[];
+  /** 给了生日才有 */
+  birth?: { line: string; age: number; storyYear: number };
+}
+
+/** 「Born 1998-04-12 07:30 in New York · 28 in 2026」 */
+export function birthLine(k: Skeleton): string | undefined {
+  const b = k.birth;
+  if (!b) return undefined;
+  return `Born ${b.wall} in ${b.place?.label ?? b.tz} · ${b.age} years old in ${b.storyYear}`;
 }
 
 const MASK_LABEL: Record<string, string> = {
@@ -60,6 +69,7 @@ export function describe(k: Skeleton): Described {
         };
       }),
     })),
+    ...(k.birth ? { birth: { line: birthLine(k)!, age: k.birth.age, storyYear: k.birth.storyYear } } : {}),
   };
 }
 
@@ -70,6 +80,7 @@ export function renderText(k: Skeleton): string {
   const out: string[] = [];
   out.push(`${d.seed} · rules v${d.rulesVersion}`, "");
   const i = d.inner;
+  if (d.birth) out.push(d.birth.line, "");
   out.push(`INNER  ${tag(i.asked)}`);
   out.push(`  Chart ${i.pillars} (${i.source === "birth" ? "from a birthday" : "from the seed"}) · day master ${i.dayMaster}`);
   out.push(`  ${i.strength}`);

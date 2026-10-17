@@ -34,6 +34,8 @@ export interface BirthInput {
   tz: string;
   /** 出生地经度（东经为正）。给了就用真太阳时排日柱、时柱。 */
   longitude?: number;
+  /** 出生地（只用来记下来、给人看；排盘只看 tz） */
+  place?: { id: string; label: string };
 }
 
 /**

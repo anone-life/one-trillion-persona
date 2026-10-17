@@ -8,6 +8,7 @@ import {
 } from "./bazi.ts";
 import { STEMS, TEN_GODS, type TenGod } from "./data.ts";
 import { formatSeed, layerStream, parseSeed } from "./seed.ts";
+import type { WallTime } from "./calendar.ts";
 
 export const RULES_VERSION = 1;
 const MAX_ATTEMPTS = 50;
@@ -129,7 +130,47 @@ export interface Skeleton {
   ask: string[];
   /** 用户钉住的字段 */
   overrides: Overrides;
+  /** 给了生日才有：出生时刻、出生地，以及按年代算出的确切岁数 */
+  birth?: BirthRecord;
 }
+
+export interface BirthRecord {
+  /** 出生地钟面时间 "YYYY-MM-DD HH:MM" */
+  wall: string;
+  tz: string;
+  place?: { id: string; label: string };
+  /** 故事里的「现在」是哪一年（由年代定，见 ERA_PRESENT） */
+  storyYear: number;
+  /** 那一年 7 月 1 日的岁数 */
+  age: number;
+}
+
+/** 每个年代的「现在」。给了生日时，用它算岁数；算不出 18–90 岁的年代不能用。见 spec/bazi-rules.v1.md §6。 */
+export const ERA_PRESENT: Record<string, number> = {
+  "late-qing": 1905, "showa": 1975, "1990s": 1995, "2010s": 2015, "2026": 2026,
+  "near-future": 2045, "alternate-history": 2026, "in-network-virtual": 2026,
+};
+const MIN_BIRTH_AGE = 18;
+const MAX_BIRTH_AGE = 90;
+
+/** 生日在某个年代的岁数（按那一年 7 月 1 日算）。 */
+export function ageInEra(wall: { year: number; month: number; day: number }, era: string): number {
+  const y = ERA_PRESENT[era] ?? 2026;
+  return y - wall.year - (wall.month > 7 || (wall.month === 7 && wall.day > 1) ? 1 : 0);
+}
+
+/** 岁数 → 年龄段 id。 */
+export function ageBandFor(age: number): string {
+  if (age <= 22) return "18-22";
+  if (age <= 27) return "23-27";
+  if (age <= 34) return "28-34";
+  if (age <= 44) return "35-44";
+  if (age <= 54) return "45-54";
+  return "55-plus";
+}
+
+const fitsEra = (w: WallTime, era: string) => { const a = ageInEra(w, era); return a >= MIN_BIRTH_AGE && a <= MAX_BIRTH_AGE; };
+const pad = (n: number) => String(n).padStart(2, "0");
 
 type GodInfo = { name: string; want: string; cost: string; break: string; mbti: Record<"EI" | "NS" | "TF" | "JP", number> };
 const GODS = translation.gods as Record<TenGod, GodInfo>;
@@ -176,7 +217,36 @@ export function buildSkeleton(input: SkeletonInput): Skeleton {
   validateOverrides(overrides);
   const ask = input.ask ?? DEFAULT_ASK;
   for (const id of ask) if (!ALL_LAYERS.includes(id)) throw new ConstraintError(`unknown layer "${id}" (layers: ${ALL_LAYERS.join(", ")})`);
-  const { picked, attempts } = drawLayers(seed, overrides);
+  let { picked, attempts } = drawLayers(seed, overrides);
+
+  // 给了生日：年代要让这个人在「现在」是 18–90 岁，年龄段按确切岁数钉死。这两个是推出来的，不写进 overrides。
+  let birth: BirthRecord | undefined;
+  if (input.birth) {
+    const w = input.birth.wall;
+    let era = picked.world!.era!;
+    if (!fitsEra(w, era)) {
+      if ("world.era" in overrides) {
+        throw new ConstraintError(`someone born in ${w.year} can't be an adult (18–90) in the era "${era}" (around ${ERA_PRESENT[era]})`);
+      }
+      const ok = Object.keys(ERA_PRESENT).filter((e) => fitsEra(w, e));
+      if (!ok.length) throw new ConstraintError(`someone born in ${w.year} can't be an adult (18–90) in any era`);
+      era = ok.includes("2026") ? "2026" : ok.sort((a, b) => Math.abs(ERA_PRESENT[a]! - w.year - 30) - Math.abs(ERA_PRESENT[b]! - w.year - 30))[0]!;
+    }
+    const age = ageInEra(w, era);
+    const band = ageBandFor(age);
+    const pinnedBand = overrides["body.age_look"];
+    if (pinnedBand && pinnedBand !== band) {
+      throw new ConstraintError(`born ${w.year}, they are ${age} — that's not the age band "${pinnedBand}"`);
+    }
+    ({ picked, attempts } = drawLayers(seed, { ...overrides, "world.era": era, "body.age_look": band }));
+    birth = {
+      wall: `${w.year}-${pad(w.month)}-${pad(w.day)} ${pad(w.hour)}:${pad(w.minute)}`,
+      tz: input.birth.tz,
+      ...(input.birth.place ? { place: input.birth.place } : {}),
+      storyYear: ERA_PRESENT[era]!,
+      age,
+    };
+  }
 
   const [g1, g2] = reading.top as [TenGod, TenGod];
   const masks = Object.fromEntries(
@@ -208,6 +278,7 @@ export function buildSkeleton(input: SkeletonInput): Skeleton {
     attempts,
     ask: ALL_LAYERS.filter((id) => ask.includes(id)),
     overrides,
+    ...(birth ? { birth } : {}),
   };
 }
 
@@ -215,5 +286,13 @@ export function buildSkeleton(input: SkeletonInput): Skeleton {
 export function rebuildSkeleton(k: Skeleton, overrides: Overrides): Skeleton {
   return buildSkeleton({
     seed: parseSeed(k.seed), ask: k.ask, overrides, keepChart: { label: k.chart.label, source: k.chart.source },
+    ...(k.birth ? { birth: birthInputOf(k.birth) } : {}),
   });
+}
+
+/** BirthRecord → BirthInput（重建骨架时用；八字由 keepChart 沿用，这里只为了年代和岁数）。 */
+export function birthInputOf(b: BirthRecord): BirthInput {
+  const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/.exec(b.wall);
+  if (!m) throw new ConstraintError(`bad birth time "${b.wall}"`);
+  return { wall: { year: +m[1]!, month: +m[2]!, day: +m[3]!, hour: +m[4]!, minute: +m[5]! }, tz: b.tz, ...(b.place ? { place: b.place } : {}) };
 }

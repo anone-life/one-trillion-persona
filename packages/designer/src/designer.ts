@@ -20,6 +20,11 @@ export function skeletonBrief(k: Skeleton): string {
   const d = describe(k);
   const i = d.inner;
   const lines: string[] = [];
+  if (d.birth) {
+    const city = d.layers.find((l) => l.id === "world")?.fields.find((f) => f.id === "city")?.valueLabel;
+    lines.push(`FILLED IN BY THE USER BEFORE THIS CHAT — don't ask for these again: ${d.birth.line}. Lives in ${city}.`);
+    lines.push("  (If the user brings up moving somewhere else, that's fine. The birthday and the age stay as they are.)");
+  }
   lines.push(`INNER LIFE — ${i.asked ? "ASK about this" : "keep unless the user brings it up"}`);
   lines.push(`  Temperament: ${i.strength}`);
   lines.push(`  Wants: ${i.wants.join(" / ")}`);

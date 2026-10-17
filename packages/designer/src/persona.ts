@@ -4,7 +4,7 @@
 // 改动：英文、代词跟骨架走、去掉 anone.life 专用条款，
 // 加了 1T 特有的「What drives them」「Four faces」「If… then…」三节。
 import { renderText, type Skeleton } from "@1t-persona/core";
-import { AGE_BANDS, checkAge, checkSlots } from "@1t-persona/core";
+import { AGE_BANDS, birthLine, checkAge, checkSlots } from "@1t-persona/core";
 import { pronounsFor } from "./designer.ts";
 import { askJson, ModelError, type Model } from "./model.ts";
 
@@ -126,7 +126,9 @@ function brief(input: PersonaInput, done: string[]): string {
   return [
     `Name: ${input.name}`,
     `Pronouns: ${p.subj}/${p.obj}/${p.poss} — use these for the character everywhere, including the archetype line`,
-    `Age band: ${band[0]}-${band[1]} (an adult)`,
+    input.skeleton.birth
+      ? `Age: exactly ${input.skeleton.birth.age} (an adult). ${birthLine(input.skeleton)}. Use this age and this birthday.`
+      : `Age band: ${band[0]}-${band[1]} (an adult)`,
     `What the user is to them: ${input.relationToUser || "not settled — choose something that fits the conversation"}`,
     "",
     "The seed (structure; the conversation can override it):",
@@ -212,6 +214,7 @@ export function assemblePersona(name: string, relationToUser: string, s: Persona
     `## Who ${p.subj} ${p.be}`,
     bullets([
       `Age ${s.age}. ${bare(s.role)}.`,
+      ...(k.birth ? [`Born ${k.birth.wall.slice(0, 10)} in ${k.birth.place?.label ?? k.birth.tz}.`] : []),
       `Lives in: ${bare(s.location)}.`,
       `The person in front of ${p.obj}: ${bare(relationToUser || "someone new")}.`,
       ...s.identity,

@@ -40,12 +40,13 @@ export function minorMentions(text: string): string[] {
   return hits;
 }
 
-/** 生成的年龄必须是整数、≥ 18、而且落在骨架的外表年龄段里。 */
+/** 生成的年龄必须是整数、≥ 18、落在骨架的外表年龄段里；给了生日的，必须等于按生日算出的岁数。 */
 export function checkAge(age: unknown, k: Skeleton): Problem[] {
   const band = AGE_BANDS[k.layers.body?.age_look ?? ""] ?? [MIN_AGE, 90];
   if (typeof age !== "number" || !Number.isInteger(age)) return [{ code: "age_not_number", detail: `age must be an integer, got ${JSON.stringify(age)}` }];
   if (age < MIN_AGE) return [{ code: "minor", detail: `age ${age} is under ${MIN_AGE}` }];
   if (age < band[0] || age > band[1]) return [{ code: "age_out_of_band", detail: `age ${age} is outside the ${band[0]}–${band[1]} band from the skeleton` }];
+  if (k.birth && age !== k.birth.age) return [{ code: "age_not_birthday", detail: `age ${age} doesn't match the birthday (${k.birth.age} in ${k.birth.storyYear})` }];
   return [];
 }
 
