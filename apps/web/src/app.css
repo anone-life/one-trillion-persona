@@ -717,15 +717,25 @@ body[data-layout="pet"] .shell-back { display: none; }
 .rc-blank ~ .rc-q { background: rgba(12, 10, 6, .78); align-items: center; }
 @media (hover: hover) { .rare-card:hover .rc-q, .rare-card:focus-visible .rc-q { opacity: 1; } }
 @media (hover: none) { .rc-q { display: none; } }
-@media (max-width: 560px) {
-  .masthead nav { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+/* 导航挤不下一行时（窗口 ≤720px）自己占一行、横向滑动，不折行 */
+@media (max-width: 720px) {
+  .masthead { flex-wrap: wrap; row-gap: 6px; }
+  .masthead nav { flex: 1 1 100%; margin-left: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .masthead nav::-webkit-scrollbar { display: none; }
   .masthead nav a, .masthead .langs { flex: none; white-space: nowrap; }
+}
+@media (max-width: 560px) {
   .rare-hero { gap: 10px; margin-bottom: 12px; }
   .rare-sub { font-size: 14px; }
 }
-/* 品牌两行：「あのね」上、「open source 01」下一行小字——导航变长以后英文界面不再被截成 “open …” */
-.masthead .by { display: flex; flex-direction: column; line-height: 1.15; overflow: visible; }
+/* 品牌两行：「あのね」上、「open source 01」下一行小字；不让它被挤窄（被挤窄时字会溢到导航上）。
+   英文导航「Once in a Lifetime」很长：宽屏把导航的字距、内边距收一点，正好一行放下（余约 17px）；再加长就要改这里 */
+.masthead .by { display: flex; flex-direction: column; line-height: 1.15; overflow: visible; flex: none; }
+@media (min-width: 721px) {
+  .masthead nav { gap: 0; }
+  .masthead nav a { padding: 4px 6px; letter-spacing: .1em; }
+  .masthead .langs { margin-left: 4px; padding-left: 6px; }
+}
 .masthead .by b { font-size: 13px; }
 .masthead .by { font-size: 10px; }
 .rare-fbar { flex-wrap: wrap; row-gap: 6px; }
