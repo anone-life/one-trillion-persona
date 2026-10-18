@@ -78,7 +78,8 @@ function methodBridge(): HTMLElement {
     el("h3", {}, t("about.problem.methodTitle")),
     el("p", { class: "pb-mb-lead" }, t("about.problem.methodLead")),
     el("ul", { class: "pb-mb-list" }, ...rows.map(([id, k]) =>
-      el("li", {}, el("span", { class: "pb-mb-problem" }, t(`about.problem.cat.${id}` as Key)), el("span", { class: "pb-mb-arrow" }, "→"), el("span", { class: "pb-mb-method" }, t(k))))),
+      // prompt 那行左边用自己的说法（about.problem.mb.prompt）：数据图里那一类的名字（cat.prompt）是分类口径，不能改。
+      el("li", {}, el("span", { class: "pb-mb-problem" }, t((id === "prompt" ? "about.problem.mb.prompt" : `about.problem.cat.${id}`) as Key)), el("span", { class: "pb-mb-arrow" }, "→"), el("span", { class: "pb-mb-method" }, t(k))))),
     go,
   );
 }

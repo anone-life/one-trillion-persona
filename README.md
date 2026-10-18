@@ -40,7 +40,7 @@ This counts people who post, not every player. The full table, row by row, is in
 | The complaint | What 1T does instead |
 |---|---|
 | Every character sounds the same, and agrees too easily | One motive with two sides: what they want, what it costs them, and what would break them |
-| Doesn't play the prompt: breaks character, too positive | Not "she's stubborn", but "push her, and she walks out." They know when to tell you no |
+| They stop being themselves: after a while, they break character | "She's stubborn" is an adjective, and a model forgets it in a few turns. "Push her, and she walks out" is a rule, and a model can play it |
 | Good characters are hard to find, or to write | One seed, eight layers, about 2 × 10²⁴ different people |
 | Stock phrases and repetition | Each person's own rules of speech and tone, instead of the model's stock voice |
 
