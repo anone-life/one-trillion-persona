@@ -141,7 +141,8 @@ let flash = "";
 export function petView(app: HTMLElement, id: string | null) {
   teardown?.();
   backBar?.remove(); backBar = null;
-  const all = listCharacters();
+  // 同步下完 anone.life 的人以后会重拍（见下面 syncAnonePeopleOnce）——只拍一次的话，正选着别人时菜单永远停在「正在带过来」
+  let all = listCharacters();
   let lastId: string | null = null;
   try { lastId = localStorage.getItem(LAST); } catch { /* 记不住就用第一个 */ }
   const c = (id && getCharacter(id)) || (lastId && getCharacter(lastId)) || all[0] || null;
@@ -239,7 +240,12 @@ export function petView(app: HTMLElement, id: string | null) {
   draw();
 
   // 第一次打开（有 anone.life key）把「anone.life 的人」下载下来；库原本是空的就切到第一位
-  void syncAnonePeopleOnce(anone, lang()).then((n) => { if (n && !c && /^#\/pet/.test(location.hash)) petView(app, null); });
+  // 不管成功、失败还是 key 被拒，结束了就重拍名单、菜单开着就重画（2026-10-18：正选着奇人时四位下载完了菜单还停在「正在带过来」）
+  void syncAnonePeopleOnce(anone, lang()).then((n) => {
+    if (n && !c && /^#\/pet/.test(location.hash)) { petView(app, null); return; }
+    all = listCharacters();
+    if (!menu.hidden) buildMenu();
+  });
 
   if (stage && c) {
     listFaces(anone).then((faces) => {
