@@ -15,6 +15,7 @@ import { rareCutout, rarePhoto } from "./rare/assets.ts";
 import { importFile } from "./importer.ts";
 import { loadPhoto } from "./photo.ts";
 import { closingLine, directUrl, handOff, isLimited, isSpent, turnsLeft } from "./limit.ts";
+import { fetchQuota, freeModel, rareCard, RareStop, rareStatus, usesFree, type RareChoice, type RareQuota } from "./rare-free.ts";
 import { lang, t } from "./i18n.ts";
 import { lastSyncError, lastSyncRejected, syncAnonePeopleOnce } from "./anone-people.ts";
 import { DEMO_PEOPLE, playDemo } from "./demo.ts";
@@ -154,6 +155,13 @@ export function petView(app: HTMLElement, id: string | null) {
   const stage = fig.kind === "live" ? new Stage({ crossOrigin: true }) : null;
   let face: Face | null = null;
   let busy = false;
+  // 一期一会没填自己的模型：走 anone.life 的免费试聊（第 28 步），和聊天页同一套
+  const free = !!c && usesFree(c);
+  let quota: RareQuota | null = null;
+  let stop: string | null = null;
+  let pendingPick = false;
+  const freeState = () => (stop ? ({ ok: false, code: stop } as const) : c ? rareStatus(c, quota, pendingPick) : ({ ok: true, pay: "default", hint: "" } as const));
+  const freeBlocked = () => free && !freeState().ok;
 
   // ── 摆法照 anone.life 桌宠（web_companion/public/desktop.html 2026-10-11 那段）：TA 在上面一截不被挡；
   //    TA 说的话、提示、输入台都在 TA 下面那一条里；右上角深色圆钮 ✥ 拖动、⋯ 菜单。
@@ -161,7 +169,8 @@ export function petView(app: HTMLElement, id: string | null) {
   // 字幕：只留这一轮（你那句 + TA 那句），从下往上；说完 10 秒淡掉。提示是一行灰字，带按钮的提示是深色小卡、不淡。
   const transcript = el("div", { class: "pet-transcript" });
   let turn: { user?: string; her?: string; status?: string } = {};
-  let notes: { text: string; action?: { label: string; onclick: () => void } }[] = [];
+  // choices：一期一会试聊卡住时的那张卡（第 28 步），几个按钮竖着排；有 action / choices 的提示都不淡
+  let notes: { text: string; action?: { label: string; onclick: () => void }; choices?: RareChoice[]; sub?: string }[] = [];
   const lastLine = () => {
     const m = c ? [...c.chat].reverse().find((x) => x.role === "assistant") : null;
     return m ? takeEmotion(m.content).text : "";
@@ -171,7 +180,11 @@ export function petView(app: HTMLElement, id: string | null) {
       ...(turn.user ? [el("div", { class: "msg msg--user" }, el("p", {}, turn.user))] : []),
       ...(turn.her && herLine(turn.her) ? [el("div", { class: "msg msg--char" }, herLine(turn.her)!)] : []),
       ...(turn.status ? [el("div", { class: "msg msg--status" }, el("p", {}, turn.status))] : []),
-      ...notes.map((n) => n.action
+      ...notes.map((n) => n.choices
+        ? el("div", { class: "msg pet-callout pet-callout--choices" }, el("span", {}, n.text),
+            ...n.choices.map((x) => el("button", { type: "button", class: x.primary ? "" : "ghost", onclick: x.run }, x.label)),
+            n.sub ? el("small", {}, n.sub) : null)
+        : n.action
         ? el("div", { class: "msg pet-callout" }, el("span", {}, n.text), el("button", { type: "button", onclick: n.action.onclick }, n.action.label))
         : el("div", { class: "msg msg--sys" }, el("p", {}, n.text))),
     );
@@ -235,9 +248,27 @@ export function petView(app: HTMLElement, id: string | null) {
   if (flash) { notes = [{ text: flash }]; flash = ""; }
   else if (!c) notes = [{ text: t("pet.empty"), action: { label: t("pet.importFile"), onclick: () => file.click() } }];
   else if (c && isSpent(c)) notes = [spentNote()]; // 第 25 步：「anone.life 的人」聊满 10 回合 → 收尾卡，输入台不再唤出
-  else if (!ready(settings)) notes = [{ text: t("pet.needModel"), action: { label: t("pet.toSettings"), onclick: () => go("#/settings?next=pet") } }];
+  else if (!ready(settings) && !free) notes = [{ text: t("pet.needModel"), action: { label: t("pet.toSettings"), onclick: () => go("#/settings?next=pet") } }];
   let calmSince = 0;
   draw();
+  /** 一期一会：照额度换输入框的提示，或者在字幕区出那张卡（卡住时输入台不唤出） */
+  const applyFree = () => {
+    if (!free || !c) return;
+    const st = freeState();
+    notes = notes.filter((n) => !n.choices);
+    if (st.ok) { box.placeholder = st.hint || t("char.placeholder", { name: c.name }); draw(); return; }
+    setState("hidden");
+    const card = rareCard(st.code, c, quota, anone, {
+      refresh: () => { stop = null; void fetchQuota(c, anone).then((q) => { quota = q; if (!q) stop = "offline"; applyFree(); }); },
+      pick: () => { pendingPick = true; stop = null; applyFree(); },
+      stamps: (on) => { c.prefs = { ...c.prefs, stamps: on }; saveCharacter(c); stop = null; applyFree(); },
+      ownApi: () => go("#/settings?next=pet"),
+      open: (url) => void window.open(url, "_blank", "noopener"),
+    });
+    notes = [...notes, { text: card.text, choices: card.choices, ...(card.note ? { sub: card.note } : {}) }];
+    draw();
+  };
+  if (free && c) void fetchQuota(c, anone).then((q) => { quota = q; applyFree(); });
 
   // 第一次打开（有 anone.life key）把「anone.life 的人」下载下来；库原本是空的就切到第一位
   // 不管成功、失败还是 key 被拒，结束了就重拍名单、菜单开着就重画（2026-10-18：正选着奇人时四位下载完了菜单还停在「正在带过来」）
@@ -261,7 +292,7 @@ export function petView(app: HTMLElement, id: string | null) {
   let last = { x: -1, y: -1 };
   const setState = (s: "hidden" | "peek" | "pinned") => { composer.dataset.state = s; };
   const pinned = () => composer.dataset.state === "pinned" || document.activeElement === box || !!box.value.trim();
-  const reveal = () => { if (composer.dataset.state === "hidden" && !(c && isSpent(c))) setState("peek"); };
+  const reveal = () => { if (composer.dataset.state === "hidden" && !(c && isSpent(c)) && !freeBlocked()) setState("peek"); };
   const conceal = () => { if (!pinned()) setState("hidden"); };
   box.addEventListener("focus", () => setState("pinned"));
   box.addEventListener("blur", () => { if (!box.value.trim()) setState(inside(last.x, last.y, composer) ? "peek" : "hidden"); });
@@ -408,7 +439,7 @@ export function petView(app: HTMLElement, id: string | null) {
   // 说完 10 秒淡掉（2026-10-18 用户定，anone.life 是 3 秒；轮询照 anone.life desktop.ts：不靠「说完那一下」排定时器——播音还在念、指针压在字上都要等）
   let fadeTimer = 0;
   const calmTick = window.setInterval(() => {
-    const fading = !!(turn.user || turn.her || turn.status || notes.some((n) => !n.action));
+    const fading = !!(turn.user || turn.her || turn.status || notes.some((n) => !n.action && !n.choices));
     if (!fading) { calmSince = 0; return; }
     if (busy || onText(last.x, last.y)) {
       calmSince = 0;
@@ -419,7 +450,7 @@ export function petView(app: HTMLElement, id: string | null) {
     if (!calmSince) { calmSince = now; return; }
     if (now - calmSince < 10_000 || fadeTimer) return;
     transcript.style.opacity = "0";
-    fadeTimer = window.setTimeout(() => { fadeTimer = 0; turn = {}; notes = notes.filter((n) => n.action); draw(); }, 450);
+    fadeTimer = window.setTimeout(() => { fadeTimer = 0; turn = {}; notes = notes.filter((n) => n.action || n.choices); draw(); }, 450);
   }, 400);
 
   // 拖文件进来：备份（导出全部）或 .anone
@@ -441,7 +472,8 @@ export function petView(app: HTMLElement, id: string | null) {
   send.onclick = async () => {
     const text = box.value.trim();
     if (!text || busy || !c || turnsLeft(c) <= 0) return;
-    if (!ready(loadSettings())) { note(t("pet.needModel"), { label: t("pet.toSettings"), onclick: () => go("#/settings?next=pet") }); return; }
+    if (!ready(loadSettings()) && !free) { note(t("pet.needModel"), { label: t("pet.toSettings"), onclick: () => go("#/settings?next=pet") }); return; }
+    if (freeBlocked()) { applyFree(); return; }
     box.value = ""; box.blur(); setState("hidden");
     busy = true; send.disabled = true;
     notes = []; turn = { user: text };
@@ -449,14 +481,20 @@ export function petView(app: HTMLElement, id: string | null) {
     let replied = false;
     draw();
     try {
-      await reply(c, modelFrom(loadSettings()), { face, stage, anone }, {
+      const model = free ? freeModel(c, anone, () => { const st = freeState(); return st.ok ? st.pay : "default"; }, (q) => { quota = q; }) : modelFrom(loadSettings());
+      await reply(c, model, { face, stage, anone }, {
         // 只在等回复时显示「正在输入…」；回复到了就一直是那句话
         status: (s) => { if (replied) return; turn.status = s || undefined; draw(); },
         sys: (s) => note(s),
         redraw: () => { replied = true; turn = { user: text, her: lastLine() }; draw(); },
       });
-    } catch { c.chat.pop(); saveCharacter(c); turn = { user: text }; }
+      pendingPick = false; stop = null;
+    } catch (e) {
+      c.chat.pop(); saveCharacter(c); turn = { user: text };
+      if (e instanceof RareStop) { stop = e.code; if (e.quota) quota = e.quota; box.value = text; }
+    }
     finally { busy = false; send.disabled = false; turn.status = undefined; draw(); }
+    if (free) applyFree();
     // 第 10 句回完：重画成收尾卡（TA 那句话照样留在字幕里）
     if (isSpent(c) && /^#\/pet/.test(location.hash)) { const said = turn.her; petView(app, c.id); if (said) { turn = { her: said }; draw(); } }
   };

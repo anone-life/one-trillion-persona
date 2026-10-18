@@ -566,6 +566,11 @@ html:has(body[data-layout="pet"]), body[data-layout="pet"] { background: transpa
   background: var(--glass); border: 1px solid var(--glass-line); color: var(--pet-ink); backdrop-filter: blur(10px); font-size: 12px; line-height: 1.5; }
 .pet-callout span { flex: 1; min-width: 0; }
 .pet-callout button { flex: none; border: 0; border-radius: 999px; padding: 5px 12px; background: var(--pet-red); color: #fff; font: 600 12px var(--gothic); cursor: pointer; }
+/* 一期一会试聊卡住（第 28 步）：一句话 + 几个按钮竖着排 */
+.pet-callout--choices { flex-direction: column !important; align-items: stretch; }
+.pet-callout--choices button { padding: 7px 12px; }
+.pet-callout--choices button.ghost { background: transparent; border: 1px solid var(--glass-line); color: var(--pet-ink); font-weight: 400; }
+.pet-callout--choices small { color: rgba(243, 237, 227, .6); font-size: 11px; }
 /* 输入台：深色胶囊，默认收起，鼠标探到底部才淡入 */
 .pet-composer { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 35; display: flex; gap: 8px; align-items: center; padding: 6px; border-radius: 999px;
   background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(12px); box-shadow: 0 10px 26px rgba(0, 0, 0, .35);

@@ -20,6 +20,7 @@ import { reply } from "./talk.ts";
 import { loadPhoto, removePhoto, savePhoto, shrinkPhoto } from "./photo.ts";
 import { lastSyncError, lastSyncRejected, syncAnonePeopleOnce } from "./anone-people.ts";
 import { closingLine, directUrl, handOff, isLimited, isSpent, turnsLeft } from "./limit.ts";
+import { fetchQuota, freeModel, rareCard, RareStop, rareStatus, usesFree, type RareCard, type RareQuota } from "./rare-free.ts";
 import { DEMO_PEOPLE, demoCard } from "./demo.ts";
 import { Stage } from "./player.ts";
 import { aboutContent } from "./about.ts";
@@ -611,9 +612,15 @@ function characterView(id: string) {
   const c = getCharacter(id);
   if (!c) return go("#/library");
   const settings = loadSettings();
-  if (!ready(settings)) return go(`#/settings?next=c/${id}`);
-  const model = modelFrom(settings);
+  // 一期一会没填自己的模型也能聊：走 anone.life 的免费试聊（第 28 步）；别的人照旧要先填模型
+  if (!ready(settings) && !c.rareId) return go(`#/settings?next=c/${id}`);
   const anone = loadAnone();
+  const free = usesFree(c);
+  let quota: RareQuota | null = null;
+  let stop: string | null = null; // 上一句被拒的原因（RareStop.code）
+  let pendingPick = false;
+  const freeState = () => (stop ? ({ ok: false, code: stop } as const) : rareStatus(c, quota, pendingPick));
+  const model = free ? freeModel(c, anone, () => { const st = freeState(); return st.ok ? st.pay : "default"; }, (q) => { quota = q; }) : modelFrom(settings);
   const rare = c.rareId ? RARE.find((r) => r.id === c.rareId) ?? null : null;
   // 奇人在别的语言下开的：界面换了语言就换到这个人这一语言的版本（人设、情境都跟着换；原来那段聊天留着）
   if (rare && c.lang && c.lang !== lang() && hasRarePersona(rare.id, lang())) return void openRare(rare);
@@ -649,7 +656,7 @@ function characterView(id: string) {
   const redraw = () => {
     log.replaceChildren(...c.chat.map((m, i) => h("div", { class: `bubble ${m.role === "assistant" ? "them" : "me"}` },
       m.role === "assistant" ? h("span", { class: "who" }, c.name) : null, ...(m.role === "assistant" ? withActions(shown(m)) : [shown(m)]),
-      m.role === "assistant" && i > 0 && !isSpent(c) ? h("button", { class: "bubble-tool", title: t("retune.tip"), onclick: () => openRetune(i) }, t("retune.button")) : null,
+      m.role === "assistant" && i > 0 && !isSpent(c) && !free ? h("button", { class: "bubble-tool", title: t("retune.tip"), onclick: () => openRetune(i) }, t("retune.button")) : null,
     )), status);
     scrollChat(log);
   };
@@ -699,24 +706,52 @@ function characterView(id: string) {
   send.onclick = async () => {
     const text = box.value.trim();
     if (!text || busy || turnsLeft(c) <= 0) return;
+    if (free && !freeState().ok) return;
     box.value = "";
     c.chat.push({ role: "user", content: text }); redraw();
-    try { await respond(); } catch { c.chat.pop(); saveCharacter(c); }
+    try {
+      await respond();
+      pendingPick = false; stop = null;
+    } catch (e) {
+      c.chat.pop(); saveCharacter(c); redraw();
+      // 一期一会卡住了：他那句放回输入框，下面换成三选一的卡
+      if (e instanceof RareStop) { stop = e.code; if (e.quota) quota = e.quota; box.value = text; }
+    }
+    if (free) drawComposer();
     // 第 25 步：这一句是第 10 句，回完就换成收尾卡
     if (isSpent(c) && location.hash === `#/c/${c.id}`) characterView(c.id);
   };
   // 「anone.life 的人」：剩 2 回合以内提示一句（第 25 步）
   if (isLimited(c) && turnsLeft(c) <= 2 && turnsLeft(c) > 0) box.placeholder = t("limit.left", { n: turnsLeft(c), name: c.name });
   box.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); } };
+  // 输入框那一格：平时是输入框；「anone.life 的人」用完 10 回合换收尾卡（第 25 步）；一期一会试聊卡住换三选一（第 28 步）
+  const composerSlot = h("div", { class: "composer-slot" });
+  const normal = h("div", { class: "composer" }, h("div", { class: "in" }, box, send));
+  const defaultHint = box.placeholder;
+  function drawComposer() {
+    if (isSpent(c!)) { composerSlot.replaceChildren(limitCard(c!, anone)); return; }
+    if (!free) { composerSlot.replaceChildren(normal); return; }
+    const st = freeState();
+    if (st.ok) { box.placeholder = st.hint || defaultHint; composerSlot.replaceChildren(normal); return; }
+    composerSlot.replaceChildren(freeCard(rareCard(st.code, c!, quota, anone, {
+      refresh: () => { stop = null; void fetchQuota(c!, anone).then((q) => { quota = q; if (!q) stop = "offline"; drawComposer(); }); },
+      pick: () => { pendingPick = true; stop = null; drawComposer(); box.focus(); },
+      stamps: (on) => { c!.prefs = { ...c!.prefs, stamps: on }; saveCharacter(c!); stop = null; drawComposer(); },
+      ownApi: () => go(`#/settings?next=c/${c!.id}`),
+      open: (url) => void window.open(url, "_blank", "noopener"),
+    })));
+  }
   const backdrop: Backdrop = photo ? { kind: "photo", src: photo }
     : rare?.layers["body.embodiment"] === "voice-only" ? { kind: "none", note: t("rare.voiceOnly") }
     : { kind: "none" };
   stagePage(rare ? "#/rare" : "#/library", {
     name: c.name, backdrop, live: live ? stage.el : undefined,
     scroll: [h("div", { class: "eyebrow" }, `${c.name} · ${c.tagline}`), rare ? contextCard(c, rare) : null, chatOptions(c), rare ? null : faceBar, log, retuneSlot],
-    composer: isSpent(c) ? limitCard(c, anone) : h("div", { class: "composer" }, h("div", { class: "in" }, box, send)),
+    composer: composerSlot,
   });
   redraw();
+  drawComposer();
+  if (free) void fetchQuota(c, anone).then((q) => { quota = q; drawComposer(); });
 }
 
 /**
@@ -742,6 +777,14 @@ function limitCard(c: SavedCharacter, anone: AnoneSettings): HTMLElement {
     c.handedOffAt ? null : h("button", { class: "btn", type: "button", onclick: () => void openTo(() => directUrl(c, anone)) }, t("limit.direct")),
     h("p", { class: "muted limit-note" }, c.handedOffAt ? t("limit.done", { name: c.name }) : t("limit.note")),
     msg);
+}
+
+/** 一期一会试聊卡住时的那张卡（第 28 步），和第 25 步的收尾卡同一个样子、占输入框的位置。 */
+function freeCard(card: RareCard): HTMLElement {
+  return h("div", { class: "composer limit-card" },
+    h("p", { class: "limit-say" }, card.text),
+    ...card.choices.map((x) => h("button", { class: x.primary ? "btn primary" : "btn", type: "button", onclick: x.run }, x.label)),
+    card.note ? h("p", { class: "muted limit-note" }, card.note) : null);
 }
 
 /** 回复里的 `*动作*` 显示成灰色斜体（动作描写开着时才会有；第 22 步）。 */

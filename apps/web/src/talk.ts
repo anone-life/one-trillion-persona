@@ -11,6 +11,7 @@ import { LANG_NAME, t } from "./i18n.ts";
 import { saveCharacter, type SavedCharacter } from "./store.ts";
 import { RARE } from "./rare-data.ts";
 import { RARE_CONTEXT } from "./rare/context.ts";
+import { RareStop } from "./rare-free.ts";
 
 export function characterSystem(c: SavedCharacter, withEmotion: boolean): string {
   const p = c.skeleton ? pronounsFor(c.skeleton) : { subj: "they" };
@@ -56,7 +57,8 @@ export async function reply(c: SavedCharacter, model: Model, live: Live, hooks: 
   } catch (e) {
     hooks.status("");
     stage?.idle();
-    hooks.sys(t("chat.error", { msg: (e as Error).message }));
+    // 一期一会试聊卡住了（第 28 步）：不是出错，调用方换成那张三选一的卡
+    if (!(e instanceof RareStop)) hooks.sys(t("chat.error", { msg: (e as Error).message }));
     throw e;
   }
   c.chat.push({ role: "assistant", content: text });
