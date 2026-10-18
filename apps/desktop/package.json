@@ -1,6 +1,6 @@
 {
   "name": "@1t-persona/desktop",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "1T Persona on your desktop: a transparent always-on-top window with your character standing in it.",
   "license": "Apache-2.0",
