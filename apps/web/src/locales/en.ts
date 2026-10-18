@@ -401,6 +401,8 @@ const en = {
   "desk.macIntel": "Mac (Intel)",
   "desk.win": "Windows",
   "desk.after": "Once it's installed, press Export all here and drag the file onto the desktop app. The file holds characters and chats, never keys.",
+  "desk.firstMac": "First time: unzip, drag 1T Persona into Applications and open it. When macOS says it \"could not verify\" the app, click Done, then go to System Settings › Privacy & Security, scroll down to 1T Persona and click Open Anyway. You only do this once. (On older macOS, right-click the app › Open also works.)",
+  "desk.firstWin": "First time: unzip the whole folder and run 1T Persona.exe. If \"Windows protected your PC\" appears, click More info › Run anyway. You only do this once.",
   "desk.others": "Other versions",
   "desk.whichMac": "Not sure which Mac? Apple menu › About This Mac: if Chip says Apple M, take the first; if it says Intel, the second.",
   "desk.notHere": "The desktop app is for Mac and Windows; download it on a computer.",

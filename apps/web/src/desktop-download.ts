@@ -66,7 +66,10 @@ export function desktopDownload(): HTMLElement {
   const buttons = el("div", { class: "desk-dl-buttons" });
   const note = el("p", { class: "muted desk-dl-note" });
   const after = el("p", { class: "muted" }, t("desk.after"));
-  const box = el("section", { class: "desk-dl" }, el("b", {}, t("desk.title")), buttons, after, note);
+  // 第一次打开会被系统拦（还没有苹果公证 / 微软签名）：按判出来的系统说怎么放行（用户 2026-10-18 下载后被 macOS 拦住）
+  const firstOpen = el("p", { class: "desk-dl-first", hidden: "" });
+  const box = el("section", { class: "desk-dl" }, el("b", {}, t("desk.title")), buttons, firstOpen, after, note);
+  const showFirst = (key: "desk.firstMac" | "desk.firstWin") => { firstOpen.textContent = t(key); firstOpen.hidden = false; };
   const button = (k: Target, primary: boolean) => {
     const a = el("a", { class: `btn${primary ? " primary" : ""}`, href: RELEASES_URL, target: "_blank", rel: "noopener" }, `${t("desk.download")} · ${LABEL[k]()}`);
     // 有最新一版就换成直接下载那个 zip；没有就留着 Releases 页
@@ -76,6 +79,7 @@ export function desktopDownload(): HTMLElement {
   const others = el("a", { class: "btn-link", href: RELEASES_URL, target: "_blank", rel: "noopener" }, t("desk.others"));
   void detectTarget().then((k) => {
     if (k === null) { buttons.replaceChildren(); after.hidden = true; note.replaceChildren(t("desk.notHere"), " ", others); return; }
+    showFirst(k === "win-x64" ? "desk.firstWin" : "desk.firstMac");
     if (k === "mac-unknown") { buttons.replaceChildren(button("mac-arm64", true), button("mac-x64", false)); note.replaceChildren(t("desk.whichMac"), " ", others); return; }
     buttons.replaceChildren(button(k, true));
     note.replaceChildren(others);

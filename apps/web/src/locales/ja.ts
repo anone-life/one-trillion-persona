@@ -402,6 +402,8 @@ const ja: Record<keyof typeof en, string> = {
   "desk.macIntel": "Mac（Intel）",
   "desk.win": "Windows",
   "desk.after": "インストールしたら、ここで「すべて書き出す」を押して、そのファイルをデスクトップ版にドラッグしてください。キャラクターと会話が入っていて、キーは入っていません。",
+  "desk.firstMac": "はじめて開くとき：解凍して 1T Persona を「アプリケーション」に入れ、ダブルクリック。「確認できません」と出たら「完了」を押し、システム設定 › プライバシーとセキュリティ を開いて、下のほうの 1T Persona の「このまま開く」を押してください。最初の一回だけです。（古い macOS ではアプリを右クリック › 開く でも開けます。）",
+  "desk.firstWin": "はじめて開くとき：フォルダごと解凍して 1T Persona.exe をダブルクリック。「Windows によって PC が保護されました」と出たら「詳細情報」›「実行」を押してください。最初の一回だけです。",
   "desk.others": "ほかの版",
   "desk.whichMac": "どちらの Mac かわからないとき：アップルメニュー › この Mac について。「チップ」が Apple M なら左、Intel なら右。",
   "desk.notHere": "デスクトップ版は Mac と Windows 用です。パソコンからダウンロードしてください。",

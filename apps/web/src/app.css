@@ -700,6 +700,8 @@ body[data-layout="pet"] .shell-back { display: none; }
 .desk-dl-buttons .btn { text-decoration: none; }
 .desk-dl-buttons:empty { display: none; }
 .desk-dl p { margin: 0; font-size: 13px; line-height: 1.6; }
+.desk-dl-first { padding: 8px 10px; border-left: 2px solid var(--shu); background: var(--shu-soft); color: var(--ink-2); }
+.desk-dl-first[hidden] { display: none; }
 
 /* 第 27 步：奇人页标题区一行高、卡片第一屏露出；悬停浮出第一句话；手机导航一行横滑 */
 .rare-hero { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 14px 28px; margin-bottom: 16px; }

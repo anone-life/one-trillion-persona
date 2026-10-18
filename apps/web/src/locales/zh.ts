@@ -402,6 +402,8 @@ const zh: Record<keyof typeof en, string> = {
   "desk.macIntel": "Mac（Intel）",
   "desk.win": "Windows",
   "desk.after": "装好后，在这里点「导出全部」，把文件拖到桌宠上。文件里有角色和聊天，不含任何 key。",
+  "desk.firstMac": "第一次打开：解压后把 1T Persona 拖进「应用程序」再双击。macOS 会提示「无法验证」——点「完成」，打开 系统设置 › 隐私与安全性，往下找到 1T Persona，点「仍要打开」。只需一次。（较旧的 macOS 可以右键点 App › 打开。）",
+  "desk.firstWin": "第一次打开：解压整个文件夹，双击 1T Persona.exe。如果出现「Windows 已保护你的电脑」，点「更多信息」›「仍要运行」。只需一次。",
   "desk.others": "其他版本",
   "desk.whichMac": "不确定是哪种 Mac？苹果菜单 › 关于本机，「芯片」写着 Apple M 的选第一个，写着 Intel 的选第二个。",
   "desk.notHere": "桌宠有 Mac 和 Windows 版，请在电脑上下载。",
