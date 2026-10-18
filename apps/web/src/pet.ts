@@ -14,6 +14,7 @@ import { RARE } from "./rare-data.ts";
 import { rareCutout, rarePhoto } from "./rare/assets.ts";
 import { importFile } from "./importer.ts";
 import { loadPhoto } from "./photo.ts";
+import { closingLine, directUrl, handOff, isLimited, isSpent, turnsLeft } from "./limit.ts";
 import { lang, t } from "./i18n.ts";
 import { lastSyncError, syncAnonePeopleOnce } from "./anone-people.ts";
 import { DEMO_PEOPLE, playDemo } from "./demo.ts";
@@ -186,6 +187,15 @@ export function petView(app: HTMLElement, id: string | null) {
   };
   const note = (text: string, action?: { label: string; onclick: () => void }) => { notes = text ? [...notes.filter((n) => n.text !== text), { text, ...(action ? { action } : {}) }] : []; draw(); };
 
+  // 「anone.life 的人」聊满 10 回合的收尾（第 25 步）：TA 口吻的一句 + 带着对话去 anone.life（桌宠外壳里由主进程交给系统浏览器）
+  function spentNote() {
+    const go2 = async () => {
+      try { window.open(c!.handedOffAt ? directUrl(c!, anone) : await handOff(c!, anone), "_blank", "noopener"); petView(app, c!.id); }
+      catch (e) { note(t("limit.fail", { msg: (e as Error).message })); }
+    };
+    return { text: closingLine(c!), action: { label: c!.handedOffAt ? t("limit.again") : t("limit.bring"), onclick: () => void go2() } };
+  }
+
   // 台
   let media: HTMLImageElement | HTMLVideoElement | null = null;
   const figure = el("div", { class: "pet-fig", "data-kind": fig.kind });
@@ -210,7 +220,7 @@ export function petView(app: HTMLElement, id: string | null) {
   const menu = el("div", { class: "pet-menu", hidden: true });
 
   // 输入台：深色胶囊 + 朱红圆钮；隐藏 → 窥视（鼠标在底部停 200ms）→ 钉住（有焦点、有字、点过 TA）
-  const box = el("textarea", { rows: "1", placeholder: c ? t("char.placeholder", { name: c.name }) : "" }) as HTMLTextAreaElement;
+  const box = el("textarea", { rows: "1", placeholder: !c ? "" : isLimited(c) && turnsLeft(c) <= 2 && turnsLeft(c) > 0 ? t("limit.left", { n: turnsLeft(c), name: c.name }) : t("char.placeholder", { name: c.name }) }) as HTMLTextAreaElement;
   const send = el("button", { class: "pet-send", type: "button", title: t("chat.send"), "aria-label": t("chat.send") }, "➤") as HTMLButtonElement;
   const composer = el("div", { class: "pet-composer", "data-state": "hidden" }, box, send);
   const file = el("input", { type: "file", accept: ".anone,.json,application/x-anone,application/zip,application/json", hidden: true }) as HTMLInputElement;
@@ -223,6 +233,7 @@ export function petView(app: HTMLElement, id: string | null) {
   if (c && lastLine()) turn = { her: lastLine() };
   if (flash) { notes = [{ text: flash }]; flash = ""; }
   else if (!c) notes = [{ text: t("pet.empty"), action: { label: t("pet.importFile"), onclick: () => file.click() } }];
+  else if (c && isSpent(c)) notes = [spentNote()]; // 第 25 步：「anone.life 的人」聊满 10 回合 → 收尾卡，输入台不再唤出
   else if (!ready(settings)) notes = [{ text: t("pet.needModel"), action: { label: t("pet.toSettings"), onclick: () => go("#/settings?next=pet") } }];
   let calmSince = 0;
   draw();
@@ -244,7 +255,7 @@ export function petView(app: HTMLElement, id: string | null) {
   let last = { x: -1, y: -1 };
   const setState = (s: "hidden" | "peek" | "pinned") => { composer.dataset.state = s; };
   const pinned = () => composer.dataset.state === "pinned" || document.activeElement === box || !!box.value.trim();
-  const reveal = () => { if (composer.dataset.state === "hidden") setState("peek"); };
+  const reveal = () => { if (composer.dataset.state === "hidden" && !(c && isSpent(c))) setState("peek"); };
   const conceal = () => { if (!pinned()) setState("hidden"); };
   box.addEventListener("focus", () => setState("pinned"));
   box.addEventListener("blur", () => { if (!box.value.trim()) setState(inside(last.x, last.y, composer) ? "peek" : "hidden"); });
@@ -421,7 +432,7 @@ export function petView(app: HTMLElement, id: string | null) {
   // 发消息
   send.onclick = async () => {
     const text = box.value.trim();
-    if (!text || busy || !c) return;
+    if (!text || busy || !c || turnsLeft(c) <= 0) return;
     if (!ready(loadSettings())) { note(t("pet.needModel"), { label: t("pet.toSettings"), onclick: () => go("#/settings?next=pet") }); return; }
     box.value = ""; box.blur(); setState("hidden");
     busy = true; send.disabled = true;
@@ -438,6 +449,8 @@ export function petView(app: HTMLElement, id: string | null) {
       });
     } catch { c.chat.pop(); saveCharacter(c); turn = { user: text }; }
     finally { busy = false; send.disabled = false; turn.status = undefined; draw(); }
+    // 第 10 句回完：重画成收尾卡（TA 那句话照样留在字幕里）
+    if (isSpent(c) && /^#\/pet/.test(location.hash)) { const said = turn.her; petView(app, c.id); if (said) { turn = { her: said }; draw(); } }
   };
   box.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send.click(); } };
 

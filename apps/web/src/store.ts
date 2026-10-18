@@ -23,6 +23,8 @@ export interface SavedCharacter {
   retunes?: { at: string; complaint: string; changed: string[]; summary: string }[];
   /** 「anone.life 的人」那四位：anone.life 上的角色 id（第 23 步，第一次启动时下载的；人设能改，改的是本地这份） */
   anoneId?: string;
+  /** 「anone.life 的人」聊满 10 回合后，带着对话去过 anone.life 的时刻（第 25 步） */
+  handedOffAt?: string;
   /** 那四位的海报图（anone.life CDN 上的，角色库卡片用） */
   anonePoster?: string;
   /** 从「奇人」页开聊的：奇人编号（台上放 TA 的照片，不挑 anone.life 的脸）。第 20 步 */

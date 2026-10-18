@@ -13,11 +13,12 @@ import { makeBackup } from "./backup.ts";
 import { importFile } from "./importer.ts";
 import { RELEASES_URL, inShell, leavePet, petView } from "./pet.ts";
 import { DEV_PROXY, PRESETS, loadSettings, modelFrom, ready, saveSettings, type Settings } from "./llm.ts";
-import { anoneReady, listFaces, loadAnone, resetFaces, saveAnone, takeEmotion, type Face } from "./anone.ts";
+import { anoneReady, listFaces, loadAnone, resetFaces, saveAnone, takeEmotion, type AnoneSettings, type Face } from "./anone.ts";
 import { GROK_ONLY, VOICES, defaultVoice, loadVoice, saveVoice, voiceReady, type VoiceProvider } from "./voice.ts";
 import { reply } from "./talk.ts";
 import { loadPhoto, removePhoto, savePhoto, shrinkPhoto } from "./photo.ts";
 import { lastSyncError, syncAnonePeopleOnce } from "./anone-people.ts";
+import { closingLine, directUrl, handOff, isLimited, isSpent, turnsLeft } from "./limit.ts";
 import { DEMO_PEOPLE, demoCard } from "./demo.ts";
 import { Stage } from "./player.ts";
 import { aboutContent } from "./about.ts";
@@ -645,7 +646,7 @@ function characterView(id: string) {
   const redraw = () => {
     log.replaceChildren(...c.chat.map((m, i) => h("div", { class: `bubble ${m.role === "assistant" ? "them" : "me"}` },
       m.role === "assistant" ? h("span", { class: "who" }, c.name) : null, ...(m.role === "assistant" ? withActions(shown(m)) : [shown(m)]),
-      m.role === "assistant" && i > 0 ? h("button", { class: "bubble-tool", title: t("retune.tip"), onclick: () => openRetune(i) }, t("retune.button")) : null,
+      m.role === "assistant" && i > 0 && !isSpent(c) ? h("button", { class: "bubble-tool", title: t("retune.tip"), onclick: () => openRetune(i) }, t("retune.button")) : null,
     )), status);
     scrollChat(log);
   };
@@ -694,11 +695,15 @@ function characterView(id: string) {
   };
   send.onclick = async () => {
     const text = box.value.trim();
-    if (!text || busy) return;
+    if (!text || busy || turnsLeft(c) <= 0) return;
     box.value = "";
     c.chat.push({ role: "user", content: text }); redraw();
     try { await respond(); } catch { c.chat.pop(); saveCharacter(c); }
+    // 第 25 步：这一句是第 10 句，回完就换成收尾卡
+    if (isSpent(c) && location.hash === `#/c/${c.id}`) characterView(c.id);
   };
+  // 「anone.life 的人」：剩 2 回合以内提示一句（第 25 步）
+  if (isLimited(c) && turnsLeft(c) <= 2 && turnsLeft(c) > 0) box.placeholder = t("limit.left", { n: turnsLeft(c), name: c.name });
   box.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); } };
   const backdrop: Backdrop = photo ? { kind: "photo", src: photo }
     : rare?.layers["body.embodiment"] === "voice-only" ? { kind: "none", note: t("rare.voiceOnly") }
@@ -706,9 +711,34 @@ function characterView(id: string) {
   stagePage(rare ? "#/rare" : "#/library", {
     name: c.name, backdrop, live: live ? stage.el : undefined,
     scroll: [h("div", { class: "eyebrow" }, `${c.name} · ${c.tagline}`), rare ? contextCard(c, rare) : null, chatOptions(c), rare ? null : faceBar, log, retuneSlot],
-    composer: h("div", { class: "composer" }, h("div", { class: "in" }, box, send)),
+    composer: isSpent(c) ? limitCard(c, anone) : h("div", { class: "composer" }, h("div", { class: "in" }, box, send)),
   });
   redraw();
+}
+
+/**
+ * 「anone.life 的人」聊满 10 回合后的收尾卡（第 25 步），占输入框的位置（手机上平时只露最后一轮，放在记录里会被藏掉）。
+ * TA 口吻的一句 +「带着这段对话去 anone.life」/「不带，直接去」；带过的只剩「去 anone.life 继续」。
+ */
+function limitCard(c: SavedCharacter, anone: AnoneSettings): HTMLElement {
+  const msg = h("p", { class: "error" });
+  // 弹窗要在点击那一刻开（等完请求再开会被浏览器拦）；桌宠外壳里由主进程交给系统浏览器
+  const openTo = async (get: () => Promise<string> | string) => {
+    const w = inShell() ? null : window.open("", "_blank");
+    try {
+      const url = await get();
+      if (w) { w.opener = null; w.location.href = url; } else window.open(url, "_blank", "noopener");
+      if (c.handedOffAt) characterView(c.id);
+    } catch (e) { w?.close(); msg.textContent = t("limit.fail", { msg: (e as Error).message }); }
+  };
+  return h("div", { class: "composer limit-card" },
+    h("p", { class: "limit-say" }, closingLine(c)),
+    c.handedOffAt
+      ? h("button", { class: "btn primary", type: "button", onclick: () => void openTo(() => directUrl(c, anone)) }, t("limit.again"))
+      : h("button", { class: "btn primary", type: "button", onclick: () => void openTo(() => handOff(c, anone)) }, t("limit.bring")),
+    c.handedOffAt ? null : h("button", { class: "btn", type: "button", onclick: () => void openTo(() => directUrl(c, anone)) }, t("limit.direct")),
+    h("p", { class: "muted limit-note" }, c.handedOffAt ? t("limit.done", { name: c.name }) : t("limit.note")),
+    msg);
 }
 
 /** 回复里的 `*动作*` 显示成灰色斜体（动作描写开着时才会有；第 22 步）。 */

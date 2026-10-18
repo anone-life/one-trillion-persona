@@ -685,3 +685,10 @@ body[data-layout="pet"] .shell-back { display: none; }
 .demo-layer.pet .demo-stage { background: transparent; box-shadow: none; }
 .demo-layer.pet .demo-sub { padding: 6px 10px; border-radius: var(--radius); background: rgba(12, 10, 8, .55); min-height: 0; }
 .demo-layer.pet .demo-sub:empty { display: none; }
+
+/* 「anone.life 的人」聊满 10 回合的收尾卡（第 25 步）：占输入框的位置 */
+.cs-chat .composer.limit-card { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.limit-card .limit-say { margin: 0; font-family: var(--mincho); font-size: 15px; line-height: 1.7; }
+.limit-card .btn { width: 100%; }
+.limit-card .limit-note { margin: 0; font-size: 12px; }
+@media (max-width: 860px) { .cs-chat .composer.limit-card { pointer-events: auto; margin: 0 12px max(10px, env(safe-area-inset-bottom)); padding: 12px; border-radius: 14px; background: var(--paper-2); border: 1px solid var(--rule); } }

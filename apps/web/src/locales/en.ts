@@ -453,6 +453,14 @@ const en = {
   "lib.anoneNeedKey": "Add your anone.life key (free) and they'll appear here.",
   "lib.mineTitle": "Made by you",
   "lib.anoneFailed": "Couldn't bring them over from anone.life ({msg}). anone.life may not have opened this yet — it'll try again next time.",
+  "limit.left": "{n} left with {name} here · say something…",
+  "limit.bring": "Bring this conversation to anone.life",
+  "limit.direct": "Just go, without it",
+  "limit.again": "Continue on anone.life",
+  "limit.note": "Only a few lines about what you talked about go along, never your messages themselves — and only to your anone.life account.",
+  "limit.done": "Brought over. {name} will pick up from here on anone.life.",
+  "limit.fail": "Couldn't reach anone.life: {msg}",
+  "limit.locked": "Your 10 turns with {name} here are used up",
 };
 
 export default en;
