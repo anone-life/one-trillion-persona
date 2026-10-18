@@ -466,6 +466,7 @@ const en = {
   "lib.anoneNeedKey": "Add your anone.life key (free) and they'll appear here.",
   "lib.mineTitle": "Made by you",
   "lib.anoneFailed": "Couldn't bring them over from anone.life ({msg}). anone.life may not have opened this yet — it'll try again next time.",
+  "lib.anoneKeyRejected": "Your anone.life key no longer works (it may have been revoked). Meet them below, then get a new key from anone.life.",
   "limit.left": "{n} left with {name} here · say something…",
   "limit.bring": "Bring this conversation to anone.life",
   "limit.direct": "Just go, without it",

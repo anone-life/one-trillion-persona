@@ -467,6 +467,7 @@ const ja: Record<keyof typeof en, string> = {
   "lib.anoneNeedKey": "anone.life のキー（無料）を入れると、ここに現れます。",
   "lib.mineTitle": "あなたがつくった人",
   "lib.anoneFailed": "anone.life から呼べませんでした（{msg}）。anone.life 側がまだ開いていないのかもしれません。次に開いたときにもう一度試します。",
+  "lib.anoneKeyRejected": "この anone.life のキーは使えなくなっています（取り消された可能性があります）。まずは会ってみて、anone.life で新しいキーを取ってください。",
   "limit.left": "{name} とあと {n} 回 · 話しかける…",
   "limit.bring": "この会話を持って anone.life へ",
   "limit.direct": "持っていかずに行く",

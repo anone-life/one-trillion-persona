@@ -14,7 +14,7 @@ export const anoneCharacterId = (id: string, lang: Lang) => `anone-${id}-${lang}
 async function get<T>(s: AnoneSettings, path: string): Promise<T> {
   const res = await fetch(`${s.base}${path}`, { headers: { authorization: `Bearer ${s.key}` } });
   const body = (await res.json().catch(() => ({}))) as T & { message?: string };
-  if (!res.ok) throw new Error(body.message ?? `anone.life said HTTP ${res.status}`);
+  if (!res.ok) throw Object.assign(new Error(body.message ?? `anone.life said HTTP ${res.status}`), { status: res.status });
   return body;
 }
 
@@ -59,6 +59,8 @@ const done = new Set<string>();
 let running: Promise<number> | null = null;
 /** 最近一次没拉成的原因（给界面说清楚「为什么这一组是空的」）；拉成了就清掉。 */
 export let lastSyncError = "";
+/** 最近一次是不是 key 被拒（401：撤销了 / 不是这台 anone.life 的）。被拒和没填一样出四位的演示，不能只剩一句报错。 */
+export let lastSyncRejected = false;
 /**
  * 每次打开页面、每把 key、每种语言只成功同步一次（网页、手机、桌宠启动时调，角色库每次打开也调）。
  * 没 key、出错都不算数：页面里刚填上 key、或者网好了，下一次调就会真去拉——
@@ -67,6 +69,6 @@ export let lastSyncError = "";
 export function syncAnonePeopleOnce(s: AnoneSettings, lang: Lang): Promise<number> {
   const k = `${s.base}|${s.key}|${lang}`;
   if (!anoneReady(s) || done.has(k)) return Promise.resolve(0);
-  running ??= syncAnonePeople(s, lang).then((n) => { done.add(k); lastSyncError = ""; return n; }, (e: Error) => { lastSyncError = e.message || "failed"; return 0; }).finally(() => { running = null; });
+  running ??= syncAnonePeople(s, lang).then((n) => { done.add(k); lastSyncError = ""; lastSyncRejected = false; return n; }, (e: Error & { status?: number }) => { lastSyncError = e.message || "failed"; lastSyncRejected = e.status === 401; return 0; }).finally(() => { running = null; });
   return running;
 }

@@ -16,7 +16,7 @@ import { importFile } from "./importer.ts";
 import { loadPhoto } from "./photo.ts";
 import { closingLine, directUrl, handOff, isLimited, isSpent, turnsLeft } from "./limit.ts";
 import { lang, t } from "./i18n.ts";
-import { lastSyncError, syncAnonePeopleOnce } from "./anone-people.ts";
+import { lastSyncError, lastSyncRejected, syncAnonePeopleOnce } from "./anone-people.ts";
 import { DEMO_PEOPLE, playDemo } from "./demo.ts";
 import { getCharacter, listCharacters, saveCharacter, type SavedCharacter } from "./store.ts";
 
@@ -331,10 +331,12 @@ export function petView(app: HTMLElement, id: string | null) {
         for (const x of list) row(x.name, () => go(`#/pet/${x.id}`), { cls: x.id === c?.id ? "now" : "", ...(x.id === c?.id ? { sub: "✓" } : {}) });
         // 这一组空着时说清楚为什么：没填 key / 拉不下来（anone.life 那边还没开放、网络）/ 正在拉
         if (isAnone && !list.length) {
-          menu.append(el("div", { class: "pet-menu-note" }, !anoneReady(anone) ? t("lib.anoneNeedKey") : lastSyncError ? t("lib.anoneFailed", { msg: lastSyncError }) : t("lib.anoneLoading")));
-          if (!anoneReady(anone)) row(t("pet.toSettings"), () => go("#/settings?next=pet"), { sub: "›" });
+          // key 格式对但被 anone.life 拒了（401）和没填一样：出四位的演示和「去设置」，不能只剩一句报错
+          const noKey = !anoneReady(anone) || lastSyncRejected;
+          menu.append(el("div", { class: "pet-menu-note" }, !anoneReady(anone) ? t("lib.anoneNeedKey") : lastSyncRejected ? t("lib.anoneKeyRejected") : lastSyncError ? t("lib.anoneFailed", { msg: lastSyncError }) : t("lib.anoneLoading")));
+          if (noKey) row(t("pet.toSettings"), () => go("#/settings?next=pet"), { sub: "›" });
           // 第 24 步：没 key 也能点这四位——TA 在桌面上走进来、请你去注册、讲完走出去
-          if (!anoneReady(anone)) for (const p of DEMO_PEOPLE) row(p.name[lang()], () => playDemo(p, (to) => { if (to === "settings") go("#/settings?next=pet"); }, { crossOrigin: true, variant: "pet" }), { sub: `▶ ${t("demo.watch")}` });
+          if (noKey) for (const p of DEMO_PEOPLE) row(p.name[lang()], () => playDemo(p, (to) => { if (to === "settings") go("#/settings?next=pet"); }, { crossOrigin: true, variant: "pet" }), { sub: `▶ ${t("demo.watch")}` });
         }
       }
       row(t("pet.menu.import"), () => file.click(), { cls: "add" });

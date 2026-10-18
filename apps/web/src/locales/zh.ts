@@ -467,6 +467,7 @@ const zh: Record<keyof typeof en, string> = {
   "lib.anoneNeedKey": "填上 anone.life 的 key（免费），TA 们就会出现在这里。",
   "lib.mineTitle": "你造的",
   "lib.anoneFailed": "没能从 anone.life 把 TA 们带过来（{msg}）。可能 anone.life 那边还没开放这一项，下次打开会再试。",
+  "lib.anoneKeyRejected": "这把 anone.life 的 key 用不了了（可能已经撤销）。先看看 TA 们，再去 anone.life 拿一把新的。",
   "limit.left": "和 {name} 还能聊 {n} 回合 · 说点什么…",
   "limit.bring": "带着这段对话去 anone.life",
   "limit.direct": "不带，直接去",

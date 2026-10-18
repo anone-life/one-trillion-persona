@@ -18,7 +18,7 @@ import { anoneReady, listFaces, loadAnone, resetFaces, saveAnone, takeEmotion, t
 import { GROK_ONLY, VOICES, defaultVoice, loadVoice, saveVoice, voiceReady, type VoiceProvider } from "./voice.ts";
 import { reply } from "./talk.ts";
 import { loadPhoto, removePhoto, savePhoto, shrinkPhoto } from "./photo.ts";
-import { lastSyncError, syncAnonePeopleOnce } from "./anone-people.ts";
+import { lastSyncError, lastSyncRejected, syncAnonePeopleOnce } from "./anone-people.ts";
 import { closingLine, directUrl, handOff, isLimited, isSpent, turnsLeft } from "./limit.ts";
 import { DEMO_PEOPLE, demoCard } from "./demo.ts";
 import { Stage } from "./player.ts";
@@ -591,11 +591,11 @@ function libraryView() {
     // 第 23 步：分组——anone.life 的人（会动）、奇人、你造的
     h("section", { class: "lib-group" }, h("h2", {}, t("lib.anoneTitle")), h("p", { class: "muted" }, t("lib.anoneNote")),
       anonePeople.length ? h("div", { class: "lib" }, ...anonePeople.map(item))
-        : anoneReady(loadAnone()) ? h("p", { class: lastSyncError ? "lib-callout" : "muted" }, lastSyncError ? t("lib.anoneFailed", { msg: lastSyncError }) : t("lib.anoneLoading"))
+        : anoneReady(loadAnone()) && !lastSyncRejected ? h("p", { class: lastSyncError ? "lib-callout" : "muted" }, lastSyncError ? t("lib.anoneFailed", { msg: lastSyncError }) : t("lib.anoneLoading"))
         // 第 24 步：没 key 也出四张卡，点了 TA 登场、亲口请你去注册，讲完出场
         : h("div", {}, h("p", { class: "muted" }, t("demo.groupNote")),
             h("div", { class: "demo-grid" }, ...DEMO_PEOPLE.map((p) => demoCard(p, { onDone: (to) => { if (to === "settings") go("#/settings"); } }))),
-            h("p", { class: "lib-callout" }, t("lib.anoneNeedKey"), " ", h("a", { href: "#/settings" }, t("nav.model"))))),
+            h("p", { class: "lib-callout" }, t(lastSyncRejected && anoneReady(loadAnone()) ? "lib.anoneKeyRejected" : "lib.anoneNeedKey"), " ", h("a", { href: "#/settings" }, t("nav.model"))))),
     rarePeople.length ? h("section", { class: "lib-group" }, h("h2", {}, t("rare.nav")), h("div", { class: "lib" }, ...rarePeople.map(item))) : null,
     h("section", { class: "lib-group" }, h("h2", {}, t("lib.mineTitle")),
       mine.length ? h("div", { class: "lib" }, ...mine.map(item)) : h("div", {}, h("p", { class: "muted" }, t("lib.empty")),
