@@ -157,7 +157,7 @@ export function petView(app: HTMLElement, id: string | null) {
   // ── 摆法照 anone.life 桌宠（web_companion/public/desktop.html 2026-10-11 那段）：TA 在上面一截不被挡；
   //    TA 说的话、提示、输入台都在 TA 下面那一条里；右上角深色圆钮 ✥ 拖动、⋯ 菜单。
 
-  // 字幕：只留这一轮（你那句 + TA 那句），从下往上；说完 3 秒淡掉。提示是一行灰字，带按钮的提示是深色小卡、不淡。
+  // 字幕：只留这一轮（你那句 + TA 那句），从下往上；说完 10 秒淡掉。提示是一行灰字，带按钮的提示是深色小卡、不淡。
   const transcript = el("div", { class: "pet-transcript" });
   let turn: { user?: string; her?: string; status?: string } = {};
   let notes: { text: string; action?: { label: string; onclick: () => void } }[] = [];
@@ -399,7 +399,7 @@ export function petView(app: HTMLElement, id: string | null) {
   const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && !menu.hidden) closeMenu(); };
   const onBlur = () => closeMenu();
 
-  // 说完 3 秒淡掉（照 anone.life desktop.ts 的轮询：不靠「说完那一下」排定时器——播音还在念、指针压在字上都要等）
+  // 说完 10 秒淡掉（2026-10-18 用户定，anone.life 是 3 秒；轮询照 anone.life desktop.ts：不靠「说完那一下」排定时器——播音还在念、指针压在字上都要等）
   let fadeTimer = 0;
   const calmTick = window.setInterval(() => {
     const fading = !!(turn.user || turn.her || turn.status || notes.some((n) => !n.action));
@@ -411,7 +411,7 @@ export function petView(app: HTMLElement, id: string | null) {
     }
     const now = Date.now();
     if (!calmSince) { calmSince = now; return; }
-    if (now - calmSince < 3000 || fadeTimer) return;
+    if (now - calmSince < 10_000 || fadeTimer) return;
     transcript.style.opacity = "0";
     fadeTimer = window.setTimeout(() => { fadeTimer = 0; turn = {}; notes = notes.filter((n) => n.action); draw(); }, 450);
   }, 400);
