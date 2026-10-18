@@ -3,7 +3,7 @@
 // 用你自己的模型聊、人设能改（改的是本地这份，不回传），立绘动画走 /v1/1t/animate（只收情绪、脸、开口时刻）。
 // 同一个人每种界面语言一份（和奇人一样），已经在本地的不重新下载，免得冲掉用户改过的人设。
 import { anoneReady, type AnoneSettings } from "./anone.ts";
-import { getCharacter, saveCharacter, type SavedCharacter } from "./store.ts";
+import { deleteCharacter, getCharacter, listCharacters, saveCharacter, type SavedCharacter } from "./store.ts";
 
 type Lang = "en" | "zh" | "ja";
 export interface AnonePerson { id: string; name: string; tagline: Record<Lang, string>; gender: "female" | "male" | null; faceId: string; poster?: string; langs: Lang[] }
@@ -27,11 +27,19 @@ export function listAnonePeople(s: AnoneSettings): Promise<AnonePerson[]> {
   return people;
 }
 
-/** 本地还没有的那几位（按这种语言）下载下来。没 key 什么都不做。返回这次新存了几位。 */
+/**
+ * 本地还没有的那几位（按这种语言）下载下来；**anone.life 不再列的人从本地删掉**（连聊天，和点「删除」一样——
+ * 2026-10-18 第四位颯换成晴，用户：「四个人！删了篠原颯」）。名单拉成功且不为空才删，拉失败或回空一个都不动。
+ * 没 key 什么都不做。返回这次新存 + 删掉了几位（不为 0 就重画）。
+ */
 export async function syncAnonePeople(s: AnoneSettings, lang: Lang): Promise<number> {
   if (!anoneReady(s)) return 0;
   const list = await listAnonePeople(s);
   let added = 0;
+  if (list.length) {
+    const listed = new Set(list.map((p) => p.id));
+    for (const c of listCharacters()) if (c.anoneId && !listed.has(c.anoneId) && deleteCharacter(c.id)) added++;
+  }
   for (const p of list) {
     const L = p.langs.includes(lang) ? lang : (p.langs[0] ?? "en");
     const id = anoneCharacterId(p.id, L);

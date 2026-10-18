@@ -659,10 +659,11 @@ body[data-layout="pet"] .shell-back { display: none; }
 
 .demo-layer { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(12, 10, 8, .72); backdrop-filter: blur(6px); animation: demo-in .25s ease; }
 @keyframes demo-in { from { opacity: 0; } }
-.demo-box { position: relative; width: min(460px, 100%); display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
-.demo-stage { position: relative; height: min(68vh, 620px); border-radius: var(--radius); overflow: hidden;
-  background: radial-gradient(ellipse 70% 55% at 50% 78%, rgba(255, 236, 205, .9), rgba(214, 196, 168, .55) 60%, rgba(60, 50, 40, .25)); }
-.demo-stage .stage { position: absolute; inset: 0; height: 100%; margin: 0; }
+/* 宽度＝立绘的宽度：四位的片子都是 3:4，台子按 3:4 走，字幕、按钮卡跟着同宽（用户 2026-10-18：暗底、和立绘一样宽） */
+.demo-box { --demo-w: min(calc(100vw - 32px), calc(min(68vh, 620px) * 3 / 4)); position: relative; width: var(--demo-w); display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+.demo-stage { position: relative; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius); overflow: hidden;
+  background: radial-gradient(ellipse 75% 55% at 50% 72%, #2a2420, #15120f 70%, #0c0a08); box-shadow: 0 10px 40px rgba(0, 0, 0, .45); }
+.demo-stage .stage { position: absolute; inset: 0; height: 100%; margin: 0; background: transparent; }
 .demo-sub { min-height: 3.2em; padding: 0 6px; text-align: center; font-size: 17px; line-height: 1.6; color: #fffdf8; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
 .demo-skip { position: absolute; z-index: 5; top: 10px; right: 48px; padding: 5px 12px; font: inherit; font-size: 13px; color: #fffdf8; background: rgba(0,0,0,.38); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; cursor: pointer; }
 .demo-close { position: absolute; z-index: 5; top: 8px; right: 10px; width: 30px; height: 30px; font-size: 20px; line-height: 1; color: #fffdf8; background: rgba(0,0,0,.38); border: 0; border-radius: 50%; cursor: pointer; }
@@ -676,10 +677,11 @@ body[data-layout="pet"] .shell-back { display: none; }
 .demo-box.ended .demo-stage, .demo-box.ended .demo-sub { display: none; }
 .demo-box.ended .demo-close { top: -38px; right: 0; }
 .demo-cta-face { width: 76px; height: 76px; margin: -50px auto 8px; display: block; border-radius: 50%; object-fit: cover; object-position: top center; border: 3px solid var(--paper-2); background: var(--paper-3); box-shadow: 0 4px 14px rgba(0,0,0,.18); }
-@media (max-width: 560px) { .demo-stage { height: 62vh; } .demo-sub { font-size: 16px; } }
+@media (max-width: 560px) { .demo-sub { font-size: 16px; } }
 /* 桌宠上演：透明窗口，不压暗；原来那位先藏起来 */
 .demo-on > :not(.demo-layer) { visibility: hidden; }
 .demo-layer.pet { background: transparent; backdrop-filter: none; padding: 8px; }
-.demo-layer.pet .demo-stage { background: transparent; height: min(78vh, 560px); }
+.demo-layer.pet .demo-box { --demo-w: min(calc(100vw - 16px), calc(min(78vh, 560px) * 3 / 4)); }
+.demo-layer.pet .demo-stage { background: transparent; box-shadow: none; }
 .demo-layer.pet .demo-sub { padding: 6px 10px; border-radius: var(--radius); background: rgba(12, 10, 8, .55); min-height: 0; }
 .demo-layer.pet .demo-sub:empty { display: none; }
