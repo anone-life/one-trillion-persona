@@ -6,14 +6,27 @@ import {
   REMOVABLE_LAYERS, parseSeed, placeById, placeLabel, randomSeed, rebuildSkeleton, type Skeleton,
 } from "@1t-persona/core";
 import {
-  DESIGNER_NAME, DesignerSession, finalize, generatePersona, generateSchedule, pronounsFor,
+  DESIGNER_NAME, DesignerSession, finalize, generatePersona, generateSchedule,
 } from "@1t-persona/designer/browser";
-import { cardInputFromPersona, packAnone, readAnone, toCardV2 } from "@1t-persona/files";
+import { cardInputFromPersona, packAnone, toCardV2 } from "@1t-persona/files";
+import { makeBackup } from "./backup.ts";
+import { importFile } from "./importer.ts";
+import { RELEASES_URL, inShell, leavePet, petView } from "./pet.ts";
 import { DEV_PROXY, PRESETS, loadSettings, modelFrom, ready, saveSettings, type Settings } from "./llm.ts";
-import { AnoneError, EMOTIONS, anoneReady, listFaces, loadAnone, resetFaces, saveAnone, spokenText, takeEmotion, type Face } from "./anone.ts";
-import { loadVoice, saveVoice, voiceLine, voiceReady, type VoiceProvider } from "./voice.ts";
+import { anoneReady, listFaces, loadAnone, resetFaces, saveAnone, takeEmotion, type Face } from "./anone.ts";
+import { GROK_ONLY, VOICES, defaultVoice, loadVoice, saveVoice, voiceReady, type VoiceProvider } from "./voice.ts";
+import { reply } from "./talk.ts";
+import { loadPhoto, removePhoto, savePhoto, shrinkPhoto } from "./photo.ts";
+import { lastSyncError, syncAnonePeopleOnce } from "./anone-people.ts";
+import { DEMO_PEOPLE, demoCard } from "./demo.ts";
 import { Stage } from "./player.ts";
 import { aboutContent } from "./about.ts";
+import { rareContent, rareProfile } from "./rare.ts";
+import { RARE, type Rare } from "./rare-data.ts";
+import { hasRarePersona, loadRarePersona, rarePhoto } from "./rare/assets.ts";
+import { rareSkeleton } from "./rare/skeleton.ts";
+import { RARE_CONTEXT } from "./rare/context.ts";
+import { RARE_NAMES } from "./rare/names.ts";
 import { retunePanel } from "./retune.ts";
 import { clipCard, clipStrip } from "./promo.ts";
 import { LANG_NAME, LANG_OPTIONS, fmtCount, joinList, lang, scaleTicks, setLang, t } from "./i18n.ts";
@@ -55,7 +68,7 @@ function masthead(active: string) {
   return h("div", { class: "masthead" },
     h("a", { class: "mark", href: "#/about", "aria-label": "あのね" }),
     h("div", { class: "by" }, h("b", {}, "あのね"), "  open source 01"),
-    h("nav", {}, link("#/about", t("nav.about")), link("#/", t("nav.new")), link("#/library", t("nav.library")), link("#/settings", t("nav.model")),
+    h("nav", {}, inShell() ? link("#/pet", t("pet.nav")) : null, link("#/about", t("nav.about")), link("#/", t("nav.new")), link("#/rare", t("rare.nav")), link("#/library", t("nav.library")), link("#/settings", t("nav.model")),
       h("span", { class: "langs" }, ...LANG_OPTIONS.map((o) => h("button", {
         class: `lang${o.id === lang() ? " on" : ""}`, "aria-pressed": String(o.id === lang()),
         onclick: () => { if (o.id !== lang()) { setLang(o.id); route(); } },
@@ -68,7 +81,7 @@ function page(active: string, ...children: Child[]) {
   window.scrollTo(0, 0);
 }
 
-// ── 聊天的台：照 anone.life 的版式——桌面左台右聊，手机台铺满、聊天浮在上面 ──
+// ── 聊天的台（第 20 步）：照 anone.life 的版式——桌面左台右聊，手机台铺满、聊天浮在上面 ──
 
 /** Elise 的立绘：只借 anone.life 那位的脸（透明底、静态），图不进本仓库，直接引用线上那张。 */
 const ELISE_PORTRAIT = "https://www.anone.life/home/02_disowned_heiress.webp";
@@ -81,10 +94,28 @@ function stagePage(active: string, o: { name: string; backdrop: Backdrop; live?:
     : b.kind === "photo" ? h("img", { class: "cs-photo", src: b.src, alt: o.name, decoding: "async" })
     : b.note ? h("div", { class: "cs-note" }, b.note) : null;
   document.body.dataset.layout = "stage";
-  app.replaceChildren(h("div", { class: "cs" }, masthead(active),
+  delete document.body.dataset.transcript;
+  // 照 anone.life（.stage-header）：台的左上角是名字，右上角一个「⋯」；站点导航收进「⋯」里那张小卡，不再占顶上一整条
+  const menu = h("div", { class: "cs-menu", hidden: true }, masthead(active));
+  const more = h("button", { class: "cs-more", type: "button", "aria-label": t("pet.more"), "aria-expanded": "false" }, "⋯");
+  const close = (e: Event) => { if (!menu.contains(e.target as Node) && e.target !== more) { menu.hidden = true; more.setAttribute("aria-expanded", "false"); document.removeEventListener("pointerdown", close, true); } };
+  more.onclick = () => {
+    menu.hidden = !menu.hidden;
+    more.setAttribute("aria-expanded", String(!menu.hidden));
+    if (!menu.hidden) document.addEventListener("pointerdown", close, true);
+  };
+  // 手机上平时只露最后一轮，点这根横条展开整段（anone.life 的 .transcript-toggle）；桌面不显示
+  const toggle = h("button", { class: "cs-toggle", type: "button", "aria-label": t("chat.history") }, h("span", { class: "grabber" }));
+  toggle.onclick = () => {
+    if (document.body.dataset.transcript === "expanded") delete document.body.dataset.transcript; else document.body.dataset.transcript = "expanded";
+    const s = app.querySelector<HTMLElement>(".cs-scroll"); if (s) s.scrollTop = s.scrollHeight;
+  };
+  app.replaceChildren(h("div", { class: "cs" },
     h("div", { class: "cs-main" },
-      h("section", { class: "cs-stage", "data-kind": b.kind }, art, o.live, h("div", { class: "cs-name" }, o.name)),
-      h("section", { class: "cs-chat" }, h("div", { class: "cs-scroll" }, ...o.scroll), o.composer))));
+      h("section", { class: "cs-stage", "data-kind": b.kind }, art, o.live),
+      h("section", { class: "cs-chat" }, h("div", { class: "cs-scroll" }, ...o.scroll), toggle, o.composer),
+      // 顶栏压在台上，但不放在台里面：台自成一层，手机上聊天层盖在台上面，「⋯」的小卡会被聊天层挡住
+      h("header", { class: "cs-head" }, h("h1", { class: "cs-name" }, o.name), h("div", { class: "cs-controls" }, more, menu)))));
 }
 /** 新消息之后滚到底：台版式滚聊天栏，其余滚整页。 */
 function scrollChat(log: HTMLElement) {
@@ -528,53 +559,49 @@ function resultView(id: string) {
 
 function libraryView() {
   const err = h("div", { class: "error" });
-  const file = h("input", { type: "file", accept: ".anone,application/x-anone,application/zip", style: "display:none" }) as HTMLInputElement;
+  const file = h("input", { type: "file", accept: ".anone,.json,application/x-anone,application/zip,application/json", style: "display:none" }) as HTMLInputElement;
   file.onchange = async () => {
     const f = file.files?.[0];
     if (!f) return;
-    try {
-      const a = await readAnone(new Uint8Array(await f.arrayBuffer()));
-      const tagline = /^# .+? · (.+)$/m.exec(a.persona)?.[1] ?? String(a.info.tagline_en ?? "");
-      saveCharacter({
-        id: crypto.randomUUID(), name: String(a.info.name), age: Number(a.info.age), location: String(a.info.location ?? ""), tagline,
-        relationToUser: /^- The person in front of \w+: (.+?)\.?$/m.exec(a.persona)?.[1] ?? "", persona: a.persona,
-        schedule: a.schedule ?? {}, skeleton: a.skeleton ?? null, createdAt: a.manifest.createdAt, chat: [],
-        ...(typeof a.info.avatarId === "string" ? { avatarId: a.info.avatarId } : {}),
-      });
-      libraryView();
-    } catch (e) { err.textContent = t("lib.importFail", { msg: (e as Error).message }); }
+    try { await importFile(f); libraryView(); } catch (e) { err.textContent = t("lib.importFail", { msg: (e as Error).message }); }
     file.value = "";
   };
+  // 「导出全部」：角色和聊天打成一个文件（不含 key），拖进桌宠就搬过去了（第 21 步）
+  const exportAll = () => download(`1t-persona-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(makeBackup(listCharacters()), null, 1), "application/json");
   const all = listCharacters();
+  const anonePeople = all.filter((c) => c.anoneId).sort((a, b) => a.anoneId!.localeCompare(b.anoneId!)), rarePeople = all.filter((c) => c.rareId), mine = all.filter((c) => !c.anoneId && !c.rareId);
+  const item = (c: SavedCharacter) => h("div", { class: "item" },
+    c.anonePoster ? h("img", { class: "lib-face", src: c.anonePoster, alt: "", loading: "lazy" }) : null,
+    h("div", { class: "who" }, h("b", {}, c.name), h("div", {}, `${c.tagline} · ${c.age}${c.skeleton ? ` · ${c.skeleton.seed}` : ""}`)),
+    h("button", { class: "btn primary", onclick: () => go(`#/c/${c.id}`) }, t("lib.talk")),
+    h("button", { class: "btn", onclick: () => go(`#/result/${c.id}`) }, t("lib.open")),
+    h("button", { class: "btn", "aria-label": t("lib.deleteAria", { name: c.name }), onclick: () => { if (confirm(t("lib.deleteConfirm", { name: c.name }))) { deleteCharacter(c.id); libraryView(); } } }, t("lib.delete")),
+  );
   page("#/library",
     h("div", { class: "eyebrow" }, t("lib.eyebrow")),
     h("h1", {}, t("lib.h1a"), h("em", {}, t("lib.h1em")), t("lib.h1b")),
-    h("div", { class: "row", style: "margin-top:14px" }, h("button", { class: "btn primary", onclick: () => go("#/") }, t("lib.new")), h("button", { class: "btn", onclick: () => file.click() }, t("lib.import")), file),
+    h("div", { class: "row", style: "margin-top:14px" }, h("button", { class: "btn primary", onclick: () => go("#/") }, t("lib.new")), h("button", { class: "btn", onclick: () => file.click() }, t("lib.import")),
+      all.length ? h("button", { class: "btn", onclick: exportAll }, t("lib.exportAll")) : null, file),
     err,
-    all.length ? h("div", { class: "lib" }, ...all.map((c) => h("div", { class: "item" },
-      h("div", { class: "who" }, h("b", {}, c.name), h("div", {}, `${c.tagline} · ${c.age}${c.skeleton ? ` · ${c.skeleton.seed}` : ""}`)),
-      h("button", { class: "btn primary", onclick: () => go(`#/c/${c.id}`) }, t("lib.talk")),
-      h("button", { class: "btn", onclick: () => go(`#/result/${c.id}`) }, t("lib.open")),
-      h("button", { class: "btn", "aria-label": t("lib.deleteAria", { name: c.name }), onclick: () => { if (confirm(t("lib.deleteConfirm", { name: c.name }))) { deleteCharacter(c.id); libraryView(); } } }, t("lib.delete")),
-    ))) : h("div", {}, h("p", { class: "muted", style: "margin-top:20px" }, t("lib.empty")),
-      clipStrip(t("promo.libTitle"), t("promo.libNote"), ["x07", "x06", "x05", "x08"])),
+    all.length ? h("p", { class: "muted lib-desk" }, ...(inShell() ? [t("lib.deskShell")] : [t("lib.deskA"), h("a", { href: RELEASES_URL, target: "_blank", rel: "noopener" }, t("lib.deskLink")), t("lib.deskB")])) : null,
+    // 第 23 步：分组——anone.life 的人（会动）、奇人、你造的
+    h("section", { class: "lib-group" }, h("h2", {}, t("lib.anoneTitle")), h("p", { class: "muted" }, t("lib.anoneNote")),
+      anonePeople.length ? h("div", { class: "lib" }, ...anonePeople.map(item))
+        : anoneReady(loadAnone()) ? h("p", { class: lastSyncError ? "lib-callout" : "muted" }, lastSyncError ? t("lib.anoneFailed", { msg: lastSyncError }) : t("lib.anoneLoading"))
+        // 第 24 步：没 key 也出四张卡，点了 TA 登场、亲口请你去注册，讲完出场
+        : h("div", {}, h("p", { class: "muted" }, t("demo.groupNote")),
+            h("div", { class: "demo-grid" }, ...DEMO_PEOPLE.map((p) => demoCard(p, { onDone: (to) => { if (to === "settings") go("#/settings"); } }))),
+            h("p", { class: "lib-callout" }, t("lib.anoneNeedKey"), " ", h("a", { href: "#/settings" }, t("nav.model"))))),
+    rarePeople.length ? h("section", { class: "lib-group" }, h("h2", {}, t("rare.nav")), h("div", { class: "lib" }, ...rarePeople.map(item))) : null,
+    h("section", { class: "lib-group" }, h("h2", {}, t("lib.mineTitle")),
+      mine.length ? h("div", { class: "lib" }, ...mine.map(item)) : h("div", {}, h("p", { class: "muted" }, t("lib.empty")),
+        clipStrip(t("promo.libTitle"), t("promo.libNote"), ["x07", "x06", "x05", "x08"]))),
   );
+  // 第一次打开（有 anone.life key）把那四位下载下来，下完重画
+  void syncAnonePeopleOnce(loadAnone(), lang()).then((n) => { if ((n || lastSyncError) && location.hash.startsWith("#/library") && !document.querySelector(".lib-group .lib-callout")) libraryView(); });
 }
 
 // ── 7. 和角色聊 ─────────────────────────────────────────────────────────────
-
-function characterSystem(c: SavedCharacter, withEmotion: boolean): string {
-  const p = c.skeleton ? pronounsFor(c.skeleton) : { subj: "they" };
-  return [
-    c.persona,
-    "",
-    "## This conversation",
-    `You are ${c.name}. Stay in character. You're texting with the person described above (${c.relationToUser || "someone you know"}).`,
-    `Reply the way ${c.name} would text: natural, usually short, no narration or stage directions, no lists. Never mention being an AI character or a persona file unless asked directly — and if asked directly whether ${p.subj === "they" ? "they're" : `${p.subj}'s`} an AI, say so honestly, in character.`,
-    ...(c.lang && c.lang !== "en" ? [`Reply in ${LANG_NAME[c.lang]}, unless the user clearly writes to you in another language.`] : []),
-    ...(withEmotion ? [`Start every reply with exactly one tag for how ${c.name} feels saying it — one of ${EMOTIONS.map((e) => `[${e}]`).join(" ")} — then the reply. The tag is never shown; it moves ${c.name}'s face.`] : []),
-  ].join("\n");
-}
 
 function characterView(id: string) {
   const c = getCharacter(id);
@@ -583,7 +610,13 @@ function characterView(id: string) {
   if (!ready(settings)) return go(`#/settings?next=c/${id}`);
   const model = modelFrom(settings);
   const anone = loadAnone();
-  const live = anoneReady(anone);
+  const rare = c.rareId ? RARE.find((r) => r.id === c.rareId) ?? null : null;
+  // 奇人在别的语言下开的：界面换了语言就换到这个人这一语言的版本（人设、情境都跟着换；原来那段聊天留着）
+  if (rare && c.lang && c.lang !== lang() && hasRarePersona(rare.id, lang())) return void openRare(rare);
+  // 第 23 步：不再换脸。会动的只有带着 anone.life 脸的人（「anone.life 的人」那四位；v0.2 时选过脸的旧角色也照旧）。
+  // 奇人用自己的照片；自己造的人可以上传一张照片，都不动。
+  const live = !rare && !!c.avatarId && anoneReady(anone);
+  const photo = rare ? rarePhoto(rare.id) : loadPhoto(c.id);
   const stage = new Stage();
   let face: Face | null = null;
   const faceBar = h("div", { class: "facebar" });
@@ -611,66 +644,53 @@ function characterView(id: string) {
   };
   const redraw = () => {
     log.replaceChildren(...c.chat.map((m, i) => h("div", { class: `bubble ${m.role === "assistant" ? "them" : "me"}` },
-      m.role === "assistant" ? h("span", { class: "who" }, c.name) : null, shown(m),
-      m.role === "assistant" && i > 0 ? h("button", { class: "bubble-tool", title: t("retune.button"), onclick: () => openRetune(i) }, t("retune.button")) : null,
+      m.role === "assistant" ? h("span", { class: "who" }, c.name) : null, ...(m.role === "assistant" ? withActions(shown(m)) : [shown(m)]),
+      m.role === "assistant" && i > 0 ? h("button", { class: "bubble-tool", title: t("retune.tip"), onclick: () => openRetune(i) }, t("retune.button")) : null,
     )), status);
     scrollChat(log);
   };
 
+  const photoInput = h("input", { type: "file", accept: "image/*", hidden: true }) as HTMLInputElement;
+  photoInput.onchange = async () => {
+    const f = photoInput.files?.[0]; photoInput.value = "";
+    if (!f) return;
+    try {
+      const url = await shrinkPhoto(f);
+      if (!savePhoto(c.id, url)) { faceBar.append(h("p", { class: "error" }, t("photo.full"))); return; }
+      characterView(c.id);
+    } catch (e) { faceBar.append(h("p", { class: "error" }, t("photo.fail", { msg: (e as Error).message }))); }
+  };
   const drawFaceBar = (faces: Face[] | null, err?: string) => {
-    if (!live) {
-      const peekSlot = h("div", { class: "promo-peek" });
-      const peek = h("button", { class: "linkish", type: "button", onclick: () => { peekSlot.replaceChildren(clipCard("x02")); peek.remove(); } }, t("promo.peek"));
-      faceBar.replaceChildren(h("p", { class: "muted" }, t("face.textOnlyA", { name: c.name }), h("a", { href: "#/settings" }, t("nav.model")), t("face.textOnlyB"), " ", peek), peekSlot);
+    if (c.avatarId) {
+      // 带着 anone.life 脸的人：没 key 时提示一句；有 key 就把那张脸接上，不给选
+      if (!anoneReady(anone)) { faceBar.replaceChildren(h("p", { class: "muted" }, t("pet.needKey", { name: c.name }), " ", h("a", { href: "#/settings" }, t("nav.model")))); return; }
+      if (err) { faceBar.replaceChildren(h("p", { class: "error" }, err)); return; }
+      if (!faces) { faceBar.replaceChildren(h("p", { class: "muted" }, t("face.loading"))); return; }
+      face = faces.find((f) => f.id === c.avatarId) ?? null;
+      stage.setFace(face);
+      faceBar.replaceChildren(...(face ? [] : [h("p", { class: "muted" }, t("pet.faceGone"))]));
       return;
     }
-    if (err) { faceBar.replaceChildren(h("p", { class: "error" }, err)); return; }
-    if (!faces) { faceBar.replaceChildren(h("p", { class: "muted" }, t("face.loading"))); return; }
-    face = faces.find((f) => f.id === c.avatarId) ?? null;
-    stage.setFace(face);
-    faceBar.replaceChildren(
-      h("div", { class: "faces-pick" }, ...faces.map((f) => h("button", {
-        class: `face-opt${f.id === c.avatarId ? " on" : ""}`, title: `${f.label}${f.gender ? ` · ${f.gender}` : ""}`,
-        onclick: () => { c.avatarId = f.id; saveCharacter(c); drawFaceBar(faces); },
-      }, h("img", { src: f.poster, alt: f.label, loading: "lazy" }), h("span", {}, f.label)))),
-      ...(face ? [] : [h("p", { class: "muted" }, t("face.pick", { name: c.name }))]),
-    );
+    // 自己造的人：上传一张照片（只存在这台设备上）
+    faceBar.replaceChildren(h("div", { class: "photo-bar" },
+      h("button", { class: "btn", type: "button", onclick: () => photoInput.click() }, photo ? t("photo.change") : t("photo.upload")),
+      photo ? h("button", { class: "linkish", type: "button", onclick: () => { removePhoto(c.id); characterView(c.id); } }, t("photo.remove")) : null,
+      photoInput), h("p", { class: "muted photo-note" }, t("photo.note")));
   };
   if (live) listFaces(anone).then((f) => drawFaceBar(f), (e) => drawFaceBar(null, t("face.loadFail", { msg: (e as Error).message })));
-  drawFaceBar(null);
+  if (!rare) drawFaceBar(null);
 
-  let silentHinted = false;
-  /** 对着聊天记录的最后一句（他说的）生成她的回复；发消息和「从这句重来」共用。 */
+  /** 对着聊天记录的最后一句（他说的）生成她的回复；发消息和「从这句重来」共用。逻辑在 talk.ts，和桌宠同一份。 */
   const respond = async () => {
     if (busy) return;
-    if (face) { stage.unlock(); stage.thinking(); }
     busy = true; send.disabled = true;
-    status.textContent = t("chat.typing", { name: c.name });
     try {
-      const reply = await model.chat([{ role: "system", content: characterSystem(c, !!face) }, ...c.chat.slice(-30)], { temperature: 0.9, maxTokens: 400 });
-      c.chat.push({ role: "assistant", content: reply });
-      saveCharacter(c);
-      status.textContent = ""; redraw();
-      if (face) {
-        const { emotion, text: said } = takeEmotion(reply);
-        const line = spokenText(said);
-        if (line) {
-          status.textContent = t("char.speaking", { name: c.name });
-          try {
-            // 台词只给玩家自己的 TTS；anone.life 只收情绪、脸、开口时刻和时长
-            const voice = loadVoice();
-            const spoken = await voiceLine(anone, voice, face, { text: line.slice(0, 300), emotion, lang: c.lang ?? "en" });
-            if (!voiceReady(voice) && !silentHinted) { silentHinted = true; log.append(h("div", { class: "bubble sys" }, t("face.silent"))); }
-            await stage.play(spoken); // 时间表最后一段就是 idle，不用再切
-          } catch (e) {
-            const msg = e instanceof AnoneError && e.status === 429 ? t("face.dailyLimit") : t("face.voiceFail", { msg: (e as Error).message });
-            log.append(h("div", { class: "bubble sys" }, msg));
-            stage.idle();
-          }
-        }
-      }
-    } catch (e) { log.append(h("div", { class: "bubble sys" }, t("chat.error", { msg: (e as Error).message }))); throw e; }
-    finally { busy = false; send.disabled = false; status.textContent = ""; }
+      await reply(c, model, { face, stage, anone }, {
+        status: (s) => { status.textContent = s; },
+        sys: (s) => { log.append(h("div", { class: "bubble sys" }, s)); scrollChat(log); },
+        redraw,
+      });
+    } finally { busy = false; send.disabled = false; status.textContent = ""; }
   };
   send.onclick = async () => {
     const text = box.value.trim();
@@ -680,12 +700,89 @@ function characterView(id: string) {
     try { await respond(); } catch { c.chat.pop(); saveCharacter(c); }
   };
   box.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); } };
-  stagePage("#/library", {
-    name: c.name, backdrop: { kind: "none" }, live: live ? stage.el : undefined,
-    scroll: [h("div", { class: "eyebrow" }, `${c.name} · ${c.tagline}`), faceBar, log, retuneSlot],
+  const backdrop: Backdrop = photo ? { kind: "photo", src: photo }
+    : rare?.layers["body.embodiment"] === "voice-only" ? { kind: "none", note: t("rare.voiceOnly") }
+    : { kind: "none" };
+  stagePage(rare ? "#/rare" : "#/library", {
+    name: c.name, backdrop, live: live ? stage.el : undefined,
+    scroll: [h("div", { class: "eyebrow" }, `${c.name} · ${c.tagline}`), rare ? contextCard(c, rare) : null, chatOptions(c), rare ? null : faceBar, log, retuneSlot],
     composer: h("div", { class: "composer" }, h("div", { class: "in" }, box, send)),
   });
   redraw();
+}
+
+/** 回复里的 `*动作*` 显示成灰色斜体（动作描写开着时才会有；第 22 步）。 */
+function withActions(text: string): (Node | string)[] {
+  return text.split(/(\*[^*\n]+\*)/g).filter(Boolean).map((part) => /^\*[^*]+\*$/.test(part) ? h("em", { class: "act" }, part.slice(1, -1)) : part);
+}
+
+/** 聊天页的开关：动作描写、播音（第 22 步）。存进这个角色的 prefs，刷新后还在。
+ * 播音一打开就在下面说清楚：没填 TTS key 给链接；填了就出音色下拉（每个角色各选一个）。 */
+function chatOptions(c: SavedCharacter): HTMLElement {
+  const below = h("div", { class: "chat-opts-below" });
+  const g = c.skeleton?.layers.body?.gender_present;
+  const gender = g === "masculine" ? "male" : g === "feminine" ? "female" : null;
+  const drawBelow = () => {
+    below.replaceChildren();
+    if (!c.prefs?.voice) return;
+    const v = loadVoice();
+    if (!voiceReady(v) || v.provider === "none") {
+      below.append(h("p", { class: "opt-hint" }, t("chat.opt.voiceNoKeyA"), h("a", { href: "#/settings" }, t("nav.model")), t("chat.opt.voiceNoKeyB")));
+      return;
+    }
+    const list = VOICES[v.provider];
+    const cur = c.prefs?.voiceId && list.includes(c.prefs.voiceId) ? c.prefs.voiceId : defaultVoice(v.provider, gender);
+    const sel = h("select", { class: "input opt-voice", "aria-label": t("chat.opt.voicePick"),
+      onchange: (ev: Event) => { c.prefs = { ...c.prefs, voiceId: (ev.target as HTMLSelectElement).value }; saveCharacter(c); } },
+      ...list.map((id) => h("option", { value: id, ...(id === cur ? { selected: true } : {}) }, id[0]!.toUpperCase() + id.slice(1))));
+    below.append(h("label", { class: "opt-voice-row" }, t("chat.opt.voicePick"), sel));
+  };
+  const sw = (key: "actions" | "voice", label: string) => {
+    const b = h("button", { type: "button", class: "opt-switch", "aria-pressed": String(!!c.prefs?.[key]) }, label) as HTMLButtonElement;
+    b.onclick = () => { c.prefs = { ...c.prefs, [key]: !c.prefs?.[key] }; saveCharacter(c); b.setAttribute("aria-pressed", String(!!c.prefs[key])); drawBelow(); };
+    return b;
+  };
+  drawBelow();
+  return h("div", { class: "chat-opts-wrap" }, h("div", { class: "chat-opts" }, sw("actions", t("chat.opt.actions")), sw("voice", t("chat.opt.voice"))), below);
+}
+
+/** 奇人聊天页上方的情境卡：TA 是谁、你是谁、你们的关系、初见和冲突点（第 22 步）。可收起，记住。 */
+function contextCard(c: SavedCharacter, r: Rare): HTMLElement {
+  const L = lang(); // 情境卡跟界面语言
+  const ctx = RARE_CONTEXT[r.id];
+  const row = (label: string, ...body: (Node | string)[]) => h("div", { class: "ctx-row" }, h("dt", {}, label), h("dd", {}, ...body));
+  const d = h("details", { class: "ctx-card", ...(c.prefs?.ctxOpen === false ? {} : { open: "" }) },
+    h("summary", {}, t("chat.ctx.title")),
+    h("dl", {},
+      row(t("chat.ctx.who"), h("b", {}, RARE_NAMES[r.id]?.[L] ?? c.name), ` · ${r.name[L]}`, h("div", { class: "muted" }, r.hook[L])),
+      ...(ctx ? [row(t("chat.ctx.you"), ctx.you[L]), row(t("chat.ctx.relation"), ctx.relation[L])] : []),
+      row(t("chat.ctx.scene"), r.scene[L]),
+      ...(ctx ? [row(t("chat.ctx.tension"), ctx.tension[L])] : []),
+    ), rareProfile(r, L)) as HTMLDetailsElement;
+  d.addEventListener("toggle", () => { c.prefs = { ...c.prefs, ctxOpen: d.open }; saveCharacter(c); });
+  return d;
+}
+
+/** 奇人开聊：用本机预生成的人设（按界面语言）存成一个角色，同一个人同一种语言只建一份（第 20 步）。 */
+async function openRare(r: Rare) {
+  const L = lang();
+  const id = `rare-${r.id}-${L}`;
+  if (getCharacter(id)) return go(`#/c/${id}`);
+  try {
+    const { persona, schedule } = await loadRarePersona(r.id, L);
+    const title = /^# (.+)$/m.exec(persona)?.[1] ?? r.name[L];
+    const [name, ...rest] = title.split(" · ");
+    const line = (label: string) => new RegExp(`^- ${label}:? (.+)$`, "m").exec(persona)?.[1]?.trim() ?? "";
+    let skeleton: Skeleton | null = null;
+    try { skeleton = rareSkeleton(r); } catch { /* 没生日的人照样能聊，只是没骨架 */ }
+    const c: SavedCharacter = {
+      id, rareId: r.id, name: name!.trim(), age: Number(/^- Age (\d+)/m.exec(persona)?.[1] ?? 0), location: bare(line("Lives in").split(/[，,]/)[0] ?? ""),
+      tagline: rest.join(" · ") || r.name[L], relationToUser: bare(line("The person in front of (?:her|him|them)")),
+      persona, schedule, skeleton, createdAt: new Date().toISOString(), chat: [], lang: L,
+    };
+    saveCharacter(c);
+    go(`#/c/${id}`);
+  } catch (e) { alert((e as Error).message); route(); }
 }
 
 // ── 8. 模型设置 ─────────────────────────────────────────────────────────────
@@ -737,7 +834,7 @@ function anoneSection() {
   const a = loadAnone();
   const v = loadVoice();
   const provider = h("select", { class: "input", onchange: (e: Event) => { v.provider = (e.target as HTMLSelectElement).value as VoiceProvider; } },
-    ...(["none", "xai", "openai"] as const).map((p) => h("option", { value: p, ...(v.provider === p ? { selected: true } : {}) }, t(`voice.provider.${p}`))));
+    ...(["xai", "openai", "none"] as const).map((p) => h("option", { value: p, ...(v.provider === p ? { selected: true } : {}) }, t(`voice.provider.${p}`))));
   const voiceKey = h("input", { class: "input mono", type: "password", autocomplete: "off", value: v.key, placeholder: "xai-… / sk-…", oninput: (e: Event) => { v.key = (e.target as HTMLInputElement).value; } });
   const msg = h("div", { class: "muted" });
   const base = h("input", { class: "input mono", value: a.base, oninput: (e: Event) => { a.base = (e.target as HTMLInputElement).value; } });
@@ -750,7 +847,7 @@ function anoneSection() {
     h("div", { class: "field" }, h("label", {}, t("anone.address")), base),
     h("div", { class: "field" }, h("label", {}, t("anone.key")), key),
     h("p", { class: "muted" }, t("voice.lead")),
-    h("div", { class: "field" }, h("label", {}, t("voice.provider")), provider),
+    GROK_ONLY ? null : h("div", { class: "field" }, h("label", {}, t("voice.provider")), provider),
     h("div", { class: "field" }, h("label", {}, t("voice.key")), voiceKey),
     h("div", { class: "row", style: "margin-top:10px" },
       h("button", { class: "btn primary", onclick: () => { saveAnone(a); saveVoice(v); resetFaces(); msg.textContent = anoneReady(loadAnone()) ? t("settings.saved") : t("anone.savedNotKey"); } }, t("settings.save")),
@@ -796,8 +893,13 @@ function route() {
   }
   const [path, query] = hash.slice(1).split("?");
   const params = new URLSearchParams(query ?? "");
+  // 桌宠页（第 21 步）：#/pet 或 #/pet/<角色 id>；去别的页时把穿透关掉、拆掉监听
+  const pet = /^\/pet(?:\/(.+))?$/.exec(path ?? "");
+  if (pet) return petView(app, pet[1] ?? null);
+  leavePet();
   if (path === "/" || path === "") return startView();
   if (path === "/about") return aboutView();
+  if (path === "/rare") return page("#/rare", ...rareContent(go, { can: (r) => hasRarePersona(r.id, lang()), open: (r) => void openRare(r) }));
   if (path === "/stranger") return strangerView();
   if (path === "/chat") return void chatView();
   if (path === "/writing") return void writingView();
@@ -810,3 +912,5 @@ function route() {
 }
 window.addEventListener("hashchange", route);
 route();
+// 第 23 步：启动时把「anone.life 的人」下载到本地（有 key 才会做；每次打开只做一次）
+void syncAnonePeopleOnce(loadAnone(), lang());

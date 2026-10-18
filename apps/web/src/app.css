@@ -101,7 +101,7 @@ h2 { font-family: var(--mincho); font-weight: 500; font-size: 20px; margin: 28px
 
 /* ── 结果 / 库 ── */
 .persona { white-space: pre-wrap; font-size: 13.5px; line-height: 1.65; max-height: 60vh; overflow: auto; background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px; }
-.lib { display: grid; gap: 10px; margin-top: 14px; }
+.lib { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 14px; } /* minmax(0)：一行按钮多时别把整页撑宽（撑宽后 ≤480 的换行规则反而不生效，第 24 步手机验收发现） */
 .lib .item { display: flex; gap: 12px; align-items: center; background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: 12px 14px; }
 .lib .item .who { flex: 1; min-width: 0; }
 .lib .item .who b { font-family: var(--mincho); font-size: 17px; font-weight: 600; }
@@ -341,15 +341,66 @@ a.mark { display: block; }
 .removed-row { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 12px 0; padding: 10px 14px; border: 1px dashed var(--rule); border-radius: var(--radius); font-size: 13px; color: var(--ink-3); }
 .edit-note a { color: var(--shu); }
 
-/* ── 聊天的台（第 20 步）──────────────────────────────────────────────────────
-   照 anone.life 主界面（web_companion/public/styles.css 的 .shell / .stage-panel / .chat-panel）：
-   桌面左边是台、右边是聊天栏；手机上台铺满整屏，聊天浮在上面，底部渐隐。
-   台上要么是透明底立绘（站在砂紋圆盘上，静态），要么是照片（铺满），要么只有圆盘。 */
-body[data-layout="stage"] { overflow: hidden; }
-.cs { height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr); }
-.cs > .masthead { margin: 0; padding: 12px 16px; }
-.cs-main { min-height: 0; display: grid; grid-template-columns: minmax(320px, 1fr) minmax(340px, 440px); gap: 16px; padding: 0 16px 16px; }
-.cs-stage { position: relative; isolation: isolate; overflow: hidden; min-height: 0;
+/* 奇人页（第 16 步）：一张卡一个人，初见和第一句直接露在外面，八层档案折起来 */
+.rare-rel { margin: 18px 0 8px; padding: 14px 18px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-2); }
+.rare-rel h2 { font-size: 17px; margin: 0 0 6px; }
+.rare-rel ol { margin: 0; padding-left: 20px; color: var(--ink-2); font-size: 14px; line-height: 1.7; }
+.rare-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 16px; margin: 22px 0; }
+.rare-card { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 18px; background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); }
+.rare-top { display: flex; justify-content: space-between; align-items: baseline; }
+.rare-n { font-family: var(--mincho); font-size: 22px; color: var(--shu); font-variant-numeric: tabular-nums; }
+.rare-twist { font-size: 11.5px; letter-spacing: .06em; color: var(--ink-3); border: 1px solid var(--rule); border-radius: 999px; padding: 1px 9px; }
+.rare-card h3 { font-family: var(--mincho); font-size: 19px; line-height: 1.4; margin: 0; }
+.rare-meta { font-size: 12.5px; color: var(--ink-3); }
+.rare-hook { margin: 2px 0; font-size: 14.5px; line-height: 1.7; color: var(--ink); }
+.rare-label { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
+.rare-scene p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.rare-first { margin: 4px 0 0; padding: 10px 14px; border-left: 2px solid var(--shu); background: var(--shu-soft); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.rare-first p { margin: 0; font-family: var(--mincho); font-size: 15.5px; line-height: 1.7; color: var(--ink); }
+.rare-profile { margin-top: 4px; }
+.rare-profile summary { cursor: pointer; font-size: 13px; color: var(--shu); }
+.rare-profile table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+.rare-profile th { text-align: left; vertical-align: top; white-space: nowrap; padding: 6px 10px 6px 0; color: var(--ink-3); font-weight: 400; width: 1%; }
+.rare-profile td { padding: 6px 0; border-bottom: 1px solid var(--rule-soft); line-height: 1.6; color: var(--ink-2); }
+.rare-profile td b { color: var(--ink); font-weight: 600; }
+.rare-k { color: var(--ink-3); }
+.rare-foot { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; margin: 8px 0 40px; }
+.rare-foot p { margin: 0; max-width: 60ch; font-size: 13px; }
+/* 顶栏多了「奇人」一项，窄屏放不下：菜单换到第二行、可以折行 */
+@media (max-width: 560px) {
+  .masthead { flex-wrap: wrap; row-gap: 6px; }
+  .masthead nav { flex: 1 1 100%; margin-left: 0; flex-wrap: wrap; row-gap: 2px; }
+  .masthead nav a { letter-spacing: .06em; padding: 4px 6px; }
+}
+
+/* 奇人页顶部的筛选标签 */
+.rare-filters { display: grid; gap: 8px; margin: 22px 0 4px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-2); }
+.rare-fgroup { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.rare-flabel { flex: none; width: 4.5em; font-size: 12px; color: var(--ink-3); letter-spacing: .06em; }
+.rare-chip { border: 1px solid var(--rule); background: var(--paper); color: var(--ink-2); border-radius: 999px; padding: 3px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.rare-chip small { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.rare-chip:hover { border-color: var(--shu); }
+.rare-chip[aria-pressed="true"] { background: var(--shu); border-color: var(--shu); color: var(--on-shu); }
+.rare-chip[aria-pressed="true"] small { color: var(--on-shu); opacity: .8; }
+.rare-chip:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
+.rare-fbar { display: flex; gap: 14px; align-items: baseline; font-size: 13px; color: var(--ink-2); }
+.rare-fbody { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--rule-soft); }
+.rare-fbody[hidden] { display: none; }
+.rare-ftoggle { font: inherit; font-size: 13px; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; }
+.rare-ftoggle::after { content: " ▾"; color: var(--ink-3); }
+.rare-ftoggle[aria-expanded="true"]::after { content: " ▴"; }
+.rare-empty { margin: 16px 0; }
+@media (max-width: 560px) { .rare-flabel { width: 100%; } }
+.rare-card[hidden], .rare-empty[hidden], .rare-filters [hidden] { display: none; }
+
+/* ── 聊天的台（第 20 步；2026-10-18 再往 anone.life 靠）──────────────────────────
+   数值照 anone.life web_companion/public/styles.css 的 .shell / .stage-header / .chat-panel / .bubble / .composer：
+   桌面整屏两块面板（四周 16px 纸边），没有站点导航——导航收在台右上角「⋯」那张小卡里；台左上角是名字。
+   手机（≤860px）台铺满，顶上只有名字和「⋯」，平时只露最后一轮、字压在画上，点横条展开整段。 */
+body[data-layout="stage"] { overflow: hidden; --radius-bubble: 14px; }
+.cs { height: 100dvh; }
+.cs-main { height: 100%; min-height: 0; display: grid; grid-template-columns: minmax(320px, 1fr) minmax(340px, 460px); gap: 16px; padding: 16px; }
+.cs-stage { grid-area: 1 / 1; position: relative; isolation: isolate; overflow: hidden; min-height: 0;
   background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); }
 /* 砂紋圆盘 + 朱色细环，和 anone.life 立绘台下面那一个是同一段渐变；照片铺满时不画 */
 .cs-stage:not([data-kind="photo"])::before { content: ""; position: absolute; z-index: -1; left: 50%; bottom: 3%;
@@ -357,38 +408,278 @@ body[data-layout="stage"] { overflow: hidden; }
   background: repeating-radial-gradient(circle at 50% 50%, transparent 0 15px, var(--rule-soft) 15px 16px), radial-gradient(circle at 50% 40%, var(--paper-3), transparent 72%); }
 .cs-stage:not([data-kind="photo"])::after { content: ""; position: absolute; z-index: -1; left: 50%; bottom: calc(3% - 14px);
   width: calc(min(94%, 620px) + 28px); aspect-ratio: 1; transform: translateX(-50%); border: 1px solid var(--shu); border-radius: 50%; opacity: .3; }
-.cs-portrait { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 96%; object-fit: contain; object-position: bottom center; }
+.cs-portrait { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 92%; object-fit: contain; object-position: bottom center; }
 .cs-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
 .cs-note { position: absolute; left: 0; right: 0; top: 45%; text-align: center; font-family: var(--mincho); font-size: 15px; letter-spacing: .3em; color: var(--ink-3); }
-.cs-name { position: absolute; top: 12px; left: 14px; z-index: 4; font-family: var(--mincho); font-weight: 600; font-size: 17px; text-shadow: var(--halo); }
-/* 接了 anone.life 的脸：会动的那套播放器铺满台，不再 sticky */
+/* 接了 anone.life 的脸：会动的那套播放器铺满台 */
 .cs-stage .stage { position: absolute; inset: 0; height: auto; margin: 0; z-index: 1; background: none; }
-.cs-chat { min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+/* 台的顶栏：名字（明朝、字距 .08em）+ 右边一个 32px 圆钮「⋯」 */
+.cs-head { grid-area: 1 / 1; align-self: start; min-width: 0; position: relative; z-index: 5; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 20px 6px; }
+.cs-name { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--mincho); font-weight: 500; font-size: 1.35rem; letter-spacing: .08em; text-shadow: var(--halo); }
+.cs-controls { position: relative; flex: none; }
+.cs-more { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--rule); background: var(--paper-2);
+  color: var(--ink-3); font-size: 1.1rem; line-height: 1; cursor: pointer; padding: 0; }
+.cs-more:hover, .cs-more[aria-expanded="true"] { border-color: var(--shu); color: var(--shu); }
+/* 「⋯」那张小卡：深一层纸面、细边、短圆角，一条一个；里面是原来的站点导航和语言 */
+.cs-menu { position: absolute; z-index: 20; top: calc(100% + 9px); right: 0; width: min(238px, calc(100vw - 28px)); padding: 6px;
+  border: 1px solid var(--rule); border-radius: 13px; background: var(--paper-2); box-shadow: 0 10px 30px rgba(27, 26, 23, .16); }
+.cs-menu[hidden] { display: none; }
+.cs-menu .masthead { display: block; margin: 0; padding: 0; border: 0; }
+.cs-menu .masthead .mark, .cs-menu .masthead .by { display: none; }
+.cs-menu nav { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin: 0; }
+.cs-menu nav > a { display: block; padding: 8px 10px; border-radius: 8px; font-size: 13.5px; color: var(--ink); text-decoration: none; letter-spacing: .02em; text-transform: none; }
+.cs-menu nav > a:hover { background: var(--paper-3); }
+.cs-menu nav > a[aria-current="page"] { color: var(--shu); }
+.cs-menu .langs { display: flex; gap: 4px; margin: 4px 0 0; padding: 8px 6px 2px; border-top: 1px solid var(--rule-soft); border-left: 0; }
+.cs-chat { grid-area: 1 / 2; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
   background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); }
-.cs-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 14px; scrollbar-width: none; }
+.cs-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px; scrollbar-width: none; }
 .cs-scroll::-webkit-scrollbar { display: none; }
-.cs-chat .chat { margin: 12px 0 0; }
-.cs-chat .bubble.them { background: var(--paper-3); border-color: var(--rule-soft); }
-.cs-chat .composer { position: static; padding: 10px 12px max(10px, env(safe-area-inset-bottom)); }
-.cs-chat .composer .in { max-width: none; }
+.cs-chat .chat { margin: 12px 0 0; gap: 12px; }
+/* 气泡：不写名字；TA 的纸色 2 + 细边、左下角收成 2px；你的 --paper-mine、右下角 2px（anone.life .bubble） */
+.cs-chat .bubble { max-width: 82%; padding: 9px 13px; border-radius: var(--radius-bubble); font-size: .92rem; line-height: 1.75; }
+.cs-chat .bubble .who { display: none; }
+.cs-chat .bubble.them { background: var(--paper); border: 1px solid var(--rule-soft); border-bottom-left-radius: 2px; }
+.cs-chat .bubble.me { background: var(--paper-mine); border: 0; border-bottom-right-radius: 2px; }
+.cs-toggle { display: none; }
+/* 输入台：两行——上面整行输入框（聚焦描朱边），下面一行按钮，「发送」在最右 */
+.cs-chat .composer { position: static; padding: 12px; padding-bottom: max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--rule); background: var(--paper-2); }
+.cs-chat .composer .in { max-width: none; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.cs-chat .composer textarea { flex: 1 1 100%; width: 100%; border-radius: var(--radius-sm); background: var(--paper); font-size: .92rem; padding: 10px 12px; max-height: 140px; }
+.cs-chat .composer textarea:focus { outline: 2px solid var(--shu); outline-offset: -1px; }
+.cs-chat .composer .btn { padding: 9px 14px; }
+.cs-chat .composer .btn.primary { min-width: 84px; padding: 9px 18px; letter-spacing: .1em; }
 
 @media (max-width: 860px) {
-  .cs { display: block; position: relative; overflow: hidden; }
-  .cs > .masthead { position: absolute; top: 0; left: 0; right: 0; z-index: 3; text-shadow: var(--halo); }
+  .cs { position: relative; overflow: hidden; }
   .cs-main { display: block; height: 100%; padding: 0; }
   .cs-stage { position: absolute; inset: 0; border: none; border-radius: 0; }
-  .cs-portrait { height: 88%; }
-  .cs-name { top: auto; bottom: calc(52% + 6px); display: none; }
-  /* 透明、不接点击的一层：中间空着的地方让给台；只有记录和输入框接手指 */
-  .cs-chat { position: absolute; inset: 0; z-index: 2; border: none; border-radius: 0; justify-content: flex-end; pointer-events: none;
-    background: linear-gradient(to top, var(--paper) 0%, color-mix(in srgb, var(--paper) 76%, transparent) 18%, transparent 48%); }
-  .cs-scroll { flex: 0 1 auto; max-height: 48%; padding: 10px 12px 4px; pointer-events: auto;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28px); mask-image: linear-gradient(to bottom, transparent 0, #000 28px); }
+  .cs-portrait { height: 86%; }
+  /* 顶栏只剩名字（带光晕）和「⋯」，不带底色 */
+  .cs-head { position: absolute; z-index: 5; top: 0; left: 0; right: 0; padding: max(10px, env(safe-area-inset-top)) 14px 12px; }
+  .cs-name { font-size: 1.15rem; }
+  /* 透明、不接点击的一层：中间空着的地方让给台；只有记录、横条和输入框接手指 */
+  .cs-chat { position: absolute; inset: 0; z-index: 2; border: none; border-radius: 0; justify-content: flex-end; pointer-events: none; background:
+    linear-gradient(to top, var(--paper) 0%, color-mix(in srgb, var(--paper) 76%, transparent) 16%, transparent 42%); }
+  .cs-scroll { flex: 0 1 auto; max-height: 42%; padding: 10px 12px 4px; pointer-events: auto; }
   .cs-chat .chat { margin: 0; }
-  .cs-scroll > .eyebrow, .cs-scroll > details > summary { text-shadow: var(--halo); color: var(--ink-2); }
-  /* 字直接压在画上：气泡半透明，字带光晕（照片比立绘花，所以不像 anone.life 那样把底色全去掉） */
-  .cs-chat .bubble.them, .cs-chat .bubble.me { background: color-mix(in srgb, var(--paper-2) 78%, transparent); border: none; text-shadow: var(--halo);
-    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-  .cs-chat .bubble.me { background: color-mix(in srgb, var(--paper-mine) 82%, transparent); }
-  .cs-chat .composer { pointer-events: auto; background: transparent; border-top: none; }
+  /* 平时只露最后一轮：TA 最后那一句和它之后的（你刚发、她还没回的那句）；聊天栏里别的东西（情境卡、开关、选脸）展开时才出来 */
+  body:not([data-transcript="expanded"]) .cs-scroll > :not(.chat) { display: none; }
+  body:not([data-transcript="expanded"]) .cs-chat .chat > .bubble:has(~ .bubble.them) { display: none; }
+  /* 平时字直接压在画上：不带底色，靠光晕 */
+  .cs-chat .bubble { max-width: 88%; padding: 5px 2px; background: none !important; border: none !important; text-shadow: var(--halo); }
+  .cs-chat .bubble .bubble-tool { text-shadow: none; }
+  /* 展开：底色加深，气泡回来 */
+  body[data-transcript="expanded"] .cs-chat { background: linear-gradient(to top, var(--paper) 0%, color-mix(in srgb, var(--paper) 94%, transparent) 74%, color-mix(in srgb, var(--paper) 40%, transparent) 100%); }
+  body[data-transcript="expanded"] .cs-scroll { max-height: 76%; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 40px); mask-image: linear-gradient(to bottom, transparent 0, #000 40px); }
+  body[data-transcript="expanded"] .cs-chat .bubble { padding: 9px 13px; text-shadow: none; }
+  body[data-transcript="expanded"] .cs-chat .bubble.them { background: var(--paper-2) !important; border: 1px solid var(--rule) !important; }
+  body[data-transcript="expanded"] .cs-chat .bubble.me { background: var(--paper-mine) !important; }
+  .cs-toggle { display: block; flex: none; pointer-events: auto; align-self: center; width: 72px; padding: 10px 0; border: none; background: none; cursor: pointer; }
+  .cs-toggle .grabber { display: block; height: 5px; border-radius: 999px; background: var(--ink-3); opacity: .5; box-shadow: 0 0 0 6px color-mix(in srgb, var(--paper) 55%, transparent); }
+  body[data-transcript="expanded"] .cs-toggle .grabber { opacity: .9; }
+  /* 一行：圆角 22px 的输入框 + 按钮 */
+  .cs-chat .composer { pointer-events: auto; background: none; border-top: none; padding: 8px 12px max(10px, env(safe-area-inset-bottom)); }
+  .cs-chat .composer .in { flex-wrap: nowrap; align-items: flex-end; }
+  .cs-chat .composer textarea { flex: 1; min-width: 0; border-radius: 22px; padding: 11px 15px; max-height: 108px;
+    background: color-mix(in srgb, var(--paper-2) 92%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .cs-chat .composer .btn { border-radius: 22px; }
+  .cs-chat .composer .btn.primary { min-width: 0; padding: 10px 16px; }
 }
+.rare-talk { margin-top: 12px; justify-self: start; }
+
+/* 奇人卡片：真名 + 称呼 + 右上角图片位（没图时是虚线空框） */
+.rare-head { display: grid; grid-template-columns: minmax(0, 1fr) 92px; gap: 14px; align-items: start; }
+.rare-head-text { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.rare-title { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+.rare-face { width: 92px; aspect-ratio: 3 / 4; max-width: 100%; border-radius: var(--radius-sm); object-fit: cover; background: var(--paper-3); }
+.rare-face.empty { border: 1px dashed var(--rule); background: transparent; }
+
+/* ── 桌宠（第 21 步）────────────────────────────────────────────────────────────
+   样子照 anone.life 桌宠（web_companion/public/desktop.html 2026-10-11 那段 + docs/桌宠界面改造.md §5.4 第二版排法）：
+   外壳窗口透明 360×760；TA 在上面一截（顶 76px、底留 176px），一点不挡；TA 说的话、提示、输入台都在 TA 下面那一条；
+   右上角深色半透明圆钮 ✥ ⋯；深色毛玻璃菜单；深色胶囊输入台 + 朱红圆钮。在浏览器里打开 #/pet 也是这一份。 */
+body[data-layout="pet"] { --below: 176px; --glass: rgba(22, 19, 17, .8); --glass-line: rgba(255, 255, 255, .22); --pet-ink: #f3ede3; --pet-red: #c94a33; }
+html:has(body[data-layout="pet"]), body[data-layout="pet"] { background: transparent; overflow: hidden; }
+.pet { position: fixed; inset: 0; user-select: none; -webkit-user-select: none; font-family: var(--gothic); font-size: 13px; }
+.pet-fig { position: absolute; left: 0; right: 0; top: 76px; bottom: calc(var(--below) - 76px); z-index: 1; }
+.pet-portrait { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom center; pointer-events: none; }
+.pet-fig .stage { position: absolute; inset: 0; height: auto; margin: 0; background: none; }
+.pet-fig .stage-video { object-position: bottom center; }
+/* 照片立牌：抠图失败、或没抠的奇人——和 anone.life 照片附件同一种倾斜相纸 */
+.pet-card { position: absolute; left: 50%; bottom: 8px; width: 72%; transform: translateX(-50%) rotate(-1.8deg); background: #fbfaf6; padding: 8px 8px 28px; border-radius: 3px;
+  box-shadow: 0 9px 22px rgba(0, 0, 0, .32), 0 2px 6px rgba(0, 0, 0, .2); }
+.pet-card img { display: block; width: 100%; border-radius: 1px; pointer-events: none; }
+.pet-card span { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font-family: var(--mincho); font-size: 13px; color: #514d45; }
+/* 没有脸 / 只有声音：深色半透明圆盘 + 名字 */
+.pet-disc { position: absolute; left: 50%; bottom: 16px; width: 76%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 16%; text-align: center;
+  background: repeating-radial-gradient(circle at 50% 50%, transparent 0 13px, rgba(255, 255, 255, .05) 13px 14px), var(--glass);
+  border: 1px solid var(--glass-line); box-shadow: 0 18px 40px rgba(0, 0, 0, .45); backdrop-filter: blur(10px); color: rgba(243, 237, 227, .72); font-size: 12px; line-height: 1.6; }
+.pet-disc b { font: 700 18px var(--mincho); color: var(--pet-ink); letter-spacing: .06em; }
+.pet-disc a { color: #e89a86; }
+/* 右上角圆钮 */
+.pet-topbar { position: absolute; top: 10px; right: 10px; z-index: 40; display: flex; gap: 6px; align-items: center; }
+.pet-btn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+  background: var(--glass); border: 1px solid var(--glass-line); color: var(--pet-ink); backdrop-filter: blur(10px); font-size: 17px; line-height: 1; opacity: .92; }
+.pet-btn:hover { opacity: 1; border-color: rgba(255, 255, 255, .4); }
+.pet-btn svg { width: 18px; height: 18px; display: block; }
+.pet-btn[hidden] { display: none; }
+.pet-move { cursor: grab; touch-action: none; }
+.pet-move:hover { background: var(--pet-red); border-color: var(--pet-red); color: #fff; }
+.pet-move.dragging { background: #a83a26; border-color: #a83a26; color: #fff; cursor: grabbing; }
+/* ⋯ 菜单 */
+.pet-menu { position: absolute; top: 52px; right: 10px; z-index: 45; display: flex; flex-direction: column; min-width: 236px; max-width: calc(100% - 20px); max-height: calc(100% - 70px); overflow-y: auto;
+  padding: 8px; border-radius: 16px; background: rgba(22, 19, 17, .92); color: var(--pet-ink); border: 1px solid var(--glass-line);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .45); backdrop-filter: blur(14px); font-size: 13px; }
+.pet-menu[hidden] { display: none; }
+.pet-menu button { display: flex; align-items: center; gap: 8px; text-align: left; border: none; background: none; color: var(--pet-ink); font: inherit; padding: 8px 10px; border-radius: 10px; cursor: pointer; }
+.pet-menu button:hover { background: rgba(255, 255, 255, .07); }
+.pet-menu .label { padding: 8px 10px 3px; color: #e89a86; font-size: 10.5px; letter-spacing: .14em; }
+.pet-menu .sub { margin-left: auto; color: rgba(243, 237, 227, .5); font-size: 12px; white-space: nowrap; }
+.pet-menu .now { font-weight: 700; }
+.pet-menu .back { color: rgba(243, 237, 227, .6); font-size: 12px; }
+.pet-menu .add { color: rgba(243, 237, 227, .8); font-size: 12px; }
+.pet-menu img.face { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; object-position: center 18%; flex: none; background: rgba(255, 255, 255, .1); }
+.pet-menu-note { padding: 6px 10px 8px; color: rgba(243, 237, 227, .62); font-size: 12px; line-height: 1.55; }
+.pet-menu .tg { margin-left: auto; width: 30px; height: 17px; border-radius: 999px; background: rgba(255, 255, 255, .18); position: relative; flex: none; }
+.pet-menu .tg::after { content: ""; position: absolute; left: 2px; top: 2px; width: 13px; height: 13px; border-radius: 50%; background: var(--pet-ink); transition: left .15s; }
+.pet-menu .tg.on { background: var(--pet-red); }
+.pet-menu .tg.on::after { left: 15px; }
+/* 字幕：TA 下面那一条，从下往上；不带框，TA 的话靠左白字明朝、你的话靠右浅灰；说完 3 秒淡掉 */
+.pet-transcript { position: absolute; left: 12px; right: 12px; top: calc(100% - var(--below) - 8px); bottom: 64px; z-index: 30;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; overflow: hidden; pointer-events: none; transition: opacity .45s ease;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22%); mask-image: linear-gradient(to bottom, transparent 0, #000 22%); }
+.pet-transcript .msg { display: flex; flex-direction: column; max-width: 100%; }
+.pet-transcript .msg p { margin: 0; max-width: 75%; padding: 0 2px; font-size: 10.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .85), 0 0 8px rgba(0, 0, 0, .5); pointer-events: auto; user-select: text; -webkit-user-select: text; }
+.pet-transcript .msg--user { align-items: flex-end; }
+.pet-transcript .msg--user p { color: rgba(243, 237, 227, .6); text-align: right; }
+.pet-transcript .msg--char { align-items: flex-start; }
+.pet-transcript .msg--char p { color: rgba(255, 255, 255, .94); font-family: var(--mincho); }
+.pet-transcript .msg--char .narration { color: rgba(243, 237, 227, .55); font-style: italic; }
+.pet-transcript .msg--status p, .pet-transcript .msg--sys p { color: rgba(243, 237, 227, .55); font-style: italic; }
+/* 带按钮的提示（没有模型 key、角色库是空的）：深色小卡，不淡 */
+.pet-callout { flex-direction: row !important; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px; pointer-events: auto;
+  background: var(--glass); border: 1px solid var(--glass-line); color: var(--pet-ink); backdrop-filter: blur(10px); font-size: 12px; line-height: 1.5; }
+.pet-callout span { flex: 1; min-width: 0; }
+.pet-callout button { flex: none; border: 0; border-radius: 999px; padding: 5px 12px; background: var(--pet-red); color: #fff; font: 600 12px var(--gothic); cursor: pointer; }
+/* 输入台：深色胶囊，默认收起，鼠标探到底部才淡入 */
+.pet-composer { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 35; display: flex; gap: 8px; align-items: center; padding: 6px; border-radius: 999px;
+  background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(12px); box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
+  transition: transform .16s ease-out, opacity .14s; }
+.pet-composer[data-state="hidden"] { transform: translateY(150%); opacity: 0; pointer-events: none; }
+.pet-composer textarea { flex: 1; resize: none; min-height: 20px; max-height: 90px; border: none; background: transparent; color: var(--pet-ink);
+  padding: 6px 8px; font: inherit; line-height: 1.4; user-select: text; -webkit-user-select: text; }
+.pet-composer textarea:focus { outline: none; }
+.pet-composer textarea::placeholder { color: rgba(243, 237, 227, .5); }
+.pet-send { flex: 0 0 auto; width: 34px; height: 34px; border: none; border-radius: 50%; background: var(--pet-red); color: #fff; font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0; }
+.pet-send:disabled { opacity: .5; cursor: default; }
+.pet[data-drop] .pet-fig { outline: 2px dashed var(--pet-red); outline-offset: -8px; border-radius: 12px; }
+.lib-group { margin-top: 26px; }
+.lib-group > h2 { margin: 0 0 4px; font-family: var(--mincho); font-weight: 600; font-size: 18px; }
+.lib-group > p.muted { margin: 0 0 10px; font-size: 13px; }
+.lib-callout { padding: 12px 14px; border: 1px dashed var(--rule); border-radius: var(--radius); color: var(--ink-2); font-size: 13.5px; }
+/* 窄屏（手机、桌宠窗口里）一行放不下名字和三个按钮：按钮换到下一行 */
+@media (max-width: 480px) { .lib .item { flex-wrap: wrap; } .lib .item .who { flex: 1 1 calc(100% - 60px); } }
+.lib .item .lib-face { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; object-position: center 15%; flex: none; background: var(--paper-3); }
+.photo-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.photo-note { font-size: 12px; margin: 6px 0 0; }
+.lib-desk { margin: 10px 0 0; font-size: 13px; }
+
+/* 桌宠外壳里的普通页（设置、角色库……）：圆角纸面；顶上一条「← 回到桌面」，这条也是拖窗口的地方（窗口没有标题栏）。
+   导航不再当拖动区：拖动区里的链接靠 no-drag 才点得到，系统层面怎么判我们测不了，不冒这个险。 */
+html[data-shell="desktop"] body:not([data-layout="pet"]) { border-radius: 10px; overflow-x: hidden; padding-top: 44px; }
+html[data-shell="desktop"] body:not([data-layout="pet"]) .cs { height: calc(100dvh - 44px); }
+.shell-back { position: fixed; top: 0; left: 0; right: 0; height: 44px; z-index: 50; display: flex; align-items: center; gap: 10px; padding: 0 10px;
+  background: var(--paper-2); border-bottom: 1px solid var(--rule); -webkit-app-region: drag; }
+.shell-back .btn { -webkit-app-region: no-drag; padding: 6px 12px; font-size: 13px; }
+.shell-back span { font-size: 11px; color: var(--ink-3); border: 1px solid var(--rule); border-radius: 3px; padding: 0 5px; }
+body[data-layout="pet"] .shell-back { display: none; }
+
+/* 聊天页：情境卡 + 开关 + 动作描写（第 22 步） */
+.ctx-card { margin: 4px 0 10px; padding: 10px 14px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-2); font-size: 13.5px; }
+.ctx-card summary { cursor: pointer; font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.ctx-card dl { margin: 8px 0 2px; display: grid; gap: 8px; }
+.ctx-row { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: 10px; }
+.ctx-row dt { color: var(--ink-3); font-size: 12.5px; }
+.ctx-row dd { margin: 0; color: var(--ink); line-height: 1.6; }
+.ctx-row dd .muted { margin-top: 2px; font-size: 13px; }
+.chat-opts { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 10px; }
+.opt-switch { border: 1px solid var(--rule); background: var(--paper); color: var(--ink-3); border-radius: 999px; padding: 3px 12px 3px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.opt-switch::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; background: var(--rule); vertical-align: 1px; }
+.opt-switch[aria-pressed="true"] { color: var(--ink); border-color: var(--shu); }
+.opt-switch[aria-pressed="true"]::before { background: var(--shu); }
+.bubble em.act { color: var(--ink-3); font-style: italic; }
+@media (max-width: 560px) { .ctx-row { grid-template-columns: 1fr; gap: 2px; } }
+.chat-opts-wrap { margin: 0 0 10px; }
+.chat-opts-wrap .chat-opts { margin: 0; }
+.chat-opts-below:empty { display: none; }
+.chat-opts-below { margin-top: 8px; }
+.opt-hint { margin: 0; font-size: 13px; color: var(--ink-2); }
+.opt-hint a { color: var(--shu); }
+.opt-voice-row { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.opt-voice { padding: 3px 8px; font-size: 13px; width: auto; }
+
+/* 奇人列表：照 anone.life 选角色页的竖卡（第 23 步）。覆盖第 16–17 步的长卡样式 */
+.rare-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.rare-card { padding: 0; gap: 0; overflow: hidden; background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+.rare-card.can { cursor: pointer; }
+.rare-card.can:hover, .rare-card.can:focus-visible { transform: translateY(-2px); border-color: var(--shu); box-shadow: 0 6px 18px rgba(0,0,0,.08); outline: none; }
+.rare-card.opening { opacity: .6; }
+.rc-img { position: relative; aspect-ratio: 3 / 4; background: var(--paper-3); overflow: hidden; }
+.rc-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rc-blank { width: 100%; height: 100%; display: grid; place-items: center; font-family: var(--mincho); font-size: 44px; color: var(--ink-3); }
+.rc-n { position: absolute; top: 8px; left: 8px; font-size: 11px; font-variant-numeric: tabular-nums; color: #fff; background: rgba(0,0,0,.45); border-radius: 999px; padding: 1px 8px; }
+.rc-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rc-body h3 { margin: 0; font-family: var(--mincho); font-size: 17px; line-height: 1.35; }
+.rc-title { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+.rc-meta { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+@media (max-width: 560px) { .rare-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .rc-body h3 { font-size: 15px; } .rc-title { font-size: 12px; } }
+/* 卡片区比正文宽，宽屏一行 4–5 张（同介绍页八层图的放宽办法） */
+@media (min-width: 761px) { .rare-grid { width: min(1100px, calc(100vw - 32px)); position: relative; left: 50%; transform: translateX(-50%); grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; } }
+
+/* 「只有声音」前的分隔卡：和照片卡同尺寸，虚线框里一句话 */
+.rare-divider { cursor: default; background: transparent; box-shadow: none; border: 1px dashed var(--rule); }
+.rare-divider .rc-img { display: grid; place-items: center; background: transparent; }
+.rc-divtext { padding: 0 18px; text-align: center; font-size: 15px; line-height: 1.6; color: var(--ink-2); letter-spacing: .06em; }
+.rare-divider[hidden] { display: none; }
+
+/* ── 第 24 步：anone.life 的人——没 key 时点卡看 TA 登场 ── */
+.demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin: 12px 0 6px; }
+.demo-card { display: flex; flex-direction: column; overflow: hidden; cursor: pointer; background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+.demo-card:hover, .demo-card:focus-visible { transform: translateY(-2px); border-color: var(--shu); box-shadow: 0 6px 18px rgba(0,0,0,.12); outline: none; }
+.dc-img { position: relative; aspect-ratio: 3 / 4; background: radial-gradient(ellipse at 50% 70%, var(--paper-3), var(--paper-mine)); }
+.dc-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.dc-play { position: absolute; left: 8px; bottom: 8px; padding: 4px 10px; border-radius: 999px; font-size: 12px; color: var(--on-shu); background: var(--shu); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+.dc-body { padding: 10px 12px 12px; }
+.dc-body h3 { margin: 0 0 3px; font-family: var(--mincho); font-size: 16px; }
+.dc-tag { font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+
+.demo-layer { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(12, 10, 8, .72); backdrop-filter: blur(6px); animation: demo-in .25s ease; }
+@keyframes demo-in { from { opacity: 0; } }
+.demo-box { position: relative; width: min(460px, 100%); display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+.demo-stage { position: relative; height: min(68vh, 620px); border-radius: var(--radius); overflow: hidden;
+  background: radial-gradient(ellipse 70% 55% at 50% 78%, rgba(255, 236, 205, .9), rgba(214, 196, 168, .55) 60%, rgba(60, 50, 40, .25)); }
+.demo-stage .stage { position: absolute; inset: 0; height: 100%; margin: 0; }
+.demo-sub { min-height: 3.2em; padding: 0 6px; text-align: center; font-size: 17px; line-height: 1.6; color: #fffdf8; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+.demo-skip { position: absolute; z-index: 5; top: 10px; right: 48px; padding: 5px 12px; font: inherit; font-size: 13px; color: #fffdf8; background: rgba(0,0,0,.38); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; cursor: pointer; }
+.demo-close { position: absolute; z-index: 5; top: 8px; right: 10px; width: 30px; height: 30px; font-size: 20px; line-height: 1; color: #fffdf8; background: rgba(0,0,0,.38); border: 0; border-radius: 50%; cursor: pointer; }
+.demo-cta { padding: 16px 18px; text-align: center; background: var(--paper-2); border-radius: var(--radius); animation: demo-in .3s ease; }
+.demo-cta h3 { margin: 0 0 6px; font-family: var(--mincho); font-size: 19px; }
+.demo-cta p { margin: 0 0 12px; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+.demo-cta .row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.demo-cta .btn-link { margin-top: 10px; }
+.demo-cta[hidden], .demo-skip[hidden] { display: none; }
+/* 讲完 TA 已经走出画面：空台子收起，按钮卡上放一张小头像 */
+.demo-box.ended .demo-stage, .demo-box.ended .demo-sub { display: none; }
+.demo-box.ended .demo-close { top: -38px; right: 0; }
+.demo-cta-face { width: 76px; height: 76px; margin: -50px auto 8px; display: block; border-radius: 50%; object-fit: cover; object-position: top center; border: 3px solid var(--paper-2); background: var(--paper-3); box-shadow: 0 4px 14px rgba(0,0,0,.18); }
+@media (max-width: 560px) { .demo-stage { height: 62vh; } .demo-sub { font-size: 16px; } }
+/* 桌宠上演：透明窗口，不压暗；原来那位先藏起来 */
+.demo-on > :not(.demo-layer) { visibility: hidden; }
+.demo-layer.pet { background: transparent; backdrop-filter: none; padding: 8px; }
+.demo-layer.pet .demo-stage { background: transparent; height: min(78vh, 560px); }
+.demo-layer.pet .demo-sub { padding: 6px 10px; border-radius: var(--radius); background: rgba(12, 10, 8, .55); min-height: 0; }
+.demo-layer.pet .demo-sub:empty { display: none; }

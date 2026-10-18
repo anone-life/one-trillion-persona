@@ -32,10 +32,16 @@ export class Stage {
   private timers: number[] = [];
   private source: AudioBufferSourceNode | null = null;
   private log: LineLog | null = null;
+  /** 每装一段 +1。换上来时不是最新那一次装的就作废——见 prepare()。 */
+  private gen = 0;
+  /** 每 stop() 一次 +1：playOnce 等片子放完的时候看它，被叫停就不再等（演示的「跳过」）。 */
+  private runs = 0;
 
-  constructor() {
+  /** crossOrigin：桌宠要读鼠标下那一点是不是透明（点击穿透），视频得按 CORS 加载才读得了像素；anone.life 的 CDN 回 `*`。 */
+  constructor(opts: { crossOrigin?: boolean } = {}) {
     const mk = () => {
       const v = document.createElement("video");
+      if (opts.crossOrigin) v.crossOrigin = "anonymous";
       v.muted = true;
       v.playsInline = true;
       v.loop = true;
@@ -50,15 +56,19 @@ export class Stage {
     this.el.append(...this.videos);
   }
 
+  /** 正在显示的那一只（桌宠按它判点击穿透）。 */
+  get current(): HTMLVideoElement { return this.videos[this.front]!; }
+
   /** 必须在一次点击里调：之后请求回来时才放得出声音（浏览器的自动播放规则）。 */
   unlock(): void {
     this.ctx ??= new AudioContext();
     if (this.ctx.state !== "running") void this.ctx.resume();
   }
 
-  setFace(face: Face | null): void {
+  /** `idle: false`：先不上人（演示要从入场片开始，第 24 步）。 */
+  setFace(face: Face | null, idle = true): void {
     this.face = face;
-    if (face) void this.show(face.clips.idle[0] ?? "idle", 0, true);
+    if (face && idle) void this.show(face.clips.idle[0] ?? "idle", 0, true);
   }
 
   private url(clip: string, fallback?: string): string {
@@ -70,8 +80,12 @@ export class Stage {
 
   /** 把 clip 装进藏着的那个 video、停在 startFrame，返回一个「换上来」的函数。 */
   private async prepare(clip: string, startFrame = 0, fallback?: string): Promise<() => Promise<void>> {
+    // 两次装片可能同时在等加载（回复比 thinking 片子先到时：thinking 还在加载，speaking 已经装进同一只藏着的 video）。
+    // 晚到的那次「换上来」不能再执行：它会把已经在前面的那只当成「旧的」藏掉，两只都透明，人就没了（2026-10-18 桌宠冒烟发现）。
+    const my = ++this.gen;
     const back = this.videos[1 - this.front]!;
     const src = this.url(clip, fallback);
+    back.loop = true; // playOnce 放出入场时会关掉，换下一段前恢复
     if (back.dataset["src"] !== src) {
       back.dataset["src"] = src;
       back.src = src;
@@ -89,6 +103,8 @@ export class Stage {
       setTimeout(resolve, 1500);
     });
     return async () => {
+      if (my !== this.gen) return; // 后面又装了一段，这次作废
+      if (back === this.videos[this.front]) { back.style.opacity = "1"; return; }
       const asked = performance.now();
       const frames: { wall: number; mediaTime: number }[] = [];
       this.log?.clips.push({ clip, frames });
@@ -125,6 +141,7 @@ export class Stage {
   }
 
   stop(): void {
+    this.runs++;
     for (const t of this.timers) clearTimeout(t);
     this.timers = [];
     try { this.source?.stop(); } catch { /* 已经停了 */ }
@@ -136,7 +153,50 @@ export class Stage {
     if (!this.face || !this.ctx) return;
     this.stop();
     const bytes = Uint8Array.from(atob(line.audio.base64), (c) => c.charCodeAt(0));
-    const buffer = await this.ctx.decodeAudioData(bytes.buffer);
+    await this.run(await this.ctx.decodeAudioData(bytes.buffer), line.timeline, line.audio.onsetMs);
+  }
+
+  /** 同 play()，声音是现成的一段（演示包里事先合成好的 mp3，第 24 步）。 */
+  async playBytes(bytes: ArrayBuffer, timeline: TimelineEvent[], onsetMs: number, onStart?: () => void): Promise<void> {
+    if (!this.face || !this.ctx) return;
+    this.stop();
+    await this.run(await this.ctx.decodeAudioData(bytes.slice(0)), timeline, onsetMs, onStart);
+  }
+
+  /**
+   * 放一支只放一遍的片子（出入场，第 24 步）：声音在片子第 `audioAtMs` 毫秒响起——
+   * 演示包按片子里开始动嘴的时刻算好的。片子放完（或 stop()）时 resolve，停在最后一帧。
+   */
+  async playOnce(clip: string, bytes: ArrayBuffer | null, audioAtMs: number, clipMs: number, onStart?: () => void): Promise<void> {
+    if (!this.face || !this.ctx) return;
+    this.stop();
+    const my = this.runs;
+    const buffer = bytes ? await this.ctx.decodeAudioData(bytes.slice(0)) : null;
+    const swap = await this.prepare(clip, 0);
+    if (my !== this.runs) return;
+    await swap();
+    const v = this.current;
+    v.loop = false;
+    onStart?.();
+    if (buffer) {
+      const src = this.ctx.createBufferSource();
+      src.buffer = buffer;
+      src.connect(this.ctx.destination);
+      const latency = (this.ctx.outputLatency || this.ctx.baseLatency || 0);
+      src.start(this.ctx.currentTime + Math.max(0, audioAtMs / 1000 - v.currentTime - latency));
+      this.source = src;
+    }
+    await new Promise<void>((resolve) => {
+      const done = () => { clearInterval(poll); resolve(); };
+      v.addEventListener("ended", done, { once: true });
+      // ended 偶尔不来（Safari 的 hevc），按时长兜底；stop() 也要能叫停
+      const poll = window.setInterval(() => { if (my !== this.runs || v.currentTime * 1000 >= clipMs - 60) done(); }, 100);
+    });
+  }
+
+  private async run(buffer: AudioBuffer, timeline: TimelineEvent[], onsetMs: number, onStart?: () => void): Promise<void> {
+    if (!this.ctx) return;
+    const line = { timeline, audio: { onsetMs } };
     // 先把说话那一段装好、停在起始帧，到点只剩 play() + 换层
     const events = line.timeline.slice(1);
     const ready = new Map<TimelineEvent, Promise<() => Promise<void>>>();
@@ -149,6 +209,7 @@ export class Stage {
     src.connect(this.ctx.destination);
     src.start(startAt);
     this.source = src;
+    onStart?.();
     const latency = (this.ctx.outputLatency || this.ctx.baseLatency || 0) * 1000;
     const audioStartWall = performance.now() + (startAt - this.ctx.currentTime) * 1000 + latency;
     this.log = { audioStartWall, onsetMs: line.audio.onsetMs, timeline: line.timeline, clips: [] };

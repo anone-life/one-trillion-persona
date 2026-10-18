@@ -112,6 +112,14 @@ You don't need this. Everything above works without it.
 
 With a free [anone.life](https://www.anone.life) API key, your character can borrow one of anone.life's animated faces. Add your own TTS key (xAI or OpenAI) and each reply is spoken aloud, lip-synced, with an expression that matches the line. Get the anone.life key at anone.life → `/console`, then paste both keys under **Model**. Your persona and your character's lines never reach anone.life: your browser voices each line with your TTS provider, and anone.life only gets the emotion, the face id, and when the voice starts and stops. Details: [docs/ANONE_API.md](docs/ANONE_API.md).
 
+## On your desktop
+
+The desktop app puts your character on your desktop: a see-through window on the left of the screen, always on top, with them standing in it. Move the mouse to the bottom to type; replies appear just below them and fade a few seconds after they finish. Clicks on the empty space go through to whatever is behind. Drag with ✥ in the corner; ⋯ (or right-click them) switches characters, opens settings, or hides the window.
+
+It's the same web app, packed in Electron and running from your computer (nothing loads from our servers). Your browser and the app keep separate storage, so bring your characters over: **Library → Export all** in the web app, then drop the file on the desktop app (no keys go in that file; enter them again in the app). Build it yourself with `cd apps/desktop && npm install && npm run pack`, or see [apps/desktop/README.md](apps/desktop/README.md).
+
+The app isn't signed yet. On macOS, right-click → **Open** the first time; on Windows, **More info → Run anyway**.
+
 ## Command line
 
 ```bash

@@ -38,6 +38,8 @@ export interface Spoken {
   timeline: TimelineEvent[];
   emotion: Emotion;
   face: string;
+  /** 这把 key 今天用了几句 / 上限（/animate 回的；第 24 步用来提前提醒、用完只提示一次）。 */
+  usage?: { linesToday: number; linesLimit: number };
 }
 
 export class AnoneError extends Error {

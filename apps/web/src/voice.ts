@@ -6,15 +6,18 @@ import { animate, type AnoneSettings, type Emotion, type Face, type Spoken } fro
 import { SAMPLE_RATE, firstAudibleMs, pcmDurationMs, pcmToWav, silence, toBase64, trimLeadingSilence } from "./audio.ts";
 
 export type VoiceProvider = "none" | "xai" | "openai";
+declare const __GROK_ONLY__: boolean;
+/** anone.life/1t 托管版只用 Grok（xAI）TTS，不给换；开源版默认也是 xAI（第 22 步）。node 里跑测试时没有这个常量。 */
+export const GROK_ONLY = typeof __GROK_ONLY__ !== "undefined" && __GROK_ONLY__;
 export interface VoiceSettings { provider: VoiceProvider; key: string }
 const KEY = "1t.voice.v1";
 
 export function loadVoice(): VoiceSettings {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return { provider: "none", key: "", ...(JSON.parse(raw) as Partial<VoiceSettings>) };
+    if (raw) { const s = { provider: "xai" as VoiceProvider, key: "", ...(JSON.parse(raw) as Partial<VoiceSettings>) }; return GROK_ONLY ? { ...s, provider: "xai" } : s; }
   } catch { /* 读不了就当没填 */ }
-  return { provider: "none", key: "" };
+  return { provider: "xai", key: "" };
 }
 export function saveVoice(s: VoiceSettings): void {
   try { localStorage.setItem(KEY, JSON.stringify({ provider: s.provider, key: s.key.trim() })); } catch { /* 存不了就只在这一页有效 */ }
@@ -35,6 +38,15 @@ export const XAI_TONE: Readonly<Record<Emotion, string>> = {
 };
 
 /** OpenAI 的音色按脸的性别挑。xAI 用脸自带的音色（和 anone.life 上同一个声音）。 */
+/** 可选的音色（第 22 步）。Grok 的五个和 anone.life 同一套；OpenAI 的按它的文档列。 */
+export const VOICES: Record<"xai" | "openai", string[]> = {
+  xai: ["ara", "eve", "leo", "rex", "sal"],
+  openai: ["nova", "shimmer", "coral", "sage", "alloy", "echo", "onyx", "ash", "fable"],
+};
+/** 没选过音色时的默认：Grok 女 ara、男 rex；OpenAI 按性别。 */
+export function defaultVoice(provider: VoiceProvider, gender: "female" | "male" | null): string {
+  return provider === "openai" ? openaiVoiceFor(gender) : gender === "male" ? "rex" : "ara";
+}
 export function openaiVoiceFor(gender: "female" | "male" | null): string {
   return gender === "male" ? "onyx" : gender === "female" ? "nova" : "alloy";
 }
@@ -62,7 +74,7 @@ export async function synthesize(s: VoiceSettings, r: VoiceRequest): Promise<Uin
     const res = await fetch("https://api.openai.com/v1/audio/speech", {
       method: "POST",
       headers: { authorization: `Bearer ${s.key.trim()}`, "content-type": "application/json" },
-      body: JSON.stringify({ model: "gpt-4o-mini-tts", voice: openaiVoiceFor(r.gender), input: r.text, response_format: "pcm" }),
+      body: JSON.stringify({ model: "gpt-4o-mini-tts", voice: VOICES.openai.includes(r.voice) ? r.voice : openaiVoiceFor(r.gender), input: r.text, response_format: "pcm" }),
     });
     if (!res.ok) throw new Error(`OpenAI TTS said HTTP ${res.status}: ${(await res.text()).slice(0, 160)}`);
     return new Uint8Array(await res.arrayBuffer());
@@ -98,5 +110,6 @@ export async function voiceLine(anone: AnoneSettings, voice: VoiceSettings, face
     timeline: anim.timeline,
     emotion: anim.emotion,
     face: anim.face,
+    usage: { linesToday: anim.usage.linesToday, linesLimit: anim.usage.linesLimit },
   };
 }

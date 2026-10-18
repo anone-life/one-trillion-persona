@@ -7,7 +7,8 @@ packages/core      seed → skeleton. Deterministic Four Pillars, 7 enumerated l
 packages/designer  Elise, the designer chat; persona.txt + schedule.json generation. Talks to any OpenAI-compatible API.
 packages/files     .anone read/write (zip, browser-safe); SillyTavern Character Card V2 export.
 packages/cli       `1t-persona roll | design | export | inspect | layers`
-apps/web           the web app (Vite, no framework)
+apps/web           the web app (Vite, no framework); #/pet is the desktop view
+apps/desktop       the desktop app: an Electron shell around apps/web (not an npm workspace, so Electron isn't installed by default)
 spec/              the rules, versioned: bazi-rules, enums, constraints, translation table, solar-term data
 tools/             dev-only scripts (data generation, acceptance runs)
 ```
@@ -35,3 +36,8 @@ tools/             dev-only scripts (data generation, acceptance runs)
 ## Optional: faces and voices (`apps/web/src/anone.ts`, `player.ts`)
 
 See [ANONE_API.md](ANONE_API.md). The web app voices each line with the user's own TTS key (`voice.ts`), trims the leading silence and measures when the voice starts (`audio.ts`), then sends only the emotion, face id, onset and duration to anone.life. It *plays* the timeline that comes back: which clip to show, when, and from which frame. Deciding that timeline (which expression face, which frame to cut in so the mouth opens on time) happens on anone.life's side and is not part of this repository. The line itself never goes to anone.life.
+
+## Desktop (`apps/desktop`, `apps/web/src/pet.ts`)
+
+The shell is a transparent, frameless, always-on-top window that serves the built web app from `app://1t/` (inside the app, never from a server) and opens `#/pet`. The page does the work; the shell only exposes four things through `preload.js` as `window.onetPet`: turn click-through on or off, start and stop following the cursor (dragging with ✥), and window commands for the page's ⋯ menu (always on top, move back, hide, quit). The page reads the pixel under the mouse (images and anone.life's clips are loaded with CORS for this) and lets clicks through wherever the character is transparent. Replies go through `talk.ts`, the same code the chat page uses.
+
