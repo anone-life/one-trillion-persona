@@ -26,7 +26,28 @@ export const DEMO_PEOPLE: DemoPerson[] = [
 ];
 
 /** 注册入口带来源：`f=1t`（anone.life 首页认）+ 是哪一位请你来的。不带任何用户数据。 */
-export const signupUrl = (p: DemoPerson) => `https://www.anone.life/?f=1t&c=${encodeURIComponent(p.id)}`;
+/** 来源标记 `f=1t-<角色编号>`：只用小写字母数字和连字符，anone.life 四条注册路（含 Google / LINE）都原样记进台账（第 26 步漏斗）。 */
+export const signupUrl = (p: DemoPerson) => `https://www.anone.life/?f=1t-${p.id.slice(0, 2)}`;
+
+/**
+ * 演示的匿名事件（第 26 步漏斗）：只在 anone.life 托管的那份（/1t/，同域）上发，开源版在别的域名上一律不发。
+ * 借 anone.life 的 /api/film-plays：不记 IP、UA、账号，只带浏览器里随机的一个 id（和 1t-visit.js 同一个）。
+ */
+function track(p: DemoPerson, event: "open" | "end" | "close" | "signup" | "havekey", sec?: number): void {
+  if (import.meta.env.BASE_URL !== "/1t/") return;
+  try {
+    let v = localStorage.getItem("anone.filmViewer") ?? "";
+    if (!/^[a-z0-9]{8,32}$/.test(v)) {
+      v = Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => (b % 36).toString(36)).join("");
+      localStorage.setItem("anone.filmViewer", v);
+    }
+    void fetch("/api/film-plays", {
+      method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+      body: JSON.stringify({ film: `t04_demo_${p.id.slice(0, 2)}`, event, page: "1t", lang: lang(), v,
+        surface: matchMedia("(max-width: 860px)").matches ? "phone" : "web", ...(sec !== undefined ? { sec } : {}) }),
+    }).catch(() => undefined);
+  } catch { /* 记不上就算了 */ }
+}
 // 本地开发时可以在这个标签页里 `sessionStorage.setItem("1t.demoBase", "http://localhost:5180")` 指到本机的 anone.life（演示包还没部署时验收用）。
 const devBase = (): string | null => { try { return import.meta.env.DEV ? sessionStorage.getItem("1t.demoBase") : null; } catch { return null; } };
 const anoneBase = () => (devBase() ?? loadAnone().base).replace(/\/+$/, "");
@@ -70,6 +91,10 @@ export function playDemo(p: DemoPerson, onDone?: (to: "settings" | null) => void
   const stage = new Stage({ crossOrigin: opts.crossOrigin });
   stage.unlock();
   let over = false;
+  const t0 = performance.now();
+  let ended = false; // 自己放完到收尾卡（end），还是中途跳过 / 关掉（close + 看了几秒）
+  const leftEarly = () => { if (!ended) { ended = true; track(p, "close", Math.round((performance.now() - t0) / 1000)); } };
+  track(p, "open");
   const sub = el("div", { class: "demo-sub", "aria-live": "polite" });
   const skip = el("button", { type: "button", class: "demo-skip" }, t("demo.skip"));
   const close = el("button", { type: "button", class: "demo-close", "aria-label": t("demo.close") }, "×");
@@ -80,10 +105,10 @@ export function playDemo(p: DemoPerson, onDone?: (to: "settings" | null) => void
   (opts.host ?? document.body).append(layer);
   if (opts.variant === "pet") document.body.classList.add("demo-on");
   const finish = (to: "settings" | null) => { over = true; stage.stop(); layer.remove(); document.body.classList.remove("demo-on"); document.removeEventListener("keydown", esc); onDone?.(to); };
-  const esc = (e: KeyboardEvent) => { if (e.key === "Escape") finish(null); };
+  const esc = (e: KeyboardEvent) => { if (e.key === "Escape") { leftEarly(); finish(null); } };
   document.addEventListener("keydown", esc);
-  close.onclick = () => finish(null);
-  layer.onclick = (e) => { if (e.target === layer) finish(null); };
+  close.onclick = () => { leftEarly(); finish(null); };
+  layer.onclick = (e) => { if (e.target === layer) { leftEarly(); finish(null); } };
 
   const showCta = () => {
     over = true;
@@ -93,7 +118,8 @@ export function playDemo(p: DemoPerson, onDone?: (to: "settings" | null) => void
     box.classList.add("ended");
     const signup = el("a", { class: "btn primary demo-signup", href: signupUrl(p), target: "_blank", rel: "noopener" }, t("demo.signup"));
     const have = el("button", { type: "button", class: "btn" }, t("demo.haveKey"));
-    have.onclick = () => finish("settings");
+    signup.addEventListener("click", () => track(p, "signup"));
+    have.onclick = () => { track(p, "havekey"); finish("settings"); };
     const again = el("button", { type: "button", class: "btn-link" }, t("demo.again"));
     again.onclick = () => { layer.remove(); document.body.classList.remove("demo-on"); document.removeEventListener("keydown", esc); playDemo(p, onDone, opts); };
     cta.replaceChildren(
@@ -105,7 +131,7 @@ export function playDemo(p: DemoPerson, onDone?: (to: "settings" | null) => void
     cta.hidden = false;
     signup.focus();
   };
-  skip.onclick = showCta;
+  skip.onclick = () => { leftEarly(); showCta(); };
 
   void (async () => {
     sub.textContent = "…";
@@ -148,6 +174,6 @@ export function playDemo(p: DemoPerson, onDone?: (to: "settings" | null) => void
     await sleep(300);
     if (over) return;
     await tr(pack.exit);
-    if (!over) showCta();
+    if (!over) { ended = true; track(p, "end"); showCta(); }
   })();
 }
