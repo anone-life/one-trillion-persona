@@ -34,4 +34,4 @@ tools/             dev-only scripts (data generation, acceptance runs)
 
 ## Optional: faces and voices (`apps/web/src/anone.ts`, `player.ts`)
 
-See [ANONE_API.md](ANONE_API.md). The web app only *plays* what the API returns: an audio clip plus a timeline that says which clip to show, when, and from which frame. Deciding that timeline (lip-sync, expression faces, trimming silence) happens on anone.life's side and is not part of this repository.
+See [ANONE_API.md](ANONE_API.md). The web app voices each line with the user's own TTS key (`voice.ts`), trims the leading silence and measures when the voice starts (`audio.ts`), then sends only the emotion, face id, onset and duration to anone.life. It *plays* the timeline that comes back: which clip to show, when, and from which frame. Deciding that timeline (which expression face, which frame to cut in so the mouth opens on time) happens on anone.life's side and is not part of this repository. The line itself never goes to anone.life.

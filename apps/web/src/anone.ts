@@ -1,4 +1,5 @@
-// anone.life 开放 API 的客户端（可选）：借脸、说话。接口说明见 docs/ANONE_API.md。
+// anone.life 开放 API 的客户端（可选）：借脸、让脸跟着声音动。接口说明见 docs/ANONE_API.md。
+// 发给 anone.life 的只有情绪、脸、开口时刻和时长；台词和声音都留在这边。
 // key 只存在这个浏览器里，只发给 anone.life。没填 key 时这个文件里的东西都不会被调用。
 
 export interface AnoneSettings { base: string; key: string }
@@ -31,12 +32,12 @@ export interface Face {
 }
 
 export interface TimelineEvent { atMs: number; clip: string; startFrame?: number; loop: boolean; fallback?: string }
+/** 放一句要的东西：本机合成好的声音 + anone.life 给的时间表。 */
 export interface Spoken {
   audio: { format: "wav"; sampleRate: number; durationMs: number; onsetMs: number; trimmedMs: number; base64: string };
   timeline: TimelineEvent[];
   emotion: Emotion;
   face: string;
-  usage: { linesToday: number; linesLimit: number; pointsCharged: number };
 }
 
 export class AnoneError extends Error {
@@ -61,8 +62,14 @@ export function listFaces(s: AnoneSettings): Promise<Face[]> {
 }
 export const resetFaces = () => { facesCache = null; };
 
-export function speak(s: AnoneSettings, body: { text: string; emotion: Emotion; faceId: string; lang?: "en" | "zh" | "ja" }): Promise<Spoken> {
-  return call<Spoken>(s, "/v1/1t/speak", { method: "POST", body: JSON.stringify(body) });
+export interface Animated { timeline: TimelineEvent[]; emotion: Emotion; face: string; usage: { linesToday: number; linesLimit: number; pointsCharged: number } }
+
+/**
+ * 只发情绪、脸、开口时刻和时长，拿回时间表。**台词不发给 anone.life**——
+ * 台词只给你自己的模型和你自己的 TTS（voice.ts），声音也在本机量（audio.ts）。
+ */
+export function animate(s: AnoneSettings, body: { emotion: Emotion; faceId: string; onsetMs: number; durationMs: number }): Promise<Animated> {
+  return call<Animated>(s, "/v1/1t/animate", { method: "POST", body: JSON.stringify(body) });
 }
 
 /**

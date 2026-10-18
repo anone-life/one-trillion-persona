@@ -106,11 +106,11 @@ Click **SillyTavern card (.json)** on the result page and import it in SillyTave
 - When SillyTavern asks, **import the embedded lorebook**. The four faces live there and trigger on keywords.
 - The card is about 4K tokens. With a reasoning model, raise **Response length** so the reply isn't cut off after the thinking.
 
-## Optional: give them a face and a voice (anone.life, paid)
+## Optional: give them a face and a voice
 
 You don't need this. Everything above works without it.
 
-With an [anone.life](https://www.anone.life) API key, your character can borrow one of anone.life's animated faces and a voice. Each reply is spoken aloud, lip-synced, with an expression that matches the line. Get a key at anone.life → `/console`, then paste it under **Model**. Each spoken line costs 1 point (5 stamps) from your anone.life account. Your persona never leaves your browser: each request sends only one line, its emotion, and the face id. Details: [docs/ANONE_API.md](docs/ANONE_API.md).
+With a free [anone.life](https://www.anone.life) API key, your character can borrow one of anone.life's animated faces. Add your own TTS key (xAI or OpenAI) and each reply is spoken aloud, lip-synced, with an expression that matches the line. Get the anone.life key at anone.life → `/console`, then paste both keys under **Model**. Your persona and your character's lines never reach anone.life: your browser voices each line with your TTS provider, and anone.life only gets the emotion, the face id, and when the voice starts and stops. Details: [docs/ANONE_API.md](docs/ANONE_API.md).
 
 ## Command line
 

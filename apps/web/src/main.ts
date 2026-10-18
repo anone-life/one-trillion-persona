@@ -10,7 +10,8 @@ import {
 } from "@1t-persona/designer/browser";
 import { cardInputFromPersona, packAnone, readAnone, toCardV2 } from "@1t-persona/files";
 import { DEV_PROXY, PRESETS, loadSettings, modelFrom, ready, saveSettings, type Settings } from "./llm.ts";
-import { AnoneError, EMOTIONS, anoneReady, listFaces, loadAnone, resetFaces, saveAnone, speak, spokenText, takeEmotion, type Face } from "./anone.ts";
+import { AnoneError, EMOTIONS, anoneReady, listFaces, loadAnone, resetFaces, saveAnone, spokenText, takeEmotion, type Face } from "./anone.ts";
+import { loadVoice, saveVoice, voiceLine, voiceReady, type VoiceProvider } from "./voice.ts";
 import { Stage } from "./player.ts";
 import { aboutContent } from "./about.ts";
 import { retunePanel } from "./retune.ts";
@@ -610,6 +611,7 @@ function characterView(id: string) {
   if (live) listFaces(anone).then((f) => drawFaceBar(f), (e) => drawFaceBar(null, t("face.loadFail", { msg: (e as Error).message })));
   drawFaceBar(null);
 
+  let silentHinted = false;
   /** 对着聊天记录的最后一句（他说的）生成她的回复；发消息和「从这句重来」共用。 */
   const respond = async () => {
     if (busy) return;
@@ -627,10 +629,13 @@ function characterView(id: string) {
         if (line) {
           status.textContent = t("char.speaking", { name: c.name });
           try {
-            const spoken = await speak(anone, { text: line.slice(0, 300), emotion, faceId: face.id, lang: c.lang ?? "en" });
+            // 台词只给玩家自己的 TTS；anone.life 只收情绪、脸、开口时刻和时长
+            const voice = loadVoice();
+            const spoken = await voiceLine(anone, voice, face, { text: line.slice(0, 300), emotion, lang: c.lang ?? "en" });
+            if (!voiceReady(voice) && !silentHinted) { silentHinted = true; log.append(h("div", { class: "bubble sys" }, t("face.silent"))); }
             await stage.play(spoken); // 时间表最后一段就是 idle，不用再切
           } catch (e) {
-            const msg = e instanceof AnoneError && e.status === 402 ? t("face.noStamps") : t("face.voiceFail", { msg: (e as Error).message });
+            const msg = e instanceof AnoneError && e.status === 429 ? t("face.dailyLimit") : t("face.voiceFail", { msg: (e as Error).message });
             log.append(h("div", { class: "bubble sys" }, msg));
             stage.idle();
           }
@@ -698,9 +703,17 @@ function settingsView(next: string | null, error: string | null) {
   );
 }
 
-/** 可选：anone.life 的 key——有了它，角色能借 anone.life 的脸边说边动（付费）。 */
+/**
+ * 可选：anone.life 的 key（借脸）+ 你自己的 TTS key（出声）。
+ * 台词只发给你自己的 TTS；anone.life 只收情绪、脸、开口时刻和时长（docs/ANONE_API.md）。
+ * 一个「保存」键存两样——第一次用的人曾经存错了地方。
+ */
 function anoneSection() {
   const a = loadAnone();
+  const v = loadVoice();
+  const provider = h("select", { class: "input", onchange: (e: Event) => { v.provider = (e.target as HTMLSelectElement).value as VoiceProvider; } },
+    ...(["none", "xai", "openai"] as const).map((p) => h("option", { value: p, ...(v.provider === p ? { selected: true } : {}) }, t(`voice.provider.${p}`))));
+  const voiceKey = h("input", { class: "input mono", type: "password", autocomplete: "off", value: v.key, placeholder: "xai-… / sk-…", oninput: (e: Event) => { v.key = (e.target as HTMLInputElement).value; } });
   const msg = h("div", { class: "muted" });
   const base = h("input", { class: "input mono", value: a.base, oninput: (e: Event) => { a.base = (e.target as HTMLInputElement).value; } });
   const key = h("input", { class: "input mono", type: "password", autocomplete: "off", value: a.key, placeholder: "ak_…", oninput: (e: Event) => { a.key = (e.target as HTMLInputElement).value; } });
@@ -711,10 +724,13 @@ function anoneSection() {
     clipStrip(t("promo.facesTitle"), t("promo.facesNote"), ["x02", "x03", "x04", "x09"]),
     h("div", { class: "field" }, h("label", {}, t("anone.address")), base),
     h("div", { class: "field" }, h("label", {}, t("anone.key")), key),
+    h("p", { class: "muted" }, t("voice.lead")),
+    h("div", { class: "field" }, h("label", {}, t("voice.provider")), provider),
+    h("div", { class: "field" }, h("label", {}, t("voice.key")), voiceKey),
     h("div", { class: "row", style: "margin-top:10px" },
-      h("button", { class: "btn primary", onclick: () => { saveAnone(a); resetFaces(); msg.textContent = anoneReady(loadAnone()) ? t("settings.saved") : t("anone.savedNotKey"); } }, t("settings.save")),
+      h("button", { class: "btn primary", onclick: () => { saveAnone(a); saveVoice(v); resetFaces(); msg.textContent = anoneReady(loadAnone()) ? t("settings.saved") : t("anone.savedNotKey"); } }, t("settings.save")),
       h("button", { class: "btn", onclick: async () => {
-        saveAnone(a); resetFaces(); msg.textContent = t("anone.checking");
+        saveAnone(a); saveVoice(v); resetFaces(); msg.textContent = t("anone.checking");
         try { const f = await listFaces(loadAnone()); msg.textContent = t("anone.works", { n: f.length }); }
         catch (e) { msg.textContent = t("anone.failed", { msg: (e as Error).message }); }
       } }, t("settings.test")),
