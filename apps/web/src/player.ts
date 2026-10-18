@@ -71,6 +71,9 @@ export class Stage {
     if (face && idle) void this.show(face.clips.idle[0] ?? "idle", 0, true);
   }
 
+  /** 这段片子在这个浏览器里会用哪个地址（演示要提前下载，第 24 步）。 */
+  clipUrl(clip: string, fallback?: string): string { return this.url(clip, fallback); }
+
   private url(clip: string, fallback?: string): string {
     const f = this.face!;
     const hasMp4 = !clip.startsWith("face_");

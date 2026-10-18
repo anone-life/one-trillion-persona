@@ -30,7 +30,10 @@ export default defineConfig(({ command }) => ({
         }
       : undefined,
   },
+  // 线上版奇人照片 / 桌宠抠图的地址前缀（rare/assets.stub.ts；第 21 步）。自己部署的人可以换成自己的，或设空字符串不用。
+  build: { target: "es2022" },
   define: {
+    __RARE_BASE__: JSON.stringify(process.env.ONE_T_RARE_BASE ?? "https://d1gjo8gsizey84.cloudfront.net/anone/1t/rare"),
     __DEV_PROXY__: JSON.stringify(!!target),
     // anone.life 托管的那份（挂在 /1t/）只用 Grok（xAI）TTS；开源自己部署的可以换（第 22 步）
     __GROK_ONLY__: JSON.stringify(!!process.env.ONE_T_GROK_ONLY || process.env.ONE_T_BASE === "/1t/"),

@@ -84,6 +84,8 @@ class HitTest {
     const nx = Math.floor((x - r.left) / r.scale), ny = Math.floor((y - r.top) / r.scale);
     try {
       if (media instanceof HTMLImageElement) {
+        // 图还没解码完就画，读到的全是透明——而且会被缓存住（线上版图在 CDN、来得慢，第一次判总是空的）：没完成就按矩形算、不缓存
+        if (!media.complete) return true;
         if (this.imgFor !== media) {
           this.imgFor = media; this.imgPixels = null;
           this.canvas.width = natural.w; this.canvas.height = natural.h;
@@ -116,7 +118,8 @@ function figureFor(c: SavedCharacter | null, liveReady: boolean): Figure {
   if (!c) return { kind: "portrait", src: ELISE_PORTRAIT, crossOrigin: inShell() };
   if (c.rareId) {
     const cut = rareCutout(c.rareId);
-    if (cut) return { kind: "portrait", src: cut, crossOrigin: false };
+    // 线上版的抠图在 CDN（另一个来源）：按 CORS 加载才读得了像素（点击穿透），CloudFront 回 `*`
+    if (cut) return { kind: "portrait", src: cut, crossOrigin: /^https?:/.test(cut) };
     const photo = rarePhoto(c.rareId);
     if (photo) return { kind: "card", src: photo };
     return { kind: "none", note: t("rare.voiceOnly") };

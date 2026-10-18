@@ -121,6 +121,12 @@ export function playDemo(p: DemoPerson, onDone?: (to: "settings" | null) => void
     if (over) return;
     const face: Face = { id: pack.face.id, label: p.name[L], gender: p.gender, voice: "", base: `${anoneBase()}${pack.face.path}`, poster: demoPoster(p), formats: pack.face.formats, clips: pack.face.clips };
     stage.setFace(face, false);
+    // 入场那 10 秒里把后面要用的片子整段下进浏览器缓存（片子 immutable；每段 1–2MB）：第一次来的人 CDN 是冷的，
+    // 不先下，说话片子会比声音晚半秒（线上实测 312–703ms，第 24 步）。藏着的 <video preload> 只缓冲一小段，不够。
+    // 要 anone.life 的 /avatar/ 那一跳 302 带跨域头（web_companion server.ts，2026-10-18 加的），别的域名上的开源版才下得了。
+    const later = [...new Set([...pack.lines.flatMap((x) => x.timeline.slice(1).map((e) => stage.clipUrl(e.clip, e.fallback))), stage.clipUrl(pack.exit.clip)])];
+    const warm = Promise.all(later.map((u) => fetch(u).then((r) => r.arrayBuffer()).catch(() => null)));
+    const warmed = () => Promise.race([warm, sleep(4000)]);
     sub.textContent = "";
 
     // 字幕：跟着每句开口出、说完留一会儿
@@ -130,6 +136,7 @@ export function playDemo(p: DemoPerson, onDone?: (to: "settings" | null) => void
       await stage.playOnce(x.clip, audio.get(x.audio)!, x.audioAtMs, x.clipMs, caption(x.text, x.speechMs[0]));
     };
     await tr(pack.enter);
+    await warmed();
     for (const line of pack.lines) {
       if (over) return;
       await sleep(250);
