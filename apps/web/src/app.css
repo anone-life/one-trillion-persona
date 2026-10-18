@@ -692,3 +692,11 @@ body[data-layout="pet"] .shell-back { display: none; }
 .limit-card .btn { width: 100%; }
 .limit-card .limit-note { margin: 0; font-size: 12px; }
 @media (max-width: 860px) { .cs-chat .composer.limit-card { pointer-events: auto; margin: 0 12px max(10px, env(safe-area-inset-bottom)); padding: 12px; border-radius: 14px; background: var(--paper-2); border: 1px solid var(--rule); } }
+
+/* 「下载桌宠」（第 24 步）：按这台电脑挑一个 zip */
+.desk-dl { display: grid; gap: 8px; margin: 14px 0 4px; padding: 14px 16px; background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); }
+.desk-dl > b { font-family: var(--mincho); font-size: 16px; }
+.desk-dl-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.desk-dl-buttons .btn { text-decoration: none; }
+.desk-dl-buttons:empty { display: none; }
+.desk-dl p { margin: 0; font-size: 13px; line-height: 1.6; }

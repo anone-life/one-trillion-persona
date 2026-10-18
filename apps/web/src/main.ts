@@ -11,7 +11,8 @@ import {
 import { cardInputFromPersona, packAnone, toCardV2 } from "@1t-persona/files";
 import { makeBackup } from "./backup.ts";
 import { importFile } from "./importer.ts";
-import { RELEASES_URL, inShell, leavePet, petView } from "./pet.ts";
+import { inShell, leavePet, petView } from "./pet.ts";
+import { desktopDownload } from "./desktop-download.ts";
 import { DEV_PROXY, PRESETS, loadSettings, modelFrom, ready, saveSettings, type Settings } from "./llm.ts";
 import { anoneReady, listFaces, loadAnone, resetFaces, saveAnone, takeEmotion, type AnoneSettings, type Face } from "./anone.ts";
 import { GROK_ONLY, VOICES, defaultVoice, loadVoice, saveVoice, voiceReady, type VoiceProvider } from "./voice.ts";
@@ -584,7 +585,8 @@ function libraryView() {
     h("div", { class: "row", style: "margin-top:14px" }, h("button", { class: "btn primary", onclick: () => go("#/") }, t("lib.new")), h("button", { class: "btn", onclick: () => file.click() }, t("lib.import")),
       all.length ? h("button", { class: "btn", onclick: exportAll }, t("lib.exportAll")) : null, file),
     err,
-    all.length ? h("p", { class: "muted lib-desk" }, ...(inShell() ? [t("lib.deskShell")] : [t("lib.deskA"), h("a", { href: RELEASES_URL, target: "_blank", rel: "noopener" }, t("lib.deskLink")), t("lib.deskB")])) : null,
+    // 桌宠里只说「导出全部」怎么用；网页 / 手机上出「下载桌宠」按钮，按这台电脑挑 Mac（Apple 芯片 / Intel）或 Windows（第 24 步）
+    inShell() ? (all.length ? h("p", { class: "muted lib-desk" }, t("lib.deskShell")) : null) : desktopDownload(),
     // 第 23 步：分组——anone.life 的人（会动）、奇人、你造的
     h("section", { class: "lib-group" }, h("h2", {}, t("lib.anoneTitle")), h("p", { class: "muted" }, t("lib.anoneNote")),
       anonePeople.length ? h("div", { class: "lib" }, ...anonePeople.map(item))
