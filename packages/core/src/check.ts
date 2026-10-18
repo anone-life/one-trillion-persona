@@ -18,7 +18,8 @@ export const MAX_NAME_LENGTH = 32;
 const MINOR_PATTERNS: RegExp[] = [
   /\b(?:1[0-7]|[1-9])[- ]?(?:years?[- ]old|y\/?o)\b/i,
   /\b(?:aged?|age:?)\s*(?:1[0-7]|[1-9])\b/i,
-  /\b(?:seventeen|sixteen|fifteen|fourteen|thirteen|twelve)[- ]?(?:years?[- ]old)?\b/i,
+  // 数字词后面紧跟单位（分钟、楼层、英寸、年……）时不是年龄；但 years old / year-old / years of age 照算（step18_adult_gate_units.md）
+  /\b(?:seventeen|sixteen|fifteen|fourteen|thirteen|twelve)\b(?![- ](?:minutes?|hours?|seconds?|days?|weeks?|months?|floors?|stor(?:e?y|ies|eys)|inch(?:es)?|foot|feet|miles?|yards?|pounds?|dollars?|bucks?|times|years?(?![- ](?:old|of age)\b))\b)/i,
   /\b(?:high[- ]?school(?:er)?|middle[- ]school(?:er)?|junior[- ]high|elementary[- ]school|grade[- ]school)\b/i,
   /\b(?:school ?girl|school ?boy|teenager|teen|underage|under[- ]age|loli|shota)\b/i,
   // 「minor」「child」本身太常见（a minor setback / treats the car like a child），只认说的是角色本人的写法

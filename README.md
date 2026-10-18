@@ -28,16 +28,16 @@ We went through a full year of r/SillyTavernAI (2025-10-17 to 2026-10-16, 13,054
 Three things stand out:
 
 - **64%** of the complaints are things 1T Persona and anone.life fix, fully or in part. Only 18% is truly out of our hands.
-- **32% of the people who blame the model** (291 of 921 posts) are really describing a prompt problem: breaking character, speaking for them, being too nice. That's the part 1T writes.
+- **32% of the people who blame the model** (291 of 921 posts) are really describing a prompt problem: breaking character, speaking for them, being too nice. That's the part 1T Persona writes.
 - **Refusals and censorship nearly doubled**, from 6.7% to 12.5% of complaints in the last nine months. That's why anone.life runs on open models, for adults only.
 
 This counts people who post, not every player. The full table, row by row, is in [docs/DESIGN.md §0](docs/DESIGN.md); rerun it with `tools/st_pain_survey.ts`.
 
-## The 1T method
+## The 1T Persona method
 
-**Not a better prompt template. A method for building a person.** Most tools describe a character with adjectives, and adjectives melt into the model. 1T builds a person the way personality psychology describes one: motives, what they cost, and what the person does in each situation. Bazi gives the motives a grammar; seven outer layers give the person a world.
+**Not a better prompt template. A method for building a person.** Most tools describe a character with adjectives, and adjectives melt into the model. 1T Persona builds a person the way personality psychology describes one: motives, what they cost, and what the person does in each situation. Bazi gives the motives a grammar; seven outer layers give the person a world.
 
-| The complaint | What 1T does instead |
+| The complaint | What 1T Persona does instead |
 |---|---|
 | Every character sounds the same, and agrees too easily | One motive with two sides: what they want, what it costs them, and what would break them |
 | They stop being themselves: after a while, they break character | "She's stubborn" is an adjective, and a model forgets it in a few turns. "Push her, and she walks out" is a rule, and a model can play it |

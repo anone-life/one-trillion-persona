@@ -78,6 +78,11 @@ test("成年闸：抓得住未成年说法，放过回忆和否定", () => {
   assert.equal(minorMentions("Owns a 1978 Mercedes that he treats like a child.").length, 0);
   assert.equal(minorMentions("His voice drops like he's speaking to a child.").length, 0);
   assert.equal(minorMentions("It was a minor setback.").length, 0);
+  // 英文数字词后面跟着单位不是年龄（step18）；年龄写法照拦
+  for (const ok of ["It's a twelve-minute walk from the station.", "I get fifteen minutes a night.", "They've been married twelve years.",
+    "She's holding a twelve-inch wrench.", "The building has fourteen floors.", "He spent fifteen years on a trading floor.", "She married a barrister fifteen years older."]) assert.equal(minorMentions(ok).length, 0, ok);
+  for (const bad of ["She is a fifteen-year-old runaway.", "She is sixteen years old.", "She was seventeen and still at home.",
+    "A twelve year old girl runs the stall.", "He is fifteen years of age.", "The doors open on fourteen and she gets in."]) assert.ok(minorMentions(bad).length > 0, bad);
   assert.ok(minorMentions("She is a minor.").length > 0);
   assert.ok(minorMentions("He's still a kid.").length > 0);
   const k = buildSkeleton({ seed: SEED, overrides: { "body.age_look": "23-27" } });

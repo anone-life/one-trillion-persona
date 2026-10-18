@@ -17,21 +17,21 @@ We went through every post in r/SillyTavernAI from 2025-10-17 to 2026-10-16: 13,
 |---|---|---|---|
 | The model got worse, or broke | 324 | 12% | Not us (model and provider) |
 | Refuses and censors | 306 | 11% | Partly anone.life: open models chosen for role-play refuse far less (but a third of these posts are about open models). Adults only (18+); never minors |
-| Doesn't play the prompt: breaks character, speaks for you, too positive | 291 | 11% | Partly 1T: it writes the character's part of the prompt as rules a model can follow |
-| Stock phrases and repetition | 286 | 11% | Partly 1T (rules of speech; not yet measured) |
-| Too hard to set up and tune | 278 | 10% | 1T (runs in the browser) + anone.life (open the site and talk) |
-| They forget | 244 | 9% | anone.life (1T keeps only the last 30 messages, on purpose) |
-| Every character sounds the same, and agrees too easily | 192 | 7% | **1T**: this page is about that |
-| Too expensive: tokens burn too fast | 160 | 6% | Not us, and 1T makes it a little worse: a 1T card is ~4K tokens on every reply |
-| Good characters are hard to find, or to write | 93 | 3% | **1T**: a seed plus a few lines of chat |
+| Doesn't play the prompt: breaks character, speaks for you, too positive | 291 | 11% | Partly 1T Persona: it writes the character's part of the prompt as rules a model can follow |
+| Stock phrases and repetition | 286 | 11% | Partly 1T Persona (rules of speech; not yet measured) |
+| Too hard to set up and tune | 278 | 10% | 1T Persona (runs in the browser) + anone.life (open the site and talk) |
+| They forget | 244 | 9% | anone.life (1T Persona keeps only the last 30 messages, on purpose) |
+| Every character sounds the same, and agrees too easily | 192 | 7% | **1T Persona**: this page is about that |
+| Too expensive: tokens burn too fast | 160 | 6% | Not us, and 1T Persona makes it a little worse: its cards are ~4K tokens on every reply |
+| Good characters are hard to find, or to write | 93 | 3% | **1T Persona**: a seed plus a few lines of chat |
 | No face, no voice | 19 | 1% | anone.life |
-| Passive: they never take the lead | 19 | 1% | 1T (wants that drive them) + anone.life (messages you first) |
+| Passive: they never take the lead | 19 | 1% | 1T Persona (wants that drive them) + anone.life (messages you first) |
 | None of the above | 478 | 18% | |
 
 Three things stand out:
 
 - **64%** of the complaints are things 1T Persona and anone.life fix, fully or in part. Only 18% is truly out of our hands.
-- **A third of the "blame the model" posts are really prompt problems** (291 of 921): breaking character, speaking for the user, being too nice. That's the part of the prompt 1T writes.
+- **A third of the "blame the model" posts are really prompt problems** (291 of 921): breaking character, speaking for the user, being too nice. That's the part of the prompt 1T Persona writes.
 - **Refusals nearly doubled**, from 6.7% to 12.5% of complaints, comparing the first three months with the last nine. anone.life runs on open models, for adults only.
 
 This counts people who post, not every player. Rerun it with `tools/st_pain_survey.ts`.
