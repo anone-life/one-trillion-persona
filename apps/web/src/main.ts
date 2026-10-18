@@ -70,7 +70,8 @@ function masthead(active: string) {
   return h("div", { class: "masthead" },
     h("a", { class: "mark", href: "#/about", "aria-label": "あのね" }),
     h("div", { class: "by" }, h("b", {}, "あのね"), "  open source 01"),
-    h("nav", {}, inShell() ? link("#/pet", t("pet.nav")) : null, link("#/about", t("nav.about")), link("#/", t("nav.new")), link("#/rare", t("rare.nav")), link("#/library", t("nav.library")), link("#/settings", t("nav.model")),
+    // 奇人排第一、介绍改叫「怎么做的」排后面（第 27 步）；手机上这一排横向滑动，不折行
+    h("nav", {}, inShell() ? link("#/pet", t("pet.nav")) : null, link("#/rare", t("nav.rare")), link("#/", t("nav.new")), link("#/library", t("nav.library")), link("#/about", t("nav.about")), link("#/settings", t("nav.model")),
       h("span", { class: "langs" }, ...LANG_OPTIONS.map((o) => h("button", {
         class: `lang${o.id === lang() ? " on" : ""}`, "aria-pressed": String(o.id === lang()),
         onclick: () => { if (o.id !== lang()) { setLang(o.id); route(); } },
@@ -909,7 +910,13 @@ function firstVisit(): boolean {
   try { return !localStorage.getItem(SEEN_ABOUT) && listCharacters().length === 0; } catch { return false; }
 }
 
+declare const __LANDING__: string;
+/** 不带 #/… 打开时落在哪一页（vite.config.ts）：托管版是 "rare"，开源版是 "about"（只在第一次）。 */
+const LANDING = typeof __LANDING__ !== "undefined" ? __LANDING__ : "about";
+
 function route() {
+  // 托管版（anone.life/1t）：光秃秃的地址一律先进奇人角色库；点「新建」是 #/，照常进新建页
+  if (LANDING === "rare" && !location.hash) history.replaceState(null, "", "#/rare");
   if (firstVisit()) { history.replaceState(null, "", "#/about"); return aboutView(); }
   const hash = location.hash || "#/";
   const seed = /^#seed=([0-9A-Za-z-]+)/.exec(hash);

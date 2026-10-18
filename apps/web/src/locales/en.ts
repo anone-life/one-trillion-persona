@@ -3,6 +3,7 @@ const en = {
   "nav.new": "New",
   "nav.library": "Mine",
   "nav.model": "Model",
+  "nav.rare": "Once in a Lifetime",
 
   "start.eyebrow": "One-Trillion Persona",
   "start.h1a": "Every seed is ",
@@ -173,7 +174,7 @@ const en = {
   "anone.removed": "Removed.",
 
   // 首页 #/about（第 11 步）
-  "nav.about": "About",
+  "nav.about": "How it works",
   "about.eyebrow": "One-Trillion Persona · あのね open source 01",
   "about.h1a": "Every seed is ",
   "about.h1em": "someone",
@@ -356,9 +357,10 @@ const en = {
   "edit.innerLink": "change the birthday.",
 
   // 奇人页（第 16 步）
-  "rare.nav": "Rare characters",
+  "rare.nav": "Once in a Lifetime",
   "rare.eyebrow": "A hundred of a trillion",
-  "rare.title": "People you'll almost never meet",
+  "rare.title": "100 strangers you'll meet only once",
+  "rare.sub": "Pick one and they speak first. Bring your own model key.",
   "rare.lead": "Each one is an ordinary choice on every layer. What makes them rare is how the layers rub against each other: a telegraph engineer in 1905, a doctor who can't practise medicine, a preacher with no body. Every combination here is one 1T can actually roll.",
   "rare.relTitle": "You and them",
   "rare.rel1": "You've never met. Every story here starts at a first meeting, and where it goes is up to the conversation.",

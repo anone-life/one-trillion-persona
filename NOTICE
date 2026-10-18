@@ -14,3 +14,10 @@ or required at runtime; they are only used by the scripts in tools/.
 packages/core/test/fixtures/oracle-pillars.json contains reference Four
 Pillars computed with lunar_python 1.4.8 (tools/gen_oracle_pillars.py),
 used only by tests.
+
+Characters and pictures
+-----------------------
+The rare characters in examples/ (persona.txt, card.json, photo.webp) and the
+pictures in docs/assets/ (rare-grid.jpg, surfaces.jpg, social-preview.jpg,
+demo.gif) are licensed under CC BY-NC 4.0, not Apache-2.0:
+https://creativecommons.org/licenses/by-nc/4.0/

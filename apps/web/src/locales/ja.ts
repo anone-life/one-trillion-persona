@@ -4,6 +4,7 @@ const ja: Record<keyof typeof en, string> = {
   "nav.new": "新しく",
   "nav.library": "マイキャラ",
   "nav.model": "モデル",
+  "nav.rare": "一期一会",
 
   "start.eyebrow": "One-Trillion Persona",
   "start.h1a": "どの種も、",
@@ -174,7 +175,7 @@ const ja: Record<keyof typeof en, string> = {
   "anone.removed": "削除しました。",
 
   // 首页 #/about（第 11 步）
-  "nav.about": "紹介",
+  "nav.about": "しくみ",
   "about.eyebrow": "One-Trillion Persona · あのね オープンソース 01",
   "about.h1a": "シードひとつに、",
   "about.h1em": "ひとりの人",
@@ -357,9 +358,10 @@ const ja: Record<keyof typeof en, string> = {
   "edit.innerLink": "誕生日を変える。",
 
   // 奇人页（第 16 步）
-  "rare.nav": "奇人キャラ一覧",
+  "rare.nav": "一期一会",
   "rare.eyebrow": "一兆人のうちの百人",
-  "rare.title": "ふだん、まず出会えない人たち",
+  "rare.title": "一生に一度だけ会える、百人の他人",
+  "rare.sub": "選ぶと、向こうから話しかけてくる。モデルのキーはご自分のものを。",
   "rare.lead": "どの層の値もありふれている。珍しいのは層どうしの食い違いだ。1905年に電信機を直す女性、医者ではない医者、体のない伝道者。ここにある組み合わせは、どれも1Tが実際に引けるものだ。",
   "rare.relTitle": "あなたと、その人",
   "rare.rel1": "二人は初対面。どの話も出会いから始まり、その先は会話しだい。",

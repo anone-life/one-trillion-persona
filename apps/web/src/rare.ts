@@ -51,7 +51,9 @@ function card(r: Rare, layers: ReturnType<typeof localizedLayers>, talk?: RareTa
   const c = el("article", { class: `rare-card${can ? " can" : ""}`, id: `rare-${r.id}`, ...(can ? { tabindex: "0", role: "button", "aria-label": `${name} · ${t("rare.talk")}` } : {}) },
     el("div", { class: "rc-img" },
       src ? el("img", { src, alt: name, loading: "lazy" }) : el("div", { class: "rc-blank", "aria-hidden": "true" }, [...name][0] ?? ""),
-      el("span", { class: "rc-n" }, r.id)),
+      el("span", { class: "rc-n" }, r.id),
+      // 鼠标停上来时浮出 TA 的第一句话（第 27 步）；只在能悬停的设备上显示，见 app.css
+      el("div", { class: "rc-q", "aria-hidden": "true" }, r.first[L])),
     el("div", { class: "rc-body" },
       el("h3", {}, name),
       el("div", { class: "rc-title" }, r.name[L]),
@@ -115,14 +117,24 @@ export function rareContent(go: (hash: string) => void, talk?: RareTalk): HTMLEl
     clear.hidden = [...picked.values()].every((s) => s.size === 0);
   }
   apply();
-  return [
-    el("div", { class: "eyebrow" }, t("rare.eyebrow")),
-    el("h1", {}, t("rare.title")),
+  // 第 27 步：标题区压成一行高（标题 + 一句话在左、按钮在右），卡片第一屏就露出来；
+  // 原来的长导语和「你和 TA」三条收进筛选条右边的开关，点开才看
+  const how = el("a", { class: "btn-link rare-how", href: "#/about" }, t("nav.about"));
+  const rel = el("section", { class: "rare-rel", id: "rare-rel" },
     el("p", { class: "lead" }, t("rare.lead")),
-    el("section", { class: "rare-rel" },
-      el("h2", {}, t("rare.relTitle")),
-      el("ol", {}, el("li", {}, t("rare.rel1")), el("li", {}, t("rare.rel2")), el("li", {}, t("rare.rel3")))),
-    el("section", { class: "rare-filters", "aria-label": t("rare.filters") }, el("div", { class: "rare-fbar" }, toggle, count, clear), body),
+    el("h2", {}, t("rare.relTitle")),
+    el("ol", {}, el("li", {}, t("rare.rel1")), el("li", {}, t("rare.rel2")), el("li", {}, t("rare.rel3"))));
+  const relToggle = el("button", { type: "button", class: "rare-reltoggle", "aria-controls": "rare-rel" });
+  const setRel = (o: boolean) => { rel.hidden = !o; relToggle.setAttribute("aria-expanded", String(o)); relToggle.textContent = `${t("rare.relTitle")} ${o ? "▾" : "▸"}`; };
+  relToggle.onclick = () => setRel(rel.hidden);
+  setRel(false);
+  const heroCta = el("button", { class: "btn primary" }, t("rare.cta"));
+  heroCta.onclick = () => go("#/");
+  return [
+    el("div", { class: "rare-hero" },
+      el("div", {}, el("div", { class: "eyebrow" }, t("rare.eyebrow")), el("h1", {}, t("rare.title")), el("p", { class: "rare-sub" }, t("rare.sub"))),
+      el("div", { class: "rare-acts" }, heroCta, how)),
+    el("section", { class: "rare-filters", "aria-label": t("rare.filters") }, el("div", { class: "rare-fbar" }, toggle, count, clear, relToggle), body, rel),
     grid,
     empty,
     el("div", { class: "rare-foot" }, el("p", { class: "muted" }, t("rare.note")), cta),

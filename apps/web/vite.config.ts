@@ -37,6 +37,8 @@ export default defineConfig(({ command }) => ({
     __DEV_PROXY__: JSON.stringify(!!target),
     // anone.life 托管的那份（挂在 /1t/）只用 Grok（xAI）TTS；开源自己部署的可以换（第 22 步）
     __GROK_ONLY__: JSON.stringify(!!process.env.ONE_T_GROK_ONLY || process.env.ONE_T_BASE === "/1t/"),
+    // 不带 #/… 打开时先落在哪：anone.life 托管的那份落在奇人角色库（用户 2026-10-18：「给人的震撼更大」），开源版照旧先看介绍
+    __LANDING__: JSON.stringify(process.env.ONE_T_LANDING ?? (process.env.ONE_T_BASE === "/1t/" ? "rare" : "about")),
     __DEV_MODEL__: JSON.stringify(process.env.ONE_T_DEV_MODEL ?? ""),
     __DEV_EXTRA_BODY__: JSON.stringify(process.env.ONE_T_DEV_EXTRA_BODY ?? ""),
   },

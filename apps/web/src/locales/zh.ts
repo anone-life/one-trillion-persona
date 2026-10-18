@@ -4,6 +4,7 @@ const zh: Record<keyof typeof en, string> = {
   "nav.new": "新建",
   "nav.library": "我的",
   "nav.model": "模型",
+  "nav.rare": "一期一会",
 
   "start.eyebrow": "One-Trillion Persona",
   "start.h1a": "每个种子都是",
@@ -174,7 +175,7 @@ const zh: Record<keyof typeof en, string> = {
   "anone.removed": "已删除。",
 
   // 首页 #/about（第 11 步）
-  "nav.about": "介绍",
+  "nav.about": "怎么做的",
   "about.eyebrow": "One-Trillion Persona · あのね 开源 01",
   "about.h1a": "每一个种子，都是",
   "about.h1em": "一个人",
@@ -357,9 +358,10 @@ const zh: Record<keyof typeof en, string> = {
   "edit.innerLink": "改生日。",
 
   // 奇人页（第 16 步）
-  "rare.nav": "奇人角色库",
+  "rare.nav": "一期一会",
   "rare.eyebrow": "一万亿个里挑出一百个",
-  "rare.title": "平时几乎遇不到的人",
+  "rare.title": "一百个此生难逢的陌生人",
+  "rare.sub": "点一个，TA 先开口。模型用你自己的 key。",
   "rare.lead": "他们每一层的取值都很普通，奇就奇在层与层错开了：1905 年修电报机的女人、不会医的医生、没有身体的布道者。这里的每一个组合，1T 都真能抽出来。",
   "rare.relTitle": "你和 TA",
   "rare.rel1": "你们素不相识。每一段都从初次见面开始，之后往哪走，由聊天决定。",
