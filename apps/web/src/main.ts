@@ -63,8 +63,33 @@ function masthead(active: string) {
   );
 }
 function page(active: string, ...children: Child[]) {
+  delete document.body.dataset.layout;
   app.replaceChildren(h("div", { class: "wrap" }, masthead(active), ...children));
   window.scrollTo(0, 0);
+}
+
+// ── 聊天的台：照 anone.life 的版式——桌面左台右聊，手机台铺满、聊天浮在上面 ──
+
+/** Elise 的立绘：只借 anone.life 那位的脸（透明底、静态），图不进本仓库，直接引用线上那张。 */
+const ELISE_PORTRAIT = "https://www.anone.life/home/02_disowned_heiress.webp";
+/** 台上放什么：透明底立绘（站在砂紋圆盘上）、照片（铺满）、或什么都没有（只留圆盘和一行字）。 */
+type Backdrop = { kind: "portrait"; src: string } | { kind: "photo"; src: string } | { kind: "none"; note?: string };
+
+function stagePage(active: string, o: { name: string; backdrop: Backdrop; live?: HTMLElement; scroll: Child[]; composer: HTMLElement }) {
+  const b = o.backdrop;
+  const art = b.kind === "portrait" ? h("img", { class: "cs-portrait", src: b.src, alt: o.name, decoding: "async" })
+    : b.kind === "photo" ? h("img", { class: "cs-photo", src: b.src, alt: o.name, decoding: "async" })
+    : b.note ? h("div", { class: "cs-note" }, b.note) : null;
+  document.body.dataset.layout = "stage";
+  app.replaceChildren(h("div", { class: "cs" }, masthead(active),
+    h("div", { class: "cs-main" },
+      h("section", { class: "cs-stage", "data-kind": b.kind }, art, o.live, h("div", { class: "cs-name" }, o.name)),
+      h("section", { class: "cs-chat" }, h("div", { class: "cs-scroll" }, ...o.scroll), o.composer))));
+}
+/** 新消息之后滚到底：台版式滚聊天栏，其余滚整页。 */
+function scrollChat(log: HTMLElement) {
+  const s = log.closest<HTMLElement>(".cs-scroll");
+  if (s) s.scrollTop = s.scrollHeight; else window.scrollTo(0, document.body.scrollHeight);
 }
 
 // ── 状态 ────────────────────────────────────────────────────────────────────
@@ -381,7 +406,7 @@ async function chatView() {
     h("div", { class: `bubble ${role}` }, role === "them" ? h("span", { class: "who" }, DESIGNER_NAME) : null, text);
   const redraw = () => {
     log.replaceChildren(...session.turns.map((t) => bubble(t.role === "designer" ? "them" : "me", t.text)), status);
-    window.scrollTo(0, document.body.scrollHeight);
+    scrollChat(log);
   };
   const run = async (what: string, fn: () => Promise<unknown>) => {
     if (busy) return;
@@ -406,12 +431,15 @@ async function chatView() {
     go("#/writing");
   });
 
-  page("#/chat",
-    h("div", { class: "eyebrow" }, t("chat.eyebrow", { name: DESIGNER_NAME, seed: draft.skeleton.seed })),
-    h("details", {}, h("summary", { class: "muted" }, t("chat.showStranger")), ...strangerCards(session.skeleton)),
-    log,
-    h("div", { class: "composer" }, h("div", { class: "in" }, box, send, done)),
-  );
+  stagePage("#/chat", {
+    name: DESIGNER_NAME, backdrop: { kind: "portrait", src: ELISE_PORTRAIT },
+    scroll: [
+      h("div", { class: "eyebrow" }, t("chat.eyebrow", { name: DESIGNER_NAME, seed: draft.skeleton.seed })),
+      h("details", {}, h("summary", { class: "muted" }, t("chat.showStranger")), ...strangerCards(session.skeleton)),
+      log,
+    ],
+    composer: h("div", { class: "composer" }, h("div", { class: "in" }, box, send, done)),
+  });
   redraw();
   if (session.turns.length === 0) await run(t("chat.readingSeed", { name: DESIGNER_NAME }), async () => { await session.open(); redraw(); });
 }
@@ -586,7 +614,7 @@ function characterView(id: string) {
       m.role === "assistant" ? h("span", { class: "who" }, c.name) : null, shown(m),
       m.role === "assistant" && i > 0 ? h("button", { class: "bubble-tool", title: t("retune.button"), onclick: () => openRetune(i) }, t("retune.button")) : null,
     )), status);
-    window.scrollTo(0, document.body.scrollHeight);
+    scrollChat(log);
   };
 
   const drawFaceBar = (faces: Face[] | null, err?: string) => {
@@ -652,14 +680,11 @@ function characterView(id: string) {
     try { await respond(); } catch { c.chat.pop(); saveCharacter(c); }
   };
   box.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); } };
-  page("#/library",
-    h("div", { class: "eyebrow" }, `${c.name} · ${c.tagline}`),
-    faceBar,
-    stage.el,
-    log,
-    retuneSlot,
-    h("div", { class: "composer" }, h("div", { class: "in" }, box, send)),
-  );
+  stagePage("#/library", {
+    name: c.name, backdrop: { kind: "none" }, live: live ? stage.el : undefined,
+    scroll: [h("div", { class: "eyebrow" }, `${c.name} · ${c.tagline}`), faceBar, log, retuneSlot],
+    composer: h("div", { class: "composer" }, h("div", { class: "in" }, box, send)),
+  });
   redraw();
 }
 

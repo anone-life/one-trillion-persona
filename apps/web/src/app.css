@@ -340,3 +340,55 @@ a.mark { display: block; }
 .btn-link:hover { color: var(--shu); }
 .removed-row { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 12px 0; padding: 10px 14px; border: 1px dashed var(--rule); border-radius: var(--radius); font-size: 13px; color: var(--ink-3); }
 .edit-note a { color: var(--shu); }
+
+/* ── 聊天的台（第 20 步）──────────────────────────────────────────────────────
+   照 anone.life 主界面（web_companion/public/styles.css 的 .shell / .stage-panel / .chat-panel）：
+   桌面左边是台、右边是聊天栏；手机上台铺满整屏，聊天浮在上面，底部渐隐。
+   台上要么是透明底立绘（站在砂紋圆盘上，静态），要么是照片（铺满），要么只有圆盘。 */
+body[data-layout="stage"] { overflow: hidden; }
+.cs { height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.cs > .masthead { margin: 0; padding: 12px 16px; }
+.cs-main { min-height: 0; display: grid; grid-template-columns: minmax(320px, 1fr) minmax(340px, 440px); gap: 16px; padding: 0 16px 16px; }
+.cs-stage { position: relative; isolation: isolate; overflow: hidden; min-height: 0;
+  background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); }
+/* 砂紋圆盘 + 朱色细环，和 anone.life 立绘台下面那一个是同一段渐变；照片铺满时不画 */
+.cs-stage:not([data-kind="photo"])::before { content: ""; position: absolute; z-index: -1; left: 50%; bottom: 3%;
+  width: min(94%, 620px); aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%;
+  background: repeating-radial-gradient(circle at 50% 50%, transparent 0 15px, var(--rule-soft) 15px 16px), radial-gradient(circle at 50% 40%, var(--paper-3), transparent 72%); }
+.cs-stage:not([data-kind="photo"])::after { content: ""; position: absolute; z-index: -1; left: 50%; bottom: calc(3% - 14px);
+  width: calc(min(94%, 620px) + 28px); aspect-ratio: 1; transform: translateX(-50%); border: 1px solid var(--shu); border-radius: 50%; opacity: .3; }
+.cs-portrait { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 96%; object-fit: contain; object-position: bottom center; }
+.cs-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+.cs-note { position: absolute; left: 0; right: 0; top: 45%; text-align: center; font-family: var(--mincho); font-size: 15px; letter-spacing: .3em; color: var(--ink-3); }
+.cs-name { position: absolute; top: 12px; left: 14px; z-index: 4; font-family: var(--mincho); font-weight: 600; font-size: 17px; text-shadow: var(--halo); }
+/* 接了 anone.life 的脸：会动的那套播放器铺满台，不再 sticky */
+.cs-stage .stage { position: absolute; inset: 0; height: auto; margin: 0; z-index: 1; background: none; }
+.cs-chat { min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); }
+.cs-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 14px; scrollbar-width: none; }
+.cs-scroll::-webkit-scrollbar { display: none; }
+.cs-chat .chat { margin: 12px 0 0; }
+.cs-chat .bubble.them { background: var(--paper-3); border-color: var(--rule-soft); }
+.cs-chat .composer { position: static; padding: 10px 12px max(10px, env(safe-area-inset-bottom)); }
+.cs-chat .composer .in { max-width: none; }
+
+@media (max-width: 860px) {
+  .cs { display: block; position: relative; overflow: hidden; }
+  .cs > .masthead { position: absolute; top: 0; left: 0; right: 0; z-index: 3; text-shadow: var(--halo); }
+  .cs-main { display: block; height: 100%; padding: 0; }
+  .cs-stage { position: absolute; inset: 0; border: none; border-radius: 0; }
+  .cs-portrait { height: 88%; }
+  .cs-name { top: auto; bottom: calc(52% + 6px); display: none; }
+  /* 透明、不接点击的一层：中间空着的地方让给台；只有记录和输入框接手指 */
+  .cs-chat { position: absolute; inset: 0; z-index: 2; border: none; border-radius: 0; justify-content: flex-end; pointer-events: none;
+    background: linear-gradient(to top, var(--paper) 0%, color-mix(in srgb, var(--paper) 76%, transparent) 18%, transparent 48%); }
+  .cs-scroll { flex: 0 1 auto; max-height: 48%; padding: 10px 12px 4px; pointer-events: auto;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28px); mask-image: linear-gradient(to bottom, transparent 0, #000 28px); }
+  .cs-chat .chat { margin: 0; }
+  .cs-scroll > .eyebrow, .cs-scroll > details > summary { text-shadow: var(--halo); color: var(--ink-2); }
+  /* 字直接压在画上：气泡半透明，字带光晕（照片比立绘花，所以不像 anone.life 那样把底色全去掉） */
+  .cs-chat .bubble.them, .cs-chat .bubble.me { background: color-mix(in srgb, var(--paper-2) 78%, transparent); border: none; text-shadow: var(--halo);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .cs-chat .bubble.me { background: color-mix(in srgb, var(--paper-mine) 82%, transparent); }
+  .cs-chat .composer { pointer-events: auto; background: transparent; border-top: none; }
+}
