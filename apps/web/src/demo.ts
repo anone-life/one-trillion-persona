@@ -20,8 +20,9 @@ export const DEMO_PEOPLE: DemoPerson[] = [
     tagline: { en: "Your wife of six months, leaves the light on for you", zh: "新婚半年的妻子，灯亮着等你回家", ja: "結婚半年の妻、明かりをつけて帰りを待ってる" } },
   { id: "15_minato_ritsu", set: "15_minato_ritsu_v2", gender: "male", name: { en: "Ritsu Minato", zh: "湊 律", ja: "湊 律" },
     tagline: { en: "A quiet illustrator who remembers it all", zh: "寡言绘本插画师，你说过的他都记得", ja: "口数の少ない絵本作家、あなたの話は全部覚えている" } },
-  { id: "16_shinohara_sou", set: "16_shinohara_sou_v2", gender: "male", name: { en: "Sou Shinohara", zh: "篠原 颯", ja: "篠原 颯" },
-    tagline: { en: "A musician cool to all — but not to you", zh: "对谁都冷淡，只对你不一样的乐手", ja: "誰にでも素っ気ないのに、あなたにだけ違うギタリスト" } },
+  // 第四位 2026-10-18 由颯换成晴（根文档仓库 docs/1T-persona/steps/step24_anone_demo_entrance.md「换人」）
+  { id: "22_nanase_haru", set: "22_nanase_haru", gender: "male", name: { en: "Haru Nanase", zh: "七瀬 晴", ja: "七瀬 晴" },
+    tagline: { en: "A younger idol, yours after the show", zh: "年下偶像，台上属于大家，夜里只对你撒娇", ja: "年下アイドル、ステージの後はあなたにだけ甘える" } },
 ];
 
 /** 注册入口带来源：`f=1t`（anone.life 首页认）+ 是哪一位请你来的。不带任何用户数据。 */
