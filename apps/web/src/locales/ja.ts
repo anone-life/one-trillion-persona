@@ -472,7 +472,7 @@ const ja: Record<keyof typeof en, string> = {
   "limit.bring": "この会話を持って anone.life へ",
   "limit.direct": "持っていかずに行く",
   "limit.again": "anone.life で続ける",
-  "limit.note": "持っていくのは、話した内容の短いまとめだけ。あなたの言葉そのものは送りません。あなたの anone.life のアカウントにだけ。",
+  "limit.note": "10往復の全文をあなたの anone.life アカウントに保存し、既存の履歴と合わせます。元の履歴は残ります。",
   "limit.done": "持っていきました。anone.life で {name} がこの続きから話します。",
   "limit.fail": "anone.life につながりませんでした：{msg}",
   "limit.locked": "{name} との 10 回はここまで",

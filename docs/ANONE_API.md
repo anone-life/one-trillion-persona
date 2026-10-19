@@ -1,15 +1,15 @@
-# anone.life API (optional, free)
+# anone.life APIs
 
-You don't need this. One-Trillion Persona makes characters and chats with them using your own model. The anone.life API adds one thing: **your character borrows an anone.life face that moves while they speak.**
+You don't need this. One-Trillion Persona makes characters and chats with them using your own model. The animation API adds **your character borrows an anone.life face that moves while they speak.**
 
 - **Get a key**: sign in at anone.life → [`/console`](https://www.anone.life/console) → *Create a key*. The key is shown once. You can have up to 3.
 - **Price**: free. Each key has a 50-lines-per-day limit, to stop abuse.
 - **The voice is yours**: lines are voiced with **your own** TTS key (xAI or OpenAI), called straight from your browser (`apps/web/src/voice.ts`). The xAI voices are the same ones the faces use on anone.life.
-- **Privacy**: anone.life never sees your character's persona or what they say. Each request carries only the emotion, the face id, when the voice starts (`onsetMs`) and how long it lasts (`durationMs`). Your browser measures those from the audio (`apps/web/src/audio.ts`). The API refuses a request that includes the text.
+- **Animation privacy**: `/animate` does not receive your character's persona or what they say. Each request carries only the emotion, the face id, when the voice starts (`onsetMs`) and how long it lasts (`durationMs`). Your browser measures those from the audio (`apps/web/src/audio.ts`). The API refuses a request that includes the text.
 
 ## Endpoints
 
-Every request needs `Authorization: Bearer ak_…`. Cross-origin requests are allowed.
+The animation endpoints below need `Authorization: Bearer ak_…`. Cross-origin requests are allowed.
 
 ### `GET /v1/1t/faces`
 
@@ -57,3 +57,13 @@ Older versions of this app sent the text and got anone.life's voice back. It sti
 | `429` | This key hit today's 50-line limit |
 
 The faces, clips and voices are anone.life's. Use them through the API, but don't download or re-host them (see [TRADEMARKS.md](../TRADEMARKS.md)).
+
+## Hosted chat and account history
+
+These services are separate from the animation API. Hosted rare-character chat receives conversation text and is subject to trial/member/stamp quotas, not the animation allowance. The app displays the applicable quota and requests an explicit choice before stamp-paid chat.
+
+- `/v1/1t/rare/transfer` stages the local rare-character transcripts the user explicitly chooses to take to anone.life; `/claim` associates the short-lived transfer token with the signed-in account. Custom characters and model keys are not uploaded. Local originals stay on the source device.
+- `/v1/1t/rare/history` reads or clears account conversations. The main site's `/encounters` surface restores them on another signed-in device and saves subsequent messages through `/v1/1t/rare/chat`.
+- `/v1/1t/handoff` appends the full ten-turn transcript for one of the four supported anone.life characters to that character's main-site history. It preserves existing history and deduplicates retries; older summary imports can be upgraded.
+
+Account history lives on anone.life's server. Local-only storage claims apply to the independent app's local library, not these optional services. Transfers must be initiated separately on each device whose local transcripts the user wants to retain in the account.

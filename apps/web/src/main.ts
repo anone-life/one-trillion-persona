@@ -1,3 +1,5 @@
+import { mainSite, accountOwner } from "./site-mode.ts";
+import { initAccountHistory, siteText } from "./account-history.ts";
 // One-Trillion Persona 网页版。页面：选维度 → 看陌生人 → 和 Elise 聊 → 写人设 → 结果 → 角色库 → 和角色聊。
 // 结构见 docs/ARCHITECTURE.md。
 import "./app.css";
@@ -70,9 +72,9 @@ function masthead(active: string) {
   const link = (href: string, label: string) => h("a", { href, "aria-current": active === href ? "page" : undefined }, label);
   return h("div", { class: "masthead" },
     h("a", { class: "mark", href: "#/about", "aria-label": "あのね" }),
-    h("div", { class: "by" }, h("b", {}, "あのね"), "  open source 01"),
+    h("div", { class: "by" }, h("b", {}, "あのね"), mainSite() ? " · 一期一会" : "  open source 01"),
     // 奇人排第一、介绍改叫「怎么做的」排后面（第 27 步）；手机上这一排横向滑动，不折行
-    h("nav", {}, inShell() ? link("#/pet", t("pet.nav")) : null, link("#/rare", t("nav.rare")), link("#/", t("nav.new")), link("#/library", t("nav.library")), link("#/about", t("nav.about")), link("#/settings", t("nav.model")),
+    h("nav", {}, mainSite() ? link("/?pick=1", siteText("主站角色", "メインの人たち", "Main cast")) : null, inShell() ? link("#/pet", t("pet.nav")) : null, link("#/rare", t("nav.rare")), mainSite() ? null : link("#/", t("nav.new")), link("#/library", t("nav.library")), mainSite() ? null : link("#/about", t("nav.about")), mainSite() ? null : link("#/settings", t("nav.model")),
       h("span", { class: "langs" }, ...LANG_OPTIONS.map((o) => h("button", {
         class: `lang${o.id === lang() ? " on" : ""}`, "aria-pressed": String(o.id === lang()),
         onclick: () => { if (o.id !== lang()) { setLang(o.id); route(); } },
@@ -81,7 +83,7 @@ function masthead(active: string) {
 }
 function page(active: string, ...children: Child[]) {
   delete document.body.dataset.layout;
-  app.replaceChildren(h("div", { class: "wrap" }, masthead(active), ...children));
+  app.replaceChildren(h("div", { class: "wrap" }, masthead(active), mainSite() ? h('p', { class: 'muted' }, siteText('与 AI 角色聊天 · 记录保存在你的账号', 'AIキャラクターとの会話 · 履歴はアカウントに保存', 'AI characters · History saved to your account')) : null, ...children));
   window.scrollTo(0, 0);
 }
 
@@ -119,7 +121,7 @@ function stagePage(active: string, o: { name: string; backdrop: Backdrop; live?:
       h("section", { class: "cs-stage", "data-kind": b.kind }, art, o.live),
       h("section", { class: "cs-chat" }, h("div", { class: "cs-scroll" }, ...o.scroll), toggle, o.composer),
       // 顶栏压在台上，但不放在台里面：台自成一层，手机上聊天层盖在台上面，「⋯」的小卡会被聊天层挡住
-      h("header", { class: "cs-head" }, h("h1", { class: "cs-name" }, o.name), h("div", { class: "cs-controls" }, more, menu)))));
+      h("header", { class: "cs-head" }, h("h1", { class: "cs-name" }, o.name, mainSite() ? h("small", { style: "font:12px sans-serif;margin-left:10px" }, "AI") : null), h("div", { class: "cs-controls" }, more, menu)))));
 }
 /** 新消息之后滚到底：台版式滚聊天栏，其余滚整页。 */
 function scrollChat(log: HTMLElement) {
@@ -562,6 +564,18 @@ function resultView(id: string) {
 // ── 6. 角色库 ───────────────────────────────────────────────────────────────
 
 function libraryView() {
+  if (mainSite()) return page('#/library',
+    h('h1', {}, siteText('聊过的人','話した人たち','Your conversations')),
+    h('p', { class: 'muted' }, siteText('完整记录保存在你的账号，换设备登录也能继续。','全履歴はアカウントに保存されます。別の端末でも続けられます。','Your full history is saved to your account, across devices.')),
+    h('div', { class: 'lib' }, ...listCharacters().map(c => h('div', { class: 'item' }, h('b', {}, c.name),
+      h('button', { class: 'btn primary', onclick: () => go(`#/c/${c.id}`) }, t('lib.talk')),
+      h('button', { class: 'btn', onclick: async () => {
+        if (!confirm(siteText('清空这位奇人的账号聊天记录？本地试用原稿不受影响。','この人とのアカウント上の履歴を消去しますか？試用時の元データは残ります。','Clear this account conversation? Original trial data stays on this device.'))) return;
+        const res = await fetch('/v1/1t/rare/history', { method: 'DELETE', headers: { 'content-type': 'application/json' }, body: JSON.stringify({accountId:accountOwner(),rareId:c.rareId,lang:c.lang}) });
+        if (res.ok) location.reload(); else alert(siteText('未能清空，请重试。','消去できませんでした。再試行してください。','Could not clear. Please retry.'));
+      } }, siteText('清空记录','履歴を消去','Clear history'))))),
+    h('a', { href: '#/rare' }, t('rare.nav')));
+
   const err = h("div", { class: "error" });
   const file = h("input", { type: "file", accept: ".anone,.json,application/x-anone,application/zip,application/json", style: "display:none" }) as HTMLInputElement;
   file.onchange = async () => {
@@ -608,9 +622,25 @@ function libraryView() {
 
 // ── 7. 和角色聊 ─────────────────────────────────────────────────────────────
 
-function characterView(id: string) {
+async function characterView(id: string): Promise<void> {
   const c = getCharacter(id);
   if (!c) return go("#/library");
+  if (mainSite() && c.rareId && !c.persona) {
+    try {
+      const data = await loadRarePersona(c.rareId, c.lang ?? lang());
+      c.persona = data.persona; c.schedule = data.schedule;
+      const [name, ...rest] = (/^# (.+)$/m.exec(c.persona)?.[1] ?? c.name).split(' · ');
+      c.name = name!; c.tagline = rest.join(' · ');
+      const rare = RARE.find(r => r.id === c.rareId);
+      if (rare) { try { c.skeleton = rareSkeleton(rare); } catch { /* historical figures without a seed */ } }
+      saveCharacter(c);
+      if (location.hash !== `#/c/${id}`) return;
+    } catch {
+      page('#/rare', h('p', {}, siteText('角色资料暂时读不到，聊天记录仍安全保存在账号里。','人物情報を取得できません。履歴はアカウントに保存されています。','Could not load this character. Your conversation is safe in your account.')),
+        h('button', { class:'btn', onclick:()=>void characterView(id) }, siteText('重试','再試行','Retry')));
+      return;
+    }
+  }
   const settings = loadSettings();
   // 一期一会没填自己的模型也能聊：走 anone.life 的免费试聊（第 28 步）；别的人照旧要先填模型
   if (!ready(settings) && !c.rareId) return go(`#/settings?next=c/${id}`);
@@ -623,7 +653,8 @@ function characterView(id: string) {
   const model = free ? freeModel(c, anone, () => { const st = freeState(); return st.ok ? st.pay : "default"; }, (q) => { quota = q; }) : modelFrom(settings);
   const rare = c.rareId ? RARE.find((r) => r.id === c.rareId) ?? null : null;
   // 奇人在别的语言下开的：界面换了语言就换到这个人这一语言的版本（人设、情境都跟着换；原来那段聊天留着）
-  if (rare && c.lang && c.lang !== lang() && hasRarePersona(rare.id, lang())) return void openRare(rare);
+  // Main-site UI language does not change the account conversation’s language/identity.
+  if (!mainSite() && rare && c.lang && c.lang !== lang() && hasRarePersona(rare.id, lang())) return void openRare(rare);
   // 第 23 步：不再换脸。会动的只有带着 anone.life 脸的人（「anone.life 的人」那四位；v0.2 时选过脸的旧角色也照旧）。
   // 奇人用自己的照片；自己造的人可以上传一张照片，都不动。
   const live = !rare && !!c.avatarId && anoneReady(anone);
@@ -713,7 +744,7 @@ function characterView(id: string) {
       await respond();
       pendingPick = false; stop = null;
     } catch (e) {
-      c.chat.pop(); saveCharacter(c); redraw();
+      c.chat.pop(); saveCharacter(c); redraw(); box.value = text;
       // 一期一会卡住了：他那句放回输入框，下面换成三选一的卡
       if (e instanceof RareStop) { stop = e.code; if (e.quota) quota = e.quota; box.value = text; }
     }
@@ -737,7 +768,7 @@ function characterView(id: string) {
       refresh: () => { stop = null; void fetchQuota(c!, anone).then((q) => { quota = q; if (!q) stop = "offline"; drawComposer(); }); },
       pick: () => { pendingPick = true; stop = null; drawComposer(); box.focus(); },
       stamps: (on) => { c!.prefs = { ...c!.prefs, stamps: on }; saveCharacter(c!); stop = null; drawComposer(); },
-      ownApi: () => go(`#/settings?next=c/${c!.id}`),
+      ownApi: () => mainSite() ? location.assign(`/1t/#/settings`) : go(`#/settings?next=c/${c!.id}`),
       open: (url) => void window.open(url, "_blank", "noopener"),
     })));
   }
@@ -766,16 +797,16 @@ function limitCard(c: SavedCharacter, anone: AnoneSettings): HTMLElement {
     try {
       const url = await get();
       if (w) { w.opener = null; w.location.href = url; } else window.open(url, "_blank", "noopener");
-      if (c.handedOffAt) characterView(c.id);
+      if ((c.handedOffAt && c.handoffVersion === 2)) characterView(c.id);
     } catch (e) { w?.close(); msg.textContent = t("limit.fail", { msg: (e as Error).message }); }
   };
   return h("div", { class: "composer limit-card" },
     h("p", { class: "limit-say" }, closingLine(c)),
-    c.handedOffAt
+    (c.handedOffAt && c.handoffVersion === 2)
       ? h("button", { class: "btn primary", type: "button", onclick: () => void openTo(() => directUrl(c, anone)) }, t("limit.again"))
       : h("button", { class: "btn primary", type: "button", onclick: () => void openTo(() => handOff(c, anone)) }, t("limit.bring")),
-    c.handedOffAt ? null : h("button", { class: "btn", type: "button", onclick: () => void openTo(() => directUrl(c, anone)) }, t("limit.direct")),
-    h("p", { class: "muted limit-note" }, c.handedOffAt ? t("limit.done", { name: c.name }) : t("limit.note")),
+    (c.handedOffAt && c.handoffVersion === 2) ? null : h("button", { class: "btn", type: "button", onclick: () => void openTo(() => directUrl(c, anone)) }, t("limit.direct")),
+    h("p", { class: "muted limit-note" }, (c.handedOffAt && c.handoffVersion === 2) ? t("limit.done", { name: c.name }) : t("limit.note")),
     msg);
 }
 
@@ -960,7 +991,7 @@ const LANDING = typeof __LANDING__ !== "undefined" ? __LANDING__ : "about";
 function route() {
   // 托管版（anone.life/1t）：光秃秃的地址一律先进奇人角色库；点「新建」是 #/，照常进新建页
   if (LANDING === "rare" && !location.hash) history.replaceState(null, "", "#/rare");
-  if (firstVisit()) { history.replaceState(null, "", "#/about"); return aboutView(); }
+  if (!mainSite() && firstVisit()) { history.replaceState(null, "", "#/about"); return aboutView(); }
   const hash = location.hash || "#/";
   const seed = /^#seed=([0-9A-Za-z-]+)/.exec(hash);
   if (seed) {
@@ -981,6 +1012,9 @@ function route() {
   leavePet();
   if (path === "/" || path === "") return startView();
   if (path === "/about") return aboutView();
+  const open = /^\/open\/(\d{1,4})$/.exec(path ?? '');
+  if (open) { const r = RARE.find(r => r.id === open[1]); if (r) return void openRare(r); }
+  if (mainSite() && !['/rare','/library'].includes(path ?? '') && !/^\/c\//.test(path ?? '')) return go('#/rare');
   if (path === "/rare") return page("#/rare", ...rareContent(go, { can: (r) => hasRarePersona(r.id, lang()), open: (r) => void openRare(r) }));
   if (path === "/stranger") return strangerView();
   if (path === "/chat") return void chatView();
@@ -992,7 +1026,9 @@ function route() {
   if (m?.[1] === "c") return characterView(m[2]!);
   startView();
 }
-window.addEventListener("hashchange", route);
-route();
+if (await initAccountHistory()) {
+  window.addEventListener("hashchange", route);
+  route();
+}
 // 第 23 步：启动时把「anone.life 的人」下载到本地（有 key 才会做；每次打开只做一次）
-void syncAnonePeopleOnce(loadAnone(), lang());
+if (!mainSite()) void syncAnonePeopleOnce(loadAnone(), lang());

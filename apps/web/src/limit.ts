@@ -1,9 +1,10 @@
+import { deviceId } from "./device-id.ts";
 // 「anone.life 的人」在 1T 里只聊 10 回合（第 25 步）：数用户发的句数，满 10 句、TA 回完那一句就停，
 // 出一张收尾卡——TA 口吻的一句 +「带着这段对话去 anone.life」/「不带，直接去」。聊天页和桌宠共用这一份。
 // 奇人、自己造的人不受影响。限制只做在网页里（聊天走用户自己的模型，不经过我们）。
-// 「带着去」：把最近 10 问 10 答发给 anone.life 的 /v1/1t/handoff，那边只存几句摘要（不存原话），
-// 用户下次在 anone.life 打开 TA，TA 接着这里的话头开口（之前在 anone.life 聊过的，只多一条记忆）。
-import { takeEmotion, type AnoneSettings } from "./anone.ts";
+// 「带着去」：用户明确选择后，把完整十轮（含开场白）发给 /v1/1t/handoff，
+// 追加到账号的主站会话，按来源去重，保留已有主站记录（step29）。
+import { type AnoneSettings } from "./anone.ts";
 import { saveCharacter, type SavedCharacter } from "./store.ts";
 
 export const TURN_LIMIT = 10;
@@ -51,16 +52,17 @@ export function closingLine(c: SavedCharacter): string {
 /** 不带对话，直接去 anone.life 上的这个人。 */
 export const directUrl = (c: SavedCharacter, s: AnoneSettings) => `${s.base}/?character=${encodeURIComponent(c.anoneId ?? "")}&f=1t`;
 
-/** 带着最近 10 问 10 答去：anone.life 回一个地址（已经带过的回 409，也带地址）。记下带过了。 */
+/** 带着完整十轮去：主站原子追加并去重；版本标记允许旧摘要用户补传原文。 */
 export async function handOff(c: SavedCharacter, s: AnoneSettings): Promise<string> {
-  const turns = c.chat.slice(-20).map((m) => ({ role: m.role, text: (m.role === "assistant" ? takeEmotion(m.content).text : m.content).slice(0, 500) })).filter((t) => t.text.trim());
+  const turns = c.chat.map((m) => ({ role: m.role, text: m.content }));
   const res = await fetch(`${s.base}/v1/1t/handoff`, {
     method: "POST",
     headers: { authorization: `Bearer ${s.key}`, "content-type": "application/json" },
-    body: JSON.stringify({ characterId: c.anoneId, lang: c.lang ?? "en", turns }),
+    body: JSON.stringify({ source: `${deviceId()}:${c.id}`, characterId: c.anoneId, lang: c.lang ?? "en", turns }),
   });
   const body = (await res.json().catch(() => ({}))) as { url?: string; message?: string };
   if ((res.ok || res.status === 409) && body.url) {
+    c.handoffVersion = 2;
     c.handedOffAt ??= new Date().toISOString();
     saveCharacter(c);
     return body.url;

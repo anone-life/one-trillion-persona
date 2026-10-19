@@ -204,10 +204,10 @@ export function petView(app: HTMLElement, id: string | null) {
   // 「anone.life 的人」聊满 10 回合的收尾（第 25 步）：TA 口吻的一句 + 带着对话去 anone.life（桌宠外壳里由主进程交给系统浏览器）
   function spentNote() {
     const go2 = async () => {
-      try { window.open(c!.handedOffAt ? directUrl(c!, anone) : await handOff(c!, anone), "_blank", "noopener"); petView(app, c!.id); }
+      try { window.open((c!.handedOffAt && c!.handoffVersion === 2) ? directUrl(c!, anone) : await handOff(c!, anone), "_blank", "noopener"); petView(app, c!.id); }
       catch (e) { note(t("limit.fail", { msg: (e as Error).message })); }
     };
-    return { text: closingLine(c!), action: { label: c!.handedOffAt ? t("limit.again") : t("limit.bring"), onclick: () => void go2() } };
+    return { text: closingLine(c!), action: { label: (c!.handedOffAt && c!.handoffVersion === 2) ? t("limit.again") : t("limit.bring"), onclick: () => void go2() } };
   }
 
   // 台

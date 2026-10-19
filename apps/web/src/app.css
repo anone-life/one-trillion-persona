@@ -571,6 +571,10 @@ html:has(body[data-layout="pet"]), body[data-layout="pet"] { background: transpa
 .pet-callout--choices button { padding: 7px 12px; }
 .pet-callout--choices button.ghost { background: transparent; border: 1px solid var(--glass-line); color: var(--pet-ink); font-weight: 400; }
 .pet-callout--choices small { color: rgba(243, 237, 227, .6); font-size: 11px; }
+/* 操作卡不能被普通字幕的固定高度和渐隐裁掉（step29，真 Electron 验证）。 */
+.pet-transcript:has(.pet-callout) { top: auto; max-height: calc(100% - 130px); overflow-y: auto;
+  justify-content: flex-start; -webkit-mask-image: none; mask-image: none; pointer-events: auto; }
+.pet-transcript:has(.pet-callout) .msg { flex-shrink: 0; }
 /* 输入台：深色胶囊，默认收起，鼠标探到底部才淡入 */
 .pet-composer { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 35; display: flex; gap: 8px; align-items: center; padding: 6px; border-radius: 999px;
   background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(12px); box-shadow: 0 10px 26px rgba(0, 0, 0, .35);

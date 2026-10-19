@@ -34,11 +34,19 @@
 
 <p align="center"><img src="docs/assets/surfaces.jpg" alt="同一个角色：在浏览器里、在手机上、站在桌面上"></p>
 
-- **浏览器**：打开 [www.anone.life/1t](https://www.anone.life/1t/)，什么都不用装。模型 key 和角色都只存在你的浏览器里。
+- **浏览器**：打开 [www.anone.life/1t](https://www.anone.life/1t/)，什么都不用装。模型 key 和本机角色库存在你的浏览器里；账号聊天记录的保存方式见下文。
 - **手机**：同一个网址，聊天铺满全屏，浮在 TA 的照片上。
 - **桌面**：Windows、macOS 上的一个小窗口，总在最上层。TA 站在屏幕边上，回话写在脚下。[下载桌面版](https://github.com/anone-life/one-trillion-persona/releases/latest)。
 
-三处各存各的角色，不会自动同步。要搬过去，在**我的 → 导出全部**，再在另一处打开那个文件。
+独立版在每台设备各存一份本机角色库。要搬过去，在**我的 → 导出全部**，再在另一处打开那个文件。
+
+### 在 anone.life 接着聊
+
+一期一会的百位奇人可以不填模型 key，使用主站提供的试聊；此时对话上下文会发送给 anone.life 生成回复。主动选择**注册 anone.life**，会把当前设备全部一期一会聊天原文上传到你登录的账号。自建角色和模型 key 不在迁移范围内，本机原稿保留。其他设备上的本机记录需要从那台设备再发起一次迁移。
+
+[anone.life → 一期一会](https://www.anone.life/encounters)把聊天保存在服务器上的账号下，换设备登录也能继续。切换界面语言不会改变已有聊天的语言归属。四位会动的主站角色也提供明确的交接按钮，把完整十轮原文追加到对应角色的主站记录，保留已有历史。
+
+在主站清空聊天不会删除独立版本机的原稿；重复导入旧记录也不会让已清空的账号记录重新出现。
 
 ## 或者，自己造一个
 
@@ -49,7 +57,7 @@
 3. **和 Elise 聊**：随时按「好了」。
 4. **读人设**：然后和 TA 聊、下载 `.anone` 文件、或导出 SillyTavern 角色卡。哪句回得不对，点下面的「这句不像 TA？调人设」：她会改人设里的一两节，你可以从那句重来，也可以撤销。
 
-所有东西都存在你的浏览器里。清除网站数据就没了，所以留好 `.anone` 文件当备份。
+自建角色与独立版本机角色库存放在浏览器里。清除网站数据会删除本机副本，所以留好 `.anone` 文件当备份；主站账号历史另存于服务器。
 
 ## 为什么 TA 们不会化在模型里
 
@@ -94,13 +102,13 @@
 
 不用也行，上面的一切都不需要它。
 
-用一个免费的 [anone.life](https://www.anone.life/?f=1t) API key，你的角色可以借 anone.life 的一张动态脸；再加上你自己的 TTS key（xAI 或 OpenAI），每句回复都会读出来、对上口型、配上合适的表情。anone.life 的 key 在 anone.life → `/console` 申请，两个 key 都填在**模型**里。你的人设和角色的台词都不会到 anone.life：浏览器用你的 TTS 服务配音，anone.life 只收到情绪、脸的编号、声音从哪开始到哪结束。细节见 [docs/ANONE_API.md](docs/ANONE_API.md)（英文）。
+用一个免费的 [anone.life](https://www.anone.life/?f=1t) API key，可以把四位会动的主站角色带到 1T；再加上你自己的 TTS key（xAI 或 OpenAI），每句回复都会读出来、对上口型、配上合适的表情。anone.life 的 key 在 anone.life → `/console` 申请，两个 key 都填在**模型**里。动画请求由浏览器用你的 TTS 服务配音，anone.life 只收到情绪、脸的编号和声音起止时间。主站试聊及主动迁移会发送对话原文，具体见上文。细节见 [docs/ANONE_API.md](docs/ANONE_API.md)（英文）。
 </details>
 
 <details>
 <summary><b>自己部署</b></summary>
 
-anone.life/1t 上的那份，就是这个仓库打包成的静态网页。它只匿名统计打开次数，别的什么都不上传。不想经过 anone.life 的话：
+anone.life/1t 上的那份，就是这个仓库打包成的静态网页。它匿名统计打开次数；主站试聊会发送对话上下文，主动交接会上传完整聊天原文，账号页面会保存后续对话。自己的模型 key 留在本机。不想经过 anone.life 的话：
 
 ```bash
 git clone https://github.com/anone-life/one-trillion-persona.git && cd one-trillion-persona

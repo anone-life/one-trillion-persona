@@ -1,6 +1,7 @@
-// 界面语言：英、中、日。第一次按浏览器语言选，之后记在 localStorage「1t.lang」。
+// 独立版保留 1t.lang；主站 /encounters 承接 companion.lang，二者不互相覆盖。
 // 词表在 locales/；层名、取值名这些在 spec/i18n/（经 @1t-persona/core 的 describe / localizedLayers 取）。
 import type { Lang } from "@1t-persona/core";
+import { mainSite } from "./site-mode.ts";
 import en from "./locales/en.ts";
 import zh from "./locales/zh.ts";
 import ja from "./locales/ja.ts";
@@ -15,7 +16,21 @@ export const LANG_OPTIONS: { id: Lang; label: string }[] = [
 /** 给模型看的语言名（写进提示词）。 */
 export const LANG_NAME: Record<Lang, string> = { en: "English", zh: "Simplified Chinese", ja: "Japanese" };
 
+const validLang = (value: string | null): value is Lang => value === "en" || value === "zh" || value === "ja";
 function detect(): Lang {
+  if (mainSite()) {
+    const explicit = new URLSearchParams(location.search).get("lang");
+    if (validLang(explicit)) {
+      // Before authentication: the login page and its return must use the same language.
+      try { localStorage.setItem("companion.lang", explicit); } catch { /* URL still works */ }
+      return explicit;
+    }
+    try {
+      const saved = localStorage.getItem("companion.lang");
+      if (validLang(saved)) return saved;
+    } catch { /* Match the main site's Japanese default. */ }
+    return "ja";
+  }
   try {
     const saved = localStorage.getItem("1t.lang");
     if (saved === "en" || saved === "zh" || saved === "ja") return saved;
@@ -32,7 +47,14 @@ export const lang = (): Lang => current;
 export function setLang(l: Lang): void {
   current = l;
   document.documentElement.lang = l === "zh" ? "zh-CN" : l;
-  try { localStorage.setItem("1t.lang", l); } catch { /* 记不住也能用 */ }
+  try { localStorage.setItem(mainSite() ? "companion.lang" : "1t.lang", l); } catch { /* 记不住也能用 */ }
+  if (mainSite()) {
+    const url = new URL(location.href);
+    if (url.searchParams.has("lang")) {
+      url.searchParams.set("lang", l);
+      history.replaceState(null, "", url.pathname + url.search + url.hash);
+    }
+  }
 }
 
 export function t(key: Key, vars: Record<string, string | number> = {}): string {

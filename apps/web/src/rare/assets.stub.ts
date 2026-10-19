@@ -3,7 +3,8 @@
 // 照片和桌宠抠图从 CDN 取（第 21 步「线上看不到奇人的图」）：开机先取一次 index.json，列在里面的才给地址。
 // 取不到（离线、自己部署没有这份）就当没有图——卡片是虚线空框、台上是圆盘，和以前一样。前缀可以用 ONE_T_RARE_BASE 换。
 declare const __RARE_BASE__: string;
-const BASE = (typeof __RARE_BASE__ === "string" ? __RARE_BASE__ : "").replace(/\/+$/, "");
+const runtimeBase = typeof window !== "undefined" ? (window as unknown as { __ONE_T_RARE_BASE__?: string }).__ONE_T_RARE_BASE__ : undefined;
+const BASE = (runtimeBase ?? (typeof __RARE_BASE__ === "string" ? __RARE_BASE__ : "")).replace(/\/+$/, "");
 
 interface RareIndex { v: string; photos: string[]; cutouts: string[]; personas?: Record<string, string[]> }
 async function loadIndex(): Promise<RareIndex | null> {

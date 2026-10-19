@@ -472,7 +472,7 @@ const zh: Record<keyof typeof en, string> = {
   "limit.bring": "带着这段对话去 anone.life",
   "limit.direct": "不带，直接去",
   "limit.again": "去 anone.life 继续",
-  "limit.note": "只带你们聊过什么的几句摘要，不带原话；只给你在 anone.life 的账号。",
+  "limit.note": "把这十轮完整原文保存到你的 anone.life 账号，与主站已有记录合并。本地原稿保留。",
   "limit.done": "已经带过去了。去 anone.life，{name} 会接着这里说。",
   "limit.fail": "连不上 anone.life：{msg}",
   "limit.locked": "和 {name} 的 10 回合用完了",

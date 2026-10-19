@@ -34,11 +34,19 @@ Eight eras, sixteen cities. Eleven are cartoons, eight are virtual idols, and fo
 
 <p align="center"><img src="docs/assets/surfaces.jpg" alt="The same character in a browser, on a phone, and standing on a desktop"></p>
 
-- **In your browser.** Open [www.anone.life/1t](https://www.anone.life/1t/). Nothing to install. Your model key and your characters stay in your browser.
+- **In your browser.** Open [www.anone.life/1t](https://www.anone.life/1t/). Nothing to install. Your model key and local character library stay in your browser; account history is described below.
 - **On your phone.** The same address. The chat goes full-screen over their picture.
 - **On your desktop.** A small always-on-top window for Windows and macOS: they stand at the edge of your screen and answer under their feet. [Download the app](https://github.com/anone-life/one-trillion-persona/releases/latest).
 
-Each place keeps its own characters. To bring them along, use **Mine → Export all** and open the file in the other place.
+The independent app keeps its own local library on each device. To move it, use **Mine → Export all** and open the file in the other place.
+
+### Continue on anone.life
+
+The hundred strangers offer a hosted trial without your own model key. This sends the conversation context to anone.life to generate replies. Choosing **Sign up for anone.life** uploads this device's full Once in a Lifetime transcripts to the account you sign in to. Your custom characters, model keys and local originals are not moved or deleted. Repeat from another device to bring over its local transcripts too.
+
+On [anone.life → Encounters](https://www.anone.life/encounters), conversations are saved on the server under your account and can be continued from another signed-in device. Changing the interface language keeps each existing conversation in its original language. The four animated anone.life characters also offer an explicit handoff of the full ten-turn conversation into that character's main-site history; existing history is preserved.
+
+Clearing a conversation on the main site clears its account history, not your independent app's local copy. Repeating an old transfer does not restore already-cleared messages.
 
 ## Or make your own
 
@@ -49,7 +57,7 @@ Each place keeps its own characters. To bring them along, use **Mine → Export 
 3. **Talk to Elise.** Press *I'm done* whenever you like.
 4. **Read the persona**, then talk to them, download the `.anone` file, or export a SillyTavern card. If a reply feels off, press **Not like them? Adjust the persona** under it: she changes one or two sections of the persona, and you can retry from that line or undo.
 
-Everything is stored in your browser. Clearing site data deletes it, so keep the `.anone` file as your backup.
+Your custom characters and independent-app library are stored in your browser. Clearing site data deletes that local copy, so keep the `.anone` file as your backup. Account history on anone.life is stored separately.
 
 ## Why they don't melt into the model
 
@@ -94,13 +102,13 @@ Click **SillyTavern card (.json)** on the result page, or take one from [`exampl
 
 You don't need this. Everything above works without it.
 
-With a free [anone.life](https://www.anone.life/?f=1t) API key, your character can borrow one of anone.life's animated faces. Add your own TTS key (xAI or OpenAI) and each reply is spoken aloud, lip-synced, with an expression that matches the line. Get the anone.life key at anone.life → `/console`, then paste both keys under **Model**. Your persona and your character's lines never reach anone.life: your browser voices each line with your TTS provider, and anone.life only gets the emotion, the face id, and when the voice starts and stops. Details: [docs/ANONE_API.md](docs/ANONE_API.md).
+With a free [anone.life](https://www.anone.life/?f=1t) API key, you can bring four of anone.life's animated characters into 1T. Add your own TTS key (xAI or OpenAI) and each reply is spoken aloud, lip-synced, with an expression that matches the line. Get the anone.life key at anone.life → `/console`, then paste both keys under **Model**. For animation requests, your browser voices each line with your TTS provider, and anone.life only gets the emotion, face id and voice timing. Hosted chat and an explicit history handoff send conversation text as described above. Details: [docs/ANONE_API.md](docs/ANONE_API.md).
 </details>
 
 <details>
 <summary><b>Run it yourself</b></summary>
 
-The hosted copy at anone.life/1t is this repository built as a static page. It counts page opens anonymously; nothing else is uploaded. If you'd rather not go through anone.life at all:
+The hosted copy at anone.life/1t is this repository built as a static page. It counts page opens anonymously. Hosted trial chat sends conversation context to anone.life; an explicit handoff uploads full transcripts, and the account page saves subsequent conversations. Your own model key stays local. If you'd rather not go through anone.life at all:
 
 ```bash
 git clone https://github.com/anone-life/one-trillion-persona.git && cd one-trillion-persona

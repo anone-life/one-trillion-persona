@@ -1,8 +1,10 @@
+import { mainSite } from "./site-mode.ts";
 // 浏览器本地存储。读写都包 try/catch：隐私模式、清了站点数据、配额满了都会抛，页面照样能用，只是存不住。
 import type { Skeleton } from "@1t-persona/core";
 import type { Schedule, Turn } from "@1t-persona/designer/browser";
 
 export interface SavedCharacter {
+  serverVersion?: number;
   id: string;
   name: string;
   age: number;
@@ -25,6 +27,7 @@ export interface SavedCharacter {
   anoneId?: string;
   /** 「anone.life 的人」聊满 10 回合后，带着对话去过 anone.life 的时刻（第 25 步） */
   handedOffAt?: string;
+  handoffVersion?: 2;
   /** 那四位的海报图（anone.life CDN 上的，角色库卡片用） */
   anonePoster?: string;
   /** 从「奇人」页开聊的：奇人编号（台上放 TA 的照片，不挑 anone.life 的脸）。第 20 步 */
@@ -35,6 +38,7 @@ export interface SavedCharacter {
   chat: { role: "user" | "assistant"; content: string }[];
 }
 
+const accountCharacters = new Map<string, SavedCharacter>();
 const KEY = "1t.characters.v1";
 const DRAFT = "1t.draft.v1";
 
@@ -55,9 +59,10 @@ function write(key: string, value: unknown): boolean {
   }
 }
 
-export const listCharacters = (): SavedCharacter[] => read<SavedCharacter[]>(KEY, []);
+export const listCharacters = (): SavedCharacter[] => mainSite() ? [...accountCharacters.values()] : read<SavedCharacter[]>(KEY, []);
 export const getCharacter = (id: string) => listCharacters().find((c) => c.id === id) ?? null;
 export function saveCharacter(c: SavedCharacter): boolean {
+  if (mainSite()) { accountCharacters.set(c.id, c); return true; }
   const all = listCharacters().filter((x) => x.id !== c.id);
   return write(KEY, [c, ...all]);
 }
